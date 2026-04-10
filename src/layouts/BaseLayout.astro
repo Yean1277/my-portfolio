@@ -1,0 +1,24 @@
+---
+import Navigation from '../components/Navigation.astro';
+import '../styles/globals.css';
+const { title, description = 'Open source projects, portfolio & creative notes with soft pastel design.' } = Astro.props;
+---
+<!DOCTYPE html>
+<html lang="zh-CN" class="h-full antialiased">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title ?? 'Personal Workspace - My Projects & Notes'}</title>
+    <meta name="description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="min-h-screen font-sans bg-background text-text-primary" style="font-family: var(--font-m-plus-rounded), sans-serif;">
+    <Navigation />
+    <slot />
+  </body>
+</html>

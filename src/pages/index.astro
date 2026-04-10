@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import HeroHeader from '../components/HeroHeader.astro';
+import ProfileCard from '../components/ProfileCard.astro';
+import BlogPost from '../components/BlogPost.astro';
+import { getCollection } from 'astro:content';
+
+const allPosts = await getCollection('posts');
+const posts = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+const categories = ['All', 'Projects', 'Anime', 'Notes', 'Design'];
+---
+<BaseLayout title="Personal Workspace - My Projects & Notes">
+  <main class="min-h-screen">
+    <HeroHeader />
+    <div class="container mx-auto px-4 mt-32 mb-24">
+      <div class="grid grid-cols-12 gap-6">
+        <aside class="col-span-12 lg:col-span-3 space-y-6">
+          <ProfileCard />
+        </aside>
+
+        <section class="col-span-12 lg:col-span-9 space-y-4">
+          <div class="rounded-[28px] glass-card border border-[#f0e3ed] shadow-soft p-6 backdrop-blur-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <p class="text-sm text-text-secondary uppercase tracking-[0.2em]">Latest Updates</p>
+                <h2 class="mt-2 text-3xl font-semibold text-[#3f3240]">My Work & Notes</h2>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <span class="badge-pill rounded-full px-4 py-2 text-xs font-semibold bg-surface text-text-secondary">{category}</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {posts.map((post) => (
+            <BlogPost {...post.data} />
+          ))}
+        </section>
+      </div>
+    </div>
+  </main>
+</BaseLayout>

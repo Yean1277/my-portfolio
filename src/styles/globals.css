@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f9f4ef;
+  --surface: #fff8f2;
+  --surface-strong: #f6ede6;
+  --text-primary: #5d4a44;
+  --text-secondary: #7b6d66;
+  --text-muted: #9e8f84;
+  --wisteria: #c44bdb;
+  --celadon: #a8d4b8;
+  --sakura: #f4c2d2;
+  --honey: #f5e6c4;
+  --mist-violet: #ebe8f5;
+  --rose-fog: #fdf0f3;
+  --border-soft: rgba(196, 155, 240, 0.25);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--text-primary);
+  --font-sans: var(--font-m-plus-rounded);
+  --font-mono: var(--font-m-plus-rounded);
+}
+
+body {
+  background: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-m-plus-rounded), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100%;
+}
+
+button, input, textarea {
+  font: inherit;
+}
+
+.shadow-soft {
+  box-shadow: 0 18px 45px rgba(115, 82, 154, 0.08);
+}
+
+.shadow-card {
+  box-shadow: 0 12px 32px rgba(140, 86, 179, 0.12);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+}
+
+.hero-bg {
+  min-height: 520px;
+  background: radial-gradient(circle at 12% 20%, rgba(196, 75, 219, 0.18), transparent 24%),
+    radial-gradient(circle at 80% 18%, rgba(244, 194, 210, 0.22), transparent 24%),
+    radial-gradient(circle at 50% 90%, rgba(168, 212, 184, 0.14), transparent 22%),
+    linear-gradient(180deg, #fff9f3 0%, #f6efe6 100%);
+}
+
+.bg-surface {
+  background-color: var(--surface);
+}
+
+.bg-surface-strong {
+  background-color: var(--surface-strong);
+}
+
+.bg-wisteria {
+  background-color: var(--wisteria);
+}
+
+.bg-wisteria-soft {
+  background-color: rgba(196, 75, 219, 0.18);
+}
+
+.bg-celadon {
+  background-color: var(--celadon);
+}
+
+.bg-celadon-soft {
+  background-color: rgba(168, 212, 184, 0.22);
+}
+
+.bg-sakura {
+  background-color: var(--sakura);
+}
+
+.bg-sakura-soft {
+  background-color: rgba(244, 194, 210, 0.28);
+}
+
+.bg-rose-fog {
+  background-color: var(--rose-fog);
+}
+
+.bg-rose-fog-soft {
+  background-color: rgba(253, 240, 243, 0.78);
+}
+
+.bg-mist-violet {
+  background-color: var(--mist-violet);
+}
+
+.bg-mist-violet-soft {
+  background-color: rgba(235, 232, 245, 0.72);
+}
+
+.bg-honey-soft {
+  background-color: rgba(245, 230, 196, 0.42);
+}
+
+.text-wisteria {
+  color: var(--wisteria);
+}
+
+.text-celadon {
+  color: var(--celadon);
+}
+
+.text-sakura {
+  color: var(--sakura);
+}
+
+.border-soft {
+  border-color: var(--border-soft);
+}
+
+.post-card {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 48px rgba(115, 82, 154, 0.14);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.badge-pill {
+  border-radius: 9999px;
+}
+
+.card-radius-lg {
+  border-radius: 24px;
+}
+
+.card-radius-xl {
+  border-radius: 32px;
+}

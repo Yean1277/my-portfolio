@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const pages = await getCollection('pages');
+const animePage = pages.find(p => p.slug === 'anime');
+
+if (!animePage) throw new Error('Anime page not found');
+const { Content } = await animePage.render();
+---
+<BaseLayout title="Anime | Personal Workspace">
+  <main class="container mx-auto px-4 mt-32 mb-24">
+    <Content />
+  </main>
+</BaseLayout>

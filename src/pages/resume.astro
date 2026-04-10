@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const pages = await getCollection('pages');
+const resumePage = pages.find(p => p.slug === 'resume');
+
+if (!resumePage) throw new Error('Resume page not found');
+const { Content } = await resumePage.render();
+---
+<BaseLayout title="Resume | Personal Workspace">
+  <main class="container mx-auto px-4 mt-32 mb-24">
+    <Content />
+  </main>
+</BaseLayout>

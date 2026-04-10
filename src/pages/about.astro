@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const pages = await getCollection('pages');
+const aboutPage = pages.find(p => p.slug === 'about');
+
+if (!aboutPage) throw new Error('About page not found');
+const { Content } = await aboutPage.render();
+---
+<BaseLayout title="About | Personal Workspace">
+  <main class="container mx-auto px-4 mt-32 mb-24">
+    <Content />
+  </main>
+</BaseLayout>
