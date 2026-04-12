@@ -1,24 +1,34 @@
 ---
 import Navigation from '../components/Navigation.astro';
 import '../styles/globals.css';
-const { title, description = 'Open source projects, portfolio & creative notes with soft pastel design.' } = Astro.props;
+const { title, description = 'Open source projects, portfolio & creative notes with the Fidelity design system.' } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="zh-CN" class="h-full antialiased">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title ?? 'Personal Workspace - My Projects & Notes'}</title>
+    <title>{title ?? 'Personal Workspace - Fidelity Theme'}</title>
     <meta name="description" content={description} />
+    
+    <!-- Google Fonts: Plus Jakarta Sans as per DESIGN.md -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
   </head>
-  <body class="min-h-screen font-sans bg-background text-text-primary" style="font-family: var(--font-m-plus-rounded), sans-serif;">
+  <body>
     <Navigation />
     <slot />
   </body>
 </html>
+
+<style is:global>
+  :root {
+    --color-primary: #39C5BB;
+    --color-bg-main: #f4f8f9;
+  }
+  
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+</style>

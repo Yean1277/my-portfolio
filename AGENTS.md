@@ -349,7 +349,7 @@ git push origin main
 - [ ] Email-to-notes feature (via GitHub Actions)
 
 ---
-
+  
 ## 📚 Architecture Documents
 
 ### Git-based CMS Philosophy

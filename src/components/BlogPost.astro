@@ -1,6 +1,10 @@
 ---
 const { title, date, category, wordCount, description, tags, image, isEncrypted } = Astro.props;
 ---
+<!-- DEPRECATED: This component uses the old pastel design system (wisteria/celadon/sakura colors).
+     The Fidelity design system (teal #39C5BB) is now the canonical design.
+     Currently replaced by inline post rendering in src/pages/index.astro.
+     When refactoring, use the Fidelity color palette: --color-primary: #39C5BB, --color-bg-primary-soft: #E8F8F7 -->
 <article class={
   `post-card group cursor-pointer overflow-hidden rounded-[28px] border border-[#f0e3ed] bg-white shadow-soft ${isEncrypted ? 'opacity-95' : ''}`
 }>

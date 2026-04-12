@@ -1,43 +1,197 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import HeroHeader from '../components/HeroHeader.astro';
-import ProfileCard from '../components/ProfileCard.astro';
-import BlogPost from '../components/BlogPost.astro';
 import { getCollection } from 'astro:content';
 
-const allPosts = await getCollection('posts');
+// 1. Fetch Dynamic Posts
+const allPosts = (await getCollection('posts')) || [];
 const posts = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
 const categories = ['All', 'Projects', 'Anime', 'Notes', 'Design'];
----
-<BaseLayout title="Personal Workspace - My Projects & Notes">
-  <main class="min-h-screen">
-    <HeroHeader />
-    <div class="container mx-auto px-4 mt-32 mb-24">
-      <div class="grid grid-cols-12 gap-6">
-        <aside class="col-span-12 lg:col-span-3 space-y-6">
-          <ProfileCard />
-        </aside>
 
-        <section class="col-span-12 lg:col-span-9 space-y-4">
-          <div class="rounded-[28px] glass-card border border-[#f0e3ed] shadow-soft p-6 backdrop-blur-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <p class="text-sm text-text-secondary uppercase tracking-[0.2em]">Latest Updates</p>
-                <h2 class="mt-2 text-3xl font-semibold text-[#3f3240]">My Work & Notes</h2>
-              </div>
-              <div class="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <span class="badge-pill rounded-full px-4 py-2 text-xs font-semibold bg-surface text-text-secondary">{category}</span>
-                ))}
+// 2. Dynamic Profile Data
+const profile = {
+  name: "Fidelity Designer",
+  tagline: '"Interface is the bridge to the heart."',
+  tags: ["UI/UX", "Astro", "Next.js", "Otaku"],
+  currentFocus: "Neo-Interface Design",
+  avatarFallback: "https://api.dicebear.com/7.x/adventurer/svg?seed=Fidelity"
+};
+
+// 3. Dynamic Music Playlist (You can add more tracks here)
+const playlist = [
+  { id: 1, title: "Secret Base", artist: "AnoHana ED", durationStr: "5:12", durationSec: 312 },
+  { id: 2, title: "Suzume", artist: "RADWIMPS", durationStr: "3:58", durationSec: 238 },
+  { id: 3, title: "Idol", artist: "YOASOBI", durationStr: "3:33", durationSec: 213 },
+  { id: 4, title: "Gurenge", artist: "LiSA", durationStr: "3:56", durationSec: 236 }
+];
+---
+
+<BaseLayout title="Portfolio // Fidelity System">
+  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- ================= SIDEBAR (Left - 4 columns) ================= -->
+      <aside class="lg:col-span-4 space-y-6">
+        
+        <!-- Profile Card -->
+        <div class="bg-white rounded-[32px] p-8 flex flex-col items-center text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div class="relative w-[110px] h-[110px] mb-5">
+            <img 
+              id="profilePic" 
+              src={profile.avatarFallback} 
+              alt={profile.name} 
+              class="w-full h-full object-cover rounded-full shadow-sm"
+            />
+            <div class="absolute bottom-1 right-1 w-6 h-6 bg-primary border-[4px] border-white rounded-full"></div>
+          </div>
+          
+          <h1 class="text-2xl font-bold mb-1 text-gray-900">{profile.name}</h1>
+          <p class="text-gray-400 text-[13px] mb-6 italic">{profile.tagline}</p>
+          
+          <div class="flex gap-2 mb-8">
+            <span class="bg-primary-soft text-primary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest">Astro</span>
+            <span class="bg-primary-soft text-primary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest">UI/UX</span>
+            <span class="bg-primary-soft text-primary px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest">Otaku</span>
+          </div>
+
+          <div class="w-full text-left pt-6 border-t border-primary-light">
+            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Directory / Pages</p>
+            <div class="space-y-3">
+               <div class="flex items-center gap-3 text-[13px] text-gray-600 font-mono">
+                 <div class="w-2 h-2 rounded-full bg-[#6EE7B7]"></div> anime.astro
+               </div>
+               <div class="flex items-center gap-3 text-[13px] text-gray-600 font-mono">
+                 <div class="w-2 h-2 rounded-full bg-[#60A5FA]"></div> projects.astro
+               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Music Player Card -->
+        <div class="bg-white rounded-[24px] p-5 flex items-center gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+          <div class="w-12 h-12 rounded-full bg-[#111] flex items-center justify-center border-[4px] border-gray-100 shrink-0" id="vinyl">
+             <div class="w-3 h-3 bg-primary rounded-full"></div>
+          </div>
+          
+          <div class="flex-1 min-w-0">
+            <p class="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mb-0.5">Now Playing</p>
+            <h4 id="trackTitle" class="text-[13px] font-bold text-gray-900 truncate">{playlist[0].title}</h4>
+            <p id="trackArtist" class="text-[10px] text-gray-400 truncate">{playlist[0].artist}</p>
+          </div>
+          
+          <button id="playBtn" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-100 text-gray-800 hover:border-primary hover:text-primary transition-colors shrink-0">
+            <svg id="playIcon" class="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+      </aside>
+
+      <!-- ================= MAIN CONTENT (Right - 8 columns) ================= -->
+      <section class="lg:col-span-8 space-y-10">
+        
+        <!-- Hero Wallpaper Immersive -->
+        <div class="relative rounded-[32px] overflow-hidden h-[420px] bg-gray-900 shadow-lg group">
+          <img 
+            id="heroWallpaper" 
+            src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop" 
+            alt="Hero Background" 
+            class="absolute inset-0 w-full h-full object-cover opacity-80"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-10 md:p-12 z-10">
+            <div class="max-w-xl">
+              <h2 class="text-4xl md:text-5xl font-extrabold mb-3 leading-tight tracking-tight text-white drop-shadow-md">
+                Crafting Digital <span class="text-primary">Experiences</span>
+              </h2>
+              <p class="text-white/80 text-sm md:text-[15px] mb-8 font-medium drop-shadow">
+                Astro-powered precision mixed with high-fidelity anime aesthetics.
+              </p>
+              <div class="flex flex-wrap gap-4">
+                <button class="bg-primary/20 backdrop-blur-md text-white border border-primary px-8 py-3 rounded-full font-bold hover:bg-primary transition-colors text-[13px]">
+                  Browse Work
+                </button>
+                <button class="bg-[#111]/80 backdrop-blur-md text-white border border-white/10 px-8 py-3 rounded-full font-bold hover:bg-white hover:text-[#111] transition-colors text-[13px]">
+                  Anime Labs
+                </button>
               </div>
             </div>
           </div>
+        </div>
 
-          {posts.map((post) => (
-            <BlogPost {...post.data} />
-          ))}
-        </section>
-      </div>
+        <!-- Latest Collections -->
+        <div>
+          <div class="flex justify-between items-end mb-6 px-2">
+            <h3 class="text-2xl font-bold text-gray-900 tracking-tight">Latest Collections</h3>
+            <a href="#" class="text-[10px] font-bold text-primary uppercase tracking-widest hover:opacity-80 transition-opacity">View All Projects</a>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {posts.length > 0 ? (
+              posts.slice(0, 2).map((post) => (
+                <a href={`/posts/${post.slug}`} class="bg-white rounded-[32px] p-8 h-56 flex flex-col justify-end shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform group no-underline">
+                   <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">{post.data.category || 'CASE STUDY'}</span>
+                   <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">{post.data.title}</h4>
+                </a>
+              ))
+            ) : (
+              <!-- Fallback to exactly match Picture 2 if no dynamic posts exist -->
+              <>
+                <div class="bg-white rounded-[32px] p-8 h-56 flex flex-col justify-end shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform cursor-pointer group">
+                   <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">Case Study</span>
+                   <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">Lumina Dashboard</h4>
+                </div>
+                <div class="bg-white rounded-[32px] p-8 h-56 flex flex-col justify-end shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform cursor-pointer group">
+                   <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">Experimental</span>
+                   <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">Cyber-Neko UI</h4>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+      </section>
     </div>
   </main>
 </BaseLayout>
+
+<script define:vars={{ playlist }}>
+  // --- Music Player Logic ---
+  const playBtn = document.getElementById('playBtn');
+  const playIcon = document.getElementById('playIcon');
+  const vinyl = document.getElementById('vinyl');
+  const titleEl = document.getElementById('trackTitle');
+  const artistEl = document.getElementById('trackArtist');
+  
+  let isPlaying = false;
+  let currentTrackIdx = 0;
+
+  function loadTrack(idx) {
+    const track = playlist[idx];
+    titleEl.textContent = track.title;
+    artistEl.textContent = track.artist;
+  }
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    
+    if (isPlaying) {
+      vinyl.classList.add('playing');
+      playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+    } else {
+      vinyl.classList.remove('playing');
+      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+    }
+  }
+
+  function nextTrack() {
+    currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
+    loadTrack(currentTrackIdx);
+    if (isPlaying) {
+      isPlaying = false;
+      togglePlay();
+    }
+  }
+
+  playBtn.addEventListener('click', togglePlay);
+  
+  // Allow clicking the vinyl to skip track
+  vinyl.addEventListener('click', nextTrack);
+  vinyl.style.cursor = 'pointer';
+</script>

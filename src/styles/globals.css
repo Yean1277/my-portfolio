@@ -3,32 +3,34 @@
 @tailwind utilities;
 
 :root {
-  --background: #f9f4ef;
-  --surface: #fff8f2;
-  --surface-strong: #f6ede6;
-  --text-primary: #5d4a44;
-  --text-secondary: #7b6d66;
-  --text-muted: #9e8f84;
-  --wisteria: #c44bdb;
-  --celadon: #a8d4b8;
-  --sakura: #f4c2d2;
-  --honey: #f5e6c4;
-  --mist-violet: #ebe8f5;
-  --rose-fog: #fdf0f3;
-  --border-soft: rgba(196, 155, 240, 0.25);
+  /* Fidelity Design System Colors */
+  --color-primary: #39C5BB;
+  --color-primary-soft: #E8F8F7;
+  --color-bg-main: #f4f8f9;
+  --color-bg-card: #ffffff;
+  --color-text-primary: #1d1d1f;
+  --color-text-secondary: #7b7b7b;
+  --color-text-muted: #b0b0b0;
+  --color-border: #e5e5e5;
+  
+  /* Legacy variables for backwards compatibility */
+  --background: #f4f8f9;
+  --surface: #ffffff;
+  --surface-strong: #f9fafb;
+  --text-primary: #1d1d1f;
+  --text-secondary: #7b7b7b;
+  --text-muted: #b0b0b0;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--text-primary);
-  --font-sans: var(--font-m-plus-rounded);
-  --font-mono: var(--font-m-plus-rounded);
+  --color-background: var(--color-bg-main);
+  --color-foreground: var(--color-text-primary);
 }
 
 body {
-  background: var(--background);
-  color: var(--text-primary);
-  font-family: var(--font-m-plus-rounded), system-ui, sans-serif;
+  background: var(--color-bg-main);
+  color: var(--color-text-primary);
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
@@ -46,11 +48,11 @@ button, input, textarea {
 }
 
 .shadow-soft {
-  box-shadow: 0 18px 45px rgba(115, 82, 154, 0.08);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 }
 
 .shadow-card {
-  box-shadow: 0 12px 32px rgba(140, 86, 179, 0.12);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
 }
 
 .glass-card {
@@ -59,80 +61,81 @@ button, input, textarea {
   border: 1px solid rgba(255, 255, 255, 0.72);
 }
 
+/* Vinyl Record Spin Animation */
+#vinyl {
+  animation: spin 4s linear infinite;
+  animation-play-state: paused;
+}
+
+#vinyl.playing {
+  animation-play-state: running;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .hero-bg {
   min-height: 520px;
-  background: radial-gradient(circle at 12% 20%, rgba(196, 75, 219, 0.18), transparent 24%),
-    radial-gradient(circle at 80% 18%, rgba(244, 194, 210, 0.22), transparent 24%),
-    radial-gradient(circle at 50% 90%, rgba(168, 212, 184, 0.14), transparent 22%),
-    linear-gradient(180deg, #fff9f3 0%, #f6efe6 100%);
+  background: 
+    radial-gradient(circle at top left, #e0f2f1 0%, transparent 40%),
+    radial-gradient(circle at bottom right, #ffffff 0%, transparent 40%);
+  background-attachment: fixed;
 }
 
 .bg-surface {
-  background-color: var(--surface);
+  background-color: var(--color-bg-card);
 }
 
 .bg-surface-strong {
-  background-color: var(--surface-strong);
+  background-color: var(--color-bg-main);
 }
 
+/* Fidelity Primary Color Utilities */
+.bg-primary {
+  background-color: var(--color-primary);
+}
+
+.bg-primary-soft {
+  background-color: var(--color-primary-soft);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.border-primary {
+  border-color: var(--color-primary);
+}
+
+.border-primary-light {
+  border-color: var(--color-primary-soft);
+}
+
+/* Legacy color utilities (deprecated - use Fidelity colors above) */
 .bg-wisteria {
-  background-color: var(--wisteria);
+  background-color: var(--color-primary);
 }
 
 .bg-wisteria-soft {
-  background-color: rgba(196, 75, 219, 0.18);
-}
-
-.bg-celadon {
-  background-color: var(--celadon);
-}
-
-.bg-celadon-soft {
-  background-color: rgba(168, 212, 184, 0.22);
-}
-
-.bg-sakura {
-  background-color: var(--sakura);
-}
-
-.bg-sakura-soft {
-  background-color: rgba(244, 194, 210, 0.28);
-}
-
-.bg-rose-fog {
-  background-color: var(--rose-fog);
-}
-
-.bg-rose-fog-soft {
-  background-color: rgba(253, 240, 243, 0.78);
-}
-
-.bg-mist-violet {
-  background-color: var(--mist-violet);
-}
-
-.bg-mist-violet-soft {
-  background-color: rgba(235, 232, 245, 0.72);
-}
-
-.bg-honey-soft {
-  background-color: rgba(245, 230, 196, 0.42);
+  background-color: var(--color-primary-soft);
 }
 
 .text-wisteria {
-  color: var(--wisteria);
+  color: var(--color-primary);
 }
 
 .text-celadon {
-  color: var(--celadon);
+  color: var(--color-primary);
 }
 
 .text-sakura {
-  color: var(--sakura);
+  color: var(--color-primary);
 }
 
 .border-soft {
-  border-color: var(--border-soft);
+  border-color: var(--color-border);
 }
 
 .post-card {
@@ -141,7 +144,7 @@ button, input, textarea {
 
 .post-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 24px 48px rgba(115, 82, 154, 0.14);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
 }
 
 .calendar-grid {

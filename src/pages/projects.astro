@@ -9,7 +9,7 @@ if (!projectsPage) throw new Error('Projects page not found');
 const { Content } = await projectsPage.render();
 ---
 <BaseLayout title="Projects | Personal Workspace">
-  <main class="container mx-auto px-4 mt-32 mb-24">
+  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
     <Content />
   </main>
 </BaseLayout>

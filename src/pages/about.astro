@@ -5,11 +5,11 @@ import { getCollection } from 'astro:content';
 const pages = await getCollection('pages');
 const aboutPage = pages.find(p => p.slug === 'about');
 
-if (!aboutPage) throw new Error('About page not found');
+if (!aboutPage) return Astro.redirect('/');
 const { Content } = await aboutPage.render();
 ---
 <BaseLayout title="About | Personal Workspace">
-  <main class="container mx-auto px-4 mt-32 mb-24">
+  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
     <Content />
   </main>
 </BaseLayout>
