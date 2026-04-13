@@ -1,8 +1,17 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
 import SidebarProfile from '../components/SidebarProfile.astro';
+import MusicPlayer from '../components/MusicPlayer.astro';
+import HeroBanner from '../components/HeroBanner.astro';
+import ProjectCollections from '../components/ProjectCollections.astro';
+import { getCollection } from 'astro:content';
 
-// Dynamic Profile Data
+// 1. Fetch Dynamic Posts
+const allPosts = (await getCollection('posts')) || [];
+const posts = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+
+// 2. Dynamic Profile Data
 const profile = {
   name: "Fidelity Designer",
   tagline: '"Interface is the bridge to the heart."',
@@ -10,21 +19,105 @@ const profile = {
   currentFocus: "Neo-Interface Design",
   avatarFallback: "https://api.dicebear.com/7.x/adventurer/svg?seed=Fidelity"
 };
+
+// 3. Dynamic Music Playlist 
+const playlist = [
+  { id: 1, title: "Secret Base", artist: "AnoHana ED", durationStr: "5:12", durationSec: 312 },
+  { id: 2, title: "Suzume", artist: "RADWIMPS", durationStr: "3:58", durationSec: 238 },
+  { id: 3, title: "Idol", artist: "YOASOBI", durationStr: "3:33", durationSec: 213 },
+  { id: 4, title: "Gurenge", artist: "LiSA", durationStr: "3:56", durationSec: 236 }
+];
 ---
 
 <BaseLayout title="Portfolio // Fidelity System">
-  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-12">
-    
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-8 w-full">
+  <!-- Navigation Header inserted outside the main grid but inside the BaseLayout -->
+  <Navigation />
+  
+  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
       
-      <aside class="md:col-span-4">
+      <!-- ================= SIDEBAR (Left - 4 columns) ================= -->
+      <aside class="lg:col-span-4 space-y-6">
         <SidebarProfile profile={profile} />
+        <MusicPlayer playlist={playlist} />
       </aside>
 
-      <section class="md:col-span-8 border-2 border-dashed border-gray-300 rounded-[32px] flex items-center justify-center p-12 bg-white/50">
-        <p class="text-gray-400 font-mono text-sm tracking-widest uppercase">Hero Banner Placeholder</p>
+      <!-- ================= MAIN CONTENT (Right - 8 columns) ================= -->
+      <section class="lg:col-span-8 space-y-10">
+        <HeroBanner />
+        <ProjectCollections posts={posts} />
       </section>
       
     </div>
   </main>
 </BaseLayout>
+
+<script>
+  // --- Dynamic Image Synthesis Logic ---
+  const apiKey = ""; 
+  const triggerBtn = document.getElementById('generate-trigger');
+  const avatarTrigger = document.getElementById('profilePicContainer');
+  const wallLoader = document.getElementById('wallpaper-loader');
+  const avatarLoader = document.getElementById('avatar-loader');
+
+  async function generateImage(prompt: string, elementId: string, loaderEl: HTMLElement | null) {
+    if (loaderEl) loaderEl.classList.remove('hidden');
+    
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
+    
+    const attemptFetch = async (retries = 0) => {
+      try {
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            instances: [{ prompt }],
+            parameters: { sampleCount: 1 }
+          })
+        });
+
+        if (!response.ok) throw new Error('API Error');
+
+        const data = await response.json();
+        if (data.predictions?.[0]) {
+          const imgEl = document.getElementById(elementId) as HTMLImageElement;
+          if (imgEl) {
+            imgEl.src = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
+          }
+        }
+      } catch (e) {
+        if (retries < 5) {
+          const delay = Math.pow(2, retries) * 1000;
+          setTimeout(() => attemptFetch(retries + 1), delay);
+        } else {
+          console.error("Synthesis failed after 5 retries.");
+        }
+      } finally {
+        if (loaderEl) loaderEl.classList.add('hidden');
+      }
+    };
+
+    await attemptFetch();
+  }
+
+  // Hook up the Anime Labs button
+  if (triggerBtn) {
+    triggerBtn.addEventListener('click', () => {
+      const vibes = [
+        "Cinematic anime scenery of a futuristic floating city at sunset, highly detailed, Makoto Shinkai style, vivid colors",
+        "Peaceful anime Ghibli meadow, gentle breeze, lush green grass, bright blue sky with fluffy clouds, studio quality",
+        "Cyberpunk alleyway with neon signs glowing in rain puddles, dark atmospheric anime illustration, 8k resolution",
+        "Ethereal sci-fi landscape, giant glowing moon, crystalline structures, deep blues and purples, anime concept art"
+      ];
+      const randomVibe = vibes[Math.floor(Math.random() * vibes.length)];
+      generateImage(randomVibe, 'heroWallpaper', wallLoader);
+    });
+  }
+
+  // Click avatar to generate a new character
+  if (avatarTrigger) {
+    avatarTrigger.addEventListener('click', () => {
+      generateImage("High-end anime style profile picture, male designer character with teal highlights, techwear aesthetic, clean white background, pixiv style illustration", "profilePic", avatarLoader);
+    });
+  }
+</script>
