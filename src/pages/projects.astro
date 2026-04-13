@@ -1,11 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
-
+ 
 const pages = await getCollection('pages');
 const projectsPage = pages.find(p => p.slug === 'projects');
-
-if (!projectsPage) throw new Error('Projects page not found');
+ 
+if (!projectsPage) return Astro.redirect('/');
 const { Content } = await projectsPage.render();
 ---
 <BaseLayout title="Projects | Personal Workspace">

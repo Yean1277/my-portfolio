@@ -1,0 +1,73 @@
+---
+interface Props {
+  playlist: Array<{
+    id: number;
+    title: string;
+    artist: string;
+    durationStr: string;
+    durationSec: number;
+  }>;
+}
+
+const { playlist } = Astro.props;
+---
+<div class="bg-white rounded-[24px] p-5 flex items-center gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform">
+  <div class="w-12 h-12 rounded-full bg-[#111] flex items-center justify-center border-[4px] border-gray-100 shrink-0 vinyl-record" id="vinyl" style="cursor: pointer;">
+      <div class="w-3 h-3 bg-primary rounded-full"></div>
+  </div>
+  
+  <div class="flex-1 min-w-0">
+    <p class="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mb-0.5">Now Playing</p>
+    <h4 id="trackTitle" class="text-[13px] font-bold text-gray-900 truncate">{playlist[0].title}</h4>
+    <p id="trackArtist" class="text-[10px] text-gray-400 truncate">{playlist[0].artist}</p>
+  </div>
+  
+  <button id="playBtn" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-100 text-gray-800 hover:border-primary hover:text-primary transition-colors shrink-0 outline-none">
+    <svg id="playIcon" class="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+  </button>
+</div>
+
+<script define:vars={{ playlist }}>
+  // --- Music Player Logic ---
+  const playBtn = document.getElementById('playBtn');
+  const playIcon = document.getElementById('playIcon');
+  const vinyl = document.getElementById('vinyl');
+  const titleEl = document.getElementById('trackTitle');
+  const artistEl = document.getElementById('trackArtist');
+  
+  let isPlaying = false;
+  let currentTrackIdx = 0;
+
+  function loadTrack(idx) {
+    const track = playlist[idx];
+    titleEl.textContent = track.title;
+    artistEl.textContent = track.artist;
+  }
+
+  function togglePlay() {
+    isPlaying = !isPlaying;
+    
+    if (isPlaying) {
+      vinyl.classList.add('playing');
+      playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+      playIcon.classList.remove('ml-0.5'); // center the pause icon properly
+    } else {
+      vinyl.classList.remove('playing');
+      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+      playIcon.classList.add('ml-0.5'); // re-add optical alignment
+    }
+  }
+
+  function nextTrack() {
+    currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
+    loadTrack(currentTrackIdx);
+    if (isPlaying) {
+      // Flash the animation
+      vinyl.classList.remove('playing');
+      setTimeout(() => vinyl.classList.add('playing'), 50);
+    }
+  }
+
+  playBtn.addEventListener('click', togglePlay);
+  vinyl.addEventListener('click', nextTrack);
+</script>

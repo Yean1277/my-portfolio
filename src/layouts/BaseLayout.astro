@@ -1,34 +1,94 @@
 ---
-import Navigation from '../components/Navigation.astro';
 import '../styles/globals.css';
-const { title, description = 'Open source projects, portfolio & creative notes with the Fidelity design system.' } = Astro.props;
+
+interface Props {
+  title?: string;
+}
+const { title = "Portfolio // Fidelity System" } = Astro.props;
 ---
 <!DOCTYPE html>
-<html lang="zh-CN" class="h-full antialiased">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title ?? 'Personal Workspace - Fidelity Theme'}</title>
-    <meta name="description" content={description} />
-    
-    <!-- Google Fonts: Plus Jakarta Sans as per DESIGN.md -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet" />
-  </head>
-  <body>
-    <Navigation />
-    <slot />
-  </body>
-</html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content="Open source projects, portfolio & creative notes with the Fidelity design system." />
 
-<style is:global>
-  :root {
-    --color-primary: #39C5BB;
-    --color-bg-main: #f4f8f9;
-  }
-  
-  body {
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  }
-</style>
+  <!-- Design System Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+
+  <!-- ✅ FIXED: tailwind.config MUST be defined BEFORE the CDN script loads,
+       otherwise Tailwind initialises without your custom tokens and ignores this block entirely. -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#00D1FF',
+            'primary-soft': 'rgba(0, 209, 255, 0.1)',
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Tailwind CDN — loads AFTER the config object is defined above -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root {
+      --color-primary: #00D1FF;
+      --color-primary-soft: rgba(0, 209, 255, 0.1);
+      --color-bg-main: #F8FAFC;
+    }
+
+    body {
+      background-color: var(--color-bg-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    ::selection {
+      background-color: var(--color-primary-soft);
+      color: var(--color-primary);
+    }
+
+    /* ── Vinyl Record Spin Animation ── */
+    .vinyl-record {
+      animation: spin 4s linear infinite;
+      animation-play-state: paused;
+    }
+    .vinyl-record.playing {
+      animation-play-state: running;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* ── Loading Shimmer ── */
+    .loading-shimmer {
+      background: linear-gradient(
+        90deg,
+        transparent 25%,
+        rgba(255, 255, 255, 0.4) 50%,
+        transparent 75%
+      );
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to   { background-position: -200% 0; }
+    }
+  </style>
+</head>
+<body class="antialiased text-gray-900 min-h-full">
+  <slot />
+</body>
+</html>

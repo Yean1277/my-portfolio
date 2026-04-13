@@ -5,7 +5,7 @@ import { getCollection } from 'astro:content';
 const pages = await getCollection('pages');
 const resumePage = pages.find(p => p.slug === 'resume');
 
-if (!resumePage) throw new Error('Resume page not found');
+if (!resumePage) return Astro.redirect('/');
 const { Content } = await resumePage.render();
 ---
 <BaseLayout title="Resume | Personal Workspace">

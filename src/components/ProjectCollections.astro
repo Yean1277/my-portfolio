@@ -1,0 +1,36 @@
+---
+interface Props {
+  posts: any[];
+}
+
+const { posts } = Astro.props;
+---
+<div>
+  <div class="flex justify-between items-end mb-6 px-2">
+    <h3 class="text-2xl font-bold text-gray-900 tracking-tight">Latest Collections</h3>
+    <a href="/projects" class="text-[10px] font-bold text-primary uppercase tracking-widest hover:opacity-80 transition-opacity">View All Projects</a>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {posts.length > 0 ? (
+      posts.slice(0, 2).map((post) => (
+        <a href={`/posts/${post.slug}`} class="...">
+          <span class="...">{post.data.category || 'CASE STUDY'}</span>
+          <h4 class="...">{post.data.title}</h4>
+        </a>
+      ))
+    ) : (
+      /* ✅ Move the comment inside the parenthesis or remove it if it's causing drift */
+      <>
+        <div class="bg-white rounded-[32px] p-8 h-56 flex flex-col justify-end shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform cursor-pointer group">
+          <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">Case Study</span>
+          <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">Lumina Dashboard</h4>
+        </div>
+        <div class="bg-white rounded-[32px] p-8 h-56 flex flex-col justify-end shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform cursor-pointer group">
+          <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">Experimental</span>
+          <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">Cyber-Neko UI</h4>
+        </div>
+      </>
+    )}
+  </div>
+</div>

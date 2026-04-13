@@ -2,165 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Fidelity Design System Colors */
-  --color-primary: #39C5BB;
-  --color-primary-soft: #E8F8F7;
-  --color-bg-main: #f4f8f9;
-  --color-bg-card: #ffffff;
-  --color-text-primary: #1d1d1f;
-  --color-text-secondary: #7b7b7b;
-  --color-text-muted: #b0b0b0;
-  --color-border: #e5e5e5;
-  
-  /* Legacy variables for backwards compatibility */
-  --background: #f4f8f9;
-  --surface: #ffffff;
-  --surface-strong: #f9fafb;
-  --text-primary: #1d1d1f;
-  --text-secondary: #7b7b7b;
-  --text-muted: #b0b0b0;
+@layer base {
+  :root {
+    /* Fidelity Design System 2.0 Colors */
+    --color-primary: #00D1FF;
+    --color-primary-soft: rgba(0, 209, 255, 0.1);
+    --color-bg-main: #F8FAFC;
+    --color-bg-card: #ffffff;
+    --color-text-primary: #111827;
+    --color-text-secondary: #4B5563;
+    --color-text-muted: #9CA3AF;
+    --color-border: #F1F5F9;
+  }
+
+  body {
+    background: var(--color-bg-main);
+    color: var(--color-text-primary);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
 }
 
-@theme inline {
-  --color-background: var(--color-bg-main);
-  --color-foreground: var(--color-text-primary);
+@layer components {
+  /* ── Vinyl Record Spin Animation ── */
+  .vinyl-record {
+    animation: spin 4s linear infinite;
+    animation-play-state: paused;
+  }
+
+  .vinyl-record.playing {
+    animation-play-state: running;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ── Loading Shimmer ── */
+  .loading-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 25%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite linear;
+  }
+
+  @keyframes shimmer {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+
+  /* ── Layout Utilities ── */
+  .glass-card {
+    /* Option A (Standard CSS): Most stable for PostCSS 
+       Option B (@apply): Use @apply bg-white/80 if your PostCSS is up to date
+    */
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(24px); 
+    -webkit-backdrop-filter: blur(24px); /* Required for Safari */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+
+  .shadow-fidelity {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+  }
 }
 
-body {
-  background: var(--color-bg-main);
-  color: var(--color-text-primary);
-  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
+/* ── Global Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-* {
-  box-sizing: border-box;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-html, body {
-  min-height: 100%;
+::-webkit-scrollbar-thumb {
+  background: #E2E8F0;
+  border-radius: 10px;
 }
 
-button, input, textarea {
-  font: inherit;
-}
-
-.shadow-soft {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-}
-
-.shadow-card {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
-}
-
-.glass-card {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-}
-
-/* Vinyl Record Spin Animation */
-#vinyl {
-  animation: spin 4s linear infinite;
-  animation-play-state: paused;
-}
-
-#vinyl.playing {
-  animation-play-state: running;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.hero-bg {
-  min-height: 520px;
-  background: 
-    radial-gradient(circle at top left, #e0f2f1 0%, transparent 40%),
-    radial-gradient(circle at bottom right, #ffffff 0%, transparent 40%);
-  background-attachment: fixed;
-}
-
-.bg-surface {
-  background-color: var(--color-bg-card);
-}
-
-.bg-surface-strong {
-  background-color: var(--color-bg-main);
-}
-
-/* Fidelity Primary Color Utilities */
-.bg-primary {
-  background-color: var(--color-primary);
-}
-
-.bg-primary-soft {
-  background-color: var(--color-primary-soft);
-}
-
-.text-primary {
-  color: var(--color-primary);
-}
-
-.border-primary {
-  border-color: var(--color-primary);
-}
-
-.border-primary-light {
-  border-color: var(--color-primary-soft);
-}
-
-/* Legacy color utilities (deprecated - use Fidelity colors above) */
-.bg-wisteria {
-  background-color: var(--color-primary);
-}
-
-.bg-wisteria-soft {
-  background-color: var(--color-primary-soft);
-}
-
-.text-wisteria {
-  color: var(--color-primary);
-}
-
-.text-celadon {
-  color: var(--color-primary);
-}
-
-.text-sakura {
-  color: var(--color-primary);
-}
-
-.border-soft {
-  border-color: var(--color-border);
-}
-
-.post-card {
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
-}
-
-.post-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
-}
-
-.calendar-grid {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.badge-pill {
-  border-radius: 9999px;
-}
-
-.card-radius-lg {
-  border-radius: 24px;
-}
-
-.card-radius-xl {
-  border-radius: 32px;
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary);
 }
