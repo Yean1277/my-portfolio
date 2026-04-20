@@ -2,8 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
-const pages = await getCollection('pages');
-const resumePage = pages.find(p => p.slug === 'resume');
+const pageData = await getCollection('pageData');
+const resumePage = pageData.find(p => p.slug === 'resume');
 
 if (!resumePage) return Astro.redirect('/');
 const { Content } = await resumePage.render();

@@ -14,18 +14,18 @@ const postsCollection = defineCollection({
 });
 
 const pagesCollection = defineCollection({
-  schema: z.object({
-    title: z.string(),
+  schema: z.object({
+    title: z.string(),
     animeList: z.array(
       z.object({
         title: z.string(),
-        poster: z.string()
+        poster: z.string(),
       })
     ).optional(),
-  }),
+  }),
 });
 
 export const collections = {
   posts: postsCollection,
-  pages: pagesCollection,
+  pageData: pagesCollection,
 };
