@@ -1,32 +1,55 @@
 ---
-// HeroBanner Component
+// HeroBanner Component — Redesigned with anime.astro color palette
 ---
-<div class="relative rounded-[32px] overflow-hidden h-[420px] bg-gray-900 shadow-lg group">
+<div class="relative rounded-[32px] overflow-hidden h-[420px] bg-slate-900 shadow-[0_20px_60px_rgba(57,197,187,0.15)] group">
   <!-- Loader overlay shown while image generates -->
   <div id="wallpaper-loader" class="absolute inset-0 z-20 loading-shimmer hidden"></div>
+
+  <!-- Gradient border ring (matches anime.astro premium ring style) -->
+  <div class="absolute -inset-[2px] rounded-[34px] bg-gradient-to-br from-[#39c5bb]/60 via-orange-400/40 to-[#39c5bb]/30 -z-10 pointer-events-none"></div>
 
   <img
     id="heroWallpaper"
     src="https://images.unsplash.com/photo-1614850523296-d8c1af93d400?q=80&w=2070&auto=format&fit=crop"
     alt="Hero Background"
-    class="absolute inset-0 w-full h-full object-cover opacity-80"
+    class="absolute inset-0 w-full h-full object-cover opacity-75 transition-transform duration-700 group-hover:scale-[1.02]"
   />
-  <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent flex flex-col justify-end p-10 md:p-12 z-10">
+
+  <!-- Teal-tinted gradient overlay instead of pure black -->
+  <div class="absolute inset-0 bg-gradient-to-t from-slate-900/95 via-slate-900/40 to-[#39c5bb]/5 z-10"></div>
+
+  <!-- Decorative teal glow bottom-left -->
+  <div class="absolute bottom-0 left-0 w-64 h-32 bg-[#39c5bb]/20 blur-3xl z-10 pointer-events-none"></div>
+  <!-- Decorative orange glow top-right -->
+  <div class="absolute top-0 right-0 w-48 h-24 bg-orange-400/10 blur-3xl z-10 pointer-events-none"></div>
+
+  <div class="absolute inset-0 flex flex-col justify-end p-10 md:p-12 z-20">
     <div class="max-w-xl">
-      <h2 class="text-4xl md:text-5xl font-extrabold mb-3 leading-tight tracking-tight text-white drop-shadow-md">
-        Crafting Digital <span class="text-primary">Experiences</span>
+      <!-- Mini badge -->
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] animate-pulse"></div>
+        <span class="text-[9px] font-black text-[#39c5bb] tracking-[0.3em] uppercase">Interface × Design System</span>
+        <span class="text-orange-400 text-xs">×</span>
+        <span class="text-[9px] font-black text-slate-400 tracking-[0.2em] uppercase">Neo-Interface</span>
+      </div>
+
+      <h2 class="text-4xl md:text-5xl font-extrabold mb-3 leading-tight tracking-tight text-white drop-shadow-md font-[Plus_Jakarta_Sans,sans-serif]">
+        Crafting Digital <span class="text-[#39c5bb]">Experiences</span>
       </h2>
-      <p class="text-white/80 text-sm md:text-[15px] mb-8 font-medium drop-shadow">
+      <p class="text-white/70 text-sm md:text-[15px] mb-8 font-medium drop-shadow">
         Astro-powered precision mixed with high-fidelity anime aesthetics.
       </p>
+
       <div class="flex flex-wrap gap-4">
-        <button class="bg-primary/20 backdrop-blur-md text-white border border-primary px-8 py-3 rounded-full font-bold hover:bg-primary transition-colors text-[13px]">
+        <!-- Primary CTA: teal gradient -->
+        <button class="relative bg-gradient-to-r from-[#39c5bb] to-[#2ba8a0] text-white px-8 py-3 rounded-full font-bold text-[13px] shadow-[0_4px_20px_rgba(57,197,187,0.4)] hover:shadow-[0_4px_28px_rgba(57,197,187,0.6)] hover:-translate-y-0.5 transition-all duration-200">
           Browse Work
         </button>
-        <!-- ✅ FIXED: added id="generate-trigger" so the script in index.astro can find this button -->
+
+        <!-- Secondary CTA: orange accent -->
         <button
           id="generate-trigger"
-          class="bg-[#111]/80 backdrop-blur-md text-white border border-white/10 px-8 py-3 rounded-full font-bold hover:bg-white hover:text-[#111] transition-colors text-[13px] flex items-center gap-2"
+          class="relative bg-orange-500/20 backdrop-blur-md text-orange-300 border border-orange-400/50 px-8 py-3 rounded-full font-bold text-[13px] hover:bg-orange-500/30 hover:text-white hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
         >
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -36,4 +59,15 @@
       </div>
     </div>
   </div>
+
+  <!-- Corner serial badge (mirrors anime.astro serial badge style) -->
+  <div class="absolute top-4 right-4 px-2.5 py-1 bg-orange-500/80 backdrop-blur-sm rounded-lg border border-white/20 z-30">
+    <span class="text-[9px] font-mono text-white font-bold">HRO-001</span>
+  </div>
+  <div class="absolute top-4 left-4 px-2.5 py-1 bg-[#39c5bb]/80 backdrop-blur-sm rounded-lg border border-white/20 z-30">
+    <span class="text-[9px] font-black text-white italic">LIVE</span>
+  </div>
+
+  <!-- Hover shimmer overlay -->
+  <div class="pointer-events-none absolute inset-0 rounded-[32px] bg-gradient-to-br from-white/0 via-orange-100/10 to-[#39c5bb]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-20"></div>
 </div>

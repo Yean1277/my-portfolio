@@ -1,21 +1,35 @@
 ---
-// Navigation Component
+// Navigation Component — Redesigned with anime.astro palette
 ---
 <nav class="max-w-[1100px] mx-auto flex justify-between items-center mb-12 px-6 pt-10">
-  <div class="text-2xl font-black tracking-tight text-primary">FIDELITY.</div>
-  <div class="hidden md:flex space-x-8 font-medium text-[13px] text-gray-500 items-center">
-    <div class="flex flex-col items-center text-primary">
-      <a href="/">Index</a>
-      <div class="w-3 h-[2px] bg-primary mt-1 rounded-full"></div>
-    </div>
-    <a href="/projects" class="hover:text-gray-900 transition-colors">Projects</a>
-    <a href="/anime" class="hover:text-gray-900 transition-colors">Anime Labs</a>
-    <a href="/resume" class="hover:text-gray-900 transition-colors">Resume</a>
-    <a href="/about" class="hover:text-gray-900 transition-colors">About</a>
+  <!-- Logo: teal gradient text -->
+  <div class="text-2xl font-black tracking-tight bg-gradient-to-r from-[#39c5bb] to-[#2ba8a0] bg-clip-text text-transparent">
+    FIDELITY.
   </div>
-  <div class="flex items-center gap-6">
-    <span class="text-[9px] font-bold text-gray-400 tracking-widest uppercase hidden lg:block">Astro_Sys_v1.0</span>
-    <button class="bg-[#111] text-white px-6 py-2.5 rounded-full text-[13px] font-bold hover:scale-105 transition-transform">
+
+  <!-- Nav links -->
+  <div class="hidden md:flex space-x-8 font-medium text-[13px] text-slate-500 items-center">
+    <div class="flex flex-col items-center text-[#39c5bb] font-bold">
+      <a href="/">Index</a>
+      <div class="w-3 h-[2px] bg-[#39c5bb] mt-1 rounded-full"></div>
+    </div>
+    <a href="/projects" class="hover:text-slate-900 transition-colors">Projects</a>
+    <a href="/anime" class="hover:text-[#39c5bb] transition-colors flex items-center gap-1">
+      Anime Labs
+      <span class="text-[8px] bg-orange-100 text-orange-500 font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">New</span>
+    </a>
+    <a href="/resume" class="hover:text-slate-900 transition-colors">Resume</a>
+    <a href="/about" class="hover:text-slate-900 transition-colors">About</a>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <!-- System version tag (matches anime.astro stat badge style) -->
+    <div class="hidden lg:flex items-center gap-2 bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-200">
+      <div class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] animate-pulse"></div>
+      <span class="text-[9px] font-bold text-slate-400 tracking-widest uppercase">Astro_Sys_v1.0</span>
+    </div>
+    <!-- CTA button: slate dark with teal hover glow -->
+    <button class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-[13px] font-bold hover:scale-105 hover:shadow-[0_4px_20px_rgba(57,197,187,0.3)] transition-all duration-200">
       Contact
     </button>
   </div>

@@ -11,30 +11,48 @@ interface Props {
 
 const { playlist } = Astro.props;
 ---
-<div class="bg-white rounded-[24px] p-5 flex items-center gap-4 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform">
-  <div class="w-12 h-12 rounded-full bg-[#111] flex items-center justify-center border-[4px] border-gray-100 shrink-0 vinyl-record" id="vinyl" style="cursor: pointer;">
-      <div class="w-3 h-3 bg-primary rounded-full"></div>
+
+<!-- Gradient border wrapper -->
+<div class="relative">
+  <div class="absolute -inset-[2px] rounded-[26px] bg-gradient-to-br from-[#39c5bb]/30 to-orange-300/20 -z-10"></div>
+
+  <div class="bg-white rounded-[24px] p-5 flex items-center gap-4 shadow-[0_8px_30px_rgba(57,197,187,0.08)] hover:-translate-y-1 transition-transform">
+
+    <!-- Vinyl disc: now slate-900 with teal center -->
+    <div
+      class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center border-[3px] border-[#39c5bb]/20 shrink-0 vinyl-record relative"
+      id="vinyl"
+      style="cursor: pointer;"
+    >
+      <!-- Teal center dot -->
+      <div class="w-3 h-3 bg-[#39c5bb] rounded-full shadow-[0_0_8px_rgba(57,197,187,0.8)]"></div>
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <p class="text-[9px] font-black text-[#39c5bb] uppercase tracking-[0.2em] mb-0.5">Now Playing</p>
+      <h4 id="trackTitle" class="text-[13px] font-bold text-slate-900 truncate">{playlist[0].title}</h4>
+      <p id="trackArtist" class="text-[10px] text-slate-400 truncate">{playlist[0].artist}</p>
+    </div>
+
+    <!-- Play button: teal border + hover fill -->
+    <button
+      id="playBtn"
+      class="w-10 h-10 flex items-center justify-center rounded-full border border-[#39c5bb]/30 text-slate-700 hover:border-[#39c5bb] hover:text-[#39c5bb] hover:bg-[#39c5bb]/10 transition-all shrink-0 outline-none"
+    >
+      <svg id="playIcon" class="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </button>
   </div>
-  
-  <div class="flex-1 min-w-0">
-    <p class="text-[9px] font-bold text-primary uppercase tracking-[0.2em] mb-0.5">Now Playing</p>
-    <h4 id="trackTitle" class="text-[13px] font-bold text-gray-900 truncate">{playlist[0].title}</h4>
-    <p id="trackArtist" class="text-[10px] text-gray-400 truncate">{playlist[0].artist}</p>
-  </div>
-  
-  <button id="playBtn" class="w-10 h-10 flex items-center justify-center rounded-full border border-gray-100 text-gray-800 hover:border-primary hover:text-primary transition-colors shrink-0 outline-none">
-    <svg id="playIcon" class="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-  </button>
 </div>
 
 <script define:vars={{ playlist }}>
-  // --- Music Player Logic ---
   const playBtn = document.getElementById('playBtn');
   const playIcon = document.getElementById('playIcon');
   const vinyl = document.getElementById('vinyl');
   const titleEl = document.getElementById('trackTitle');
   const artistEl = document.getElementById('trackArtist');
-  
+
   let isPlaying = false;
   let currentTrackIdx = 0;
 
@@ -46,15 +64,14 @@ const { playlist } = Astro.props;
 
   function togglePlay() {
     isPlaying = !isPlaying;
-    
     if (isPlaying) {
       vinyl.classList.add('playing');
-      playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
-      playIcon.classList.remove('ml-0.5'); // center the pause icon properly
+      playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+      playIcon.classList.remove('ml-0.5');
     } else {
       vinyl.classList.remove('playing');
-      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
-      playIcon.classList.add('ml-0.5'); // re-add optical alignment
+      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+      playIcon.classList.add('ml-0.5');
     }
   }
 
@@ -62,7 +79,6 @@ const { playlist } = Astro.props;
     currentTrackIdx = (currentTrackIdx + 1) % playlist.length;
     loadTrack(currentTrackIdx);
     if (isPlaying) {
-      // Flash the animation
       vinyl.classList.remove('playing');
       setTimeout(() => vinyl.classList.add('playing'), 50);
     }

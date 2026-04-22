@@ -1,4 +1,15 @@
 declare module 'astro:content' {
+	interface Render {
+		'.mdx': Promise<{
+			Content: import('astro').MarkdownInstance<{}>['Content'];
+			headings: import('astro').MarkdownHeading[];
+			remarkPluginFrontmatter: Record<string, any>;
+			components: import('astro').MDXInstance<{}>['components'];
+		}>;
+	}
+}
+
+declare module 'astro:content' {
 	interface RenderResult {
 		Content: import('astro/runtime/server/index.js').AstroComponentFactory;
 		headings: import('astro').MarkdownHeading[];
@@ -140,14 +151,36 @@ declare module 'astro:content' {
 	>;
 
 	type ContentEntryMap = {
-		"pageData": Record<string, {
-  id: string;
-  slug: string;
+		"pageData": {
+"about.mdx": {
+	id: "about.mdx";
+  slug: "about";
   body: string;
   collection: "pageData";
-  data: InferEntrySchema<"pageData">;
-  render(): Render[".md"];
-}>;
+  data: InferEntrySchema<"pageData">
+} & { render(): Render[".mdx"] };
+"anime.mdx": {
+	id: "anime.mdx";
+  slug: "anime";
+  body: string;
+  collection: "pageData";
+  data: InferEntrySchema<"pageData">
+} & { render(): Render[".mdx"] };
+"projects.mdx": {
+	id: "projects.mdx";
+  slug: "projects";
+  body: string;
+  collection: "pageData";
+  data: InferEntrySchema<"pageData">
+} & { render(): Render[".mdx"] };
+"resume.mdx": {
+	id: "resume.mdx";
+  slug: "resume";
+  body: string;
+  collection: "pageData";
+  data: InferEntrySchema<"pageData">
+} & { render(): Render[".mdx"] };
+};
 "posts": {
 "building-a-static-cms-with-git.md": {
 	id: "building-a-static-cms-with-git.md";

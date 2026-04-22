@@ -4,32 +4,122 @@ interface Props {
 }
 
 const { posts } = Astro.props;
+
+// Serial number helper (mirrors anime.astro)
+const toSerial = (i: number) => `PRJ-${String(i + 1).padStart(3, '0')}`;
+
+// Alternate card accent: even = teal, odd = orange
+const cardAccents = [
+  { ring: "from-[#39c5bb]/50 to-orange-300/30", badge: "bg-[#39c5bb]/80", label: "text-[#39c5bb]", hover: "group-hover:text-[#39c5bb]" },
+  { ring: "from-orange-400/50 to-[#39c5bb]/30",  badge: "bg-orange-500/80",  label: "text-orange-500", hover: "group-hover:text-orange-500" },
+];
 ---
+
 <div>
+  <!-- Section header -->
   <div class="flex justify-between items-end mb-6 px-2">
-    <h3 class="text-2xl font-bold text-gray-900 tracking-tight">Latest Collections</h3>
-    <a href="/projects" class="text-[10px] font-bold text-primary uppercase tracking-widest hover:opacity-80 transition-opacity">View All Projects</a>
+    <div class="flex items-center gap-3">
+      <div class="w-1 h-6 bg-gradient-to-b from-[#39c5bb] to-orange-400 rounded-full"></div>
+      <h3 class="text-2xl font-black text-slate-900 tracking-tight font-[Plus_Jakarta_Sans,sans-serif]">
+        Latest Collections
+      </h3>
+    </div>
+    <a href="/projects" class="flex items-center gap-1.5 text-[10px] font-black text-[#39c5bb] uppercase tracking-widest hover:opacity-70 transition-opacity">
+      View All
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/>
+      </svg>
+    </a>
   </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     {posts.length > 0 ? (
-      posts.slice(0, 2).map((post) => (
-        <a href={`/posts/${post.slug}`} class="...">
-          <span class="...">{post.data.category || 'CASE STUDY'}</span>
-          <h4 class="...">{post.data.title}</h4>
-        </a>
-      ))
+      posts.slice(0, 2).map((post, i) => {
+        const accent = cardAccents[i % 2];
+        return (
+          <a href={`/posts/${post.slug}`} class="relative group block">
+            <!-- Gradient border ring -->
+            <div class={`absolute -inset-[2px] rounded-[34px] bg-gradient-to-br ${accent.ring} transition-all duration-500`}></div>
+
+            <div class="relative bg-white rounded-[32px] p-8 h-56 flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-transform overflow-hidden">
+              <!-- Background watermark -->
+              <div class="absolute right-4 bottom-4 opacity-[0.04] pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                  <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                </svg>
+              </div>
+
+              <!-- Top row: serial badge -->
+              <div class="flex items-center justify-between">
+                <span class={`text-[9px] font-mono font-bold text-slate-400 tracking-widest`}>
+                  {toSerial(i)}
+                </span>
+                <div class={`px-2 py-0.5 ${accent.badge} backdrop-blur-sm rounded-md`}>
+                  <span class="text-[9px] font-black text-white uppercase tracking-wide">
+                    {post.data.category || 'Case Study'}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Title -->
+              <div>
+                <div class="flex items-center gap-1 mb-1.5">
+                  <svg xmlns="http://www.w3.org/2000/svg" class={`w-2 h-2 ${accent.label}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
+                    <line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
+                  </svg>
+                  <span class={`text-[9px] ${accent.label} font-bold tracking-[0.2em] uppercase`}>PROJECT_COLLECTION</span>
+                </div>
+                <h4 class={`text-xl font-black text-slate-900 ${accent.hover} transition-colors tracking-tight line-clamp-2 font-[Plus_Jakarta_Sans,sans-serif]`}>
+                  {post.data.title}
+                </h4>
+              </div>
+            </div>
+
+            <!-- Hover shimmer -->
+            <div class="pointer-events-none absolute inset-0 rounded-[32px] bg-gradient-to-br from-white/0 via-orange-100/20 to-[#39c5bb]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </a>
+        );
+      })
     ) : (
-      /* ✅ Move the comment inside the parenthesis or remove it if it's causing drift */
       <>
-        <div class="bg-white rounded-[32px] p-8 h-56 flex flex-col justify-end shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform cursor-pointer group">
-          <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">Case Study</span>
-          <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">Lumina Dashboard</h4>
-        </div>
-        <div class="bg-white rounded-[32px] p-8 h-56 flex flex-col justify-end shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:-translate-y-1 transition-transform cursor-pointer group">
-          <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-2 block">Experimental</span>
-          <h4 class="text-2xl font-bold text-gray-900 group-hover:text-primary transition-colors">Cyber-Neko UI</h4>
-        </div>
+        {[
+          { title: "Lumina Dashboard",  category: "Case Study",   idx: 0 },
+          { title: "Cyber-Neko UI",     category: "Experimental", idx: 1 },
+        ].map(({ title, category, idx }) => {
+          const accent = cardAccents[idx % 2];
+          return (
+            <div class="relative group cursor-pointer">
+              <div class={`absolute -inset-[2px] rounded-[34px] bg-gradient-to-br ${accent.ring} transition-all duration-500`}></div>
+
+              <div class="relative bg-white rounded-[32px] p-8 h-56 flex flex-col justify-between shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1.5 transition-transform overflow-hidden">
+                <div class="absolute right-4 bottom-4 opacity-[0.04] pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-20 h-20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                  </svg>
+                </div>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-[9px] font-mono font-bold text-slate-400 tracking-widest">{toSerial(idx)}</span>
+                  <div class={`px-2 py-0.5 ${accent.badge} backdrop-blur-sm rounded-md`}>
+                    <span class="text-[9px] font-black text-white uppercase tracking-wide">{category}</span>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex items-center gap-1 mb-1.5">
+                    <span class={`text-[9px] ${accent.label} font-bold tracking-[0.2em] uppercase`}>PROJECT_COLLECTION</span>
+                  </div>
+                  <h4 class={`text-xl font-black text-slate-900 ${accent.hover} transition-colors tracking-tight font-[Plus_Jakarta_Sans,sans-serif]`}>
+                    {title}
+                  </h4>
+                </div>
+              </div>
+
+              <div class="pointer-events-none absolute inset-0 rounded-[32px] bg-gradient-to-br from-white/0 via-orange-100/20 to-[#39c5bb]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            </div>
+          );
+        })}
       </>
     )}
   </div>

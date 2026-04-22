@@ -10,39 +10,93 @@ interface Props {
 }
 
 const { profile } = Astro.props;
+
+// Map tag → color pair  [bgClass, textClass, borderClass]
+const tagColors: Record<string, [string, string, string]> = {
+  "UI/UX":   ["bg-[#39c5bb]/10", "text-[#2ba8a0]", "border-[#39c5bb]/30"],
+  "Astro":   ["bg-orange-50",    "text-orange-500", "border-orange-200"],
+  "Next.js": ["bg-slate-100",    "text-slate-600",  "border-slate-200"],
+  "Otaku":   ["bg-orange-50",    "text-orange-500", "border-orange-200"],
+};
+const defaultTagStyle: [string, string, string] = ["bg-[#39c5bb]/10", "text-[#2ba8a0]", "border-[#39c5bb]/30"];
 ---
-<div class="bg-white rounded-[32px] p-8 flex flex-col items-center text-center shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-  <div class="relative w-[110px] h-[110px] mb-5 group cursor-pointer" id="profilePicContainer">
-    <div id="avatar-loader" class="absolute inset-0 z-10 loading-shimmer rounded-full hidden"></div>
-    <img
-      id="profilePic"
-      src={profile.avatarFallback}
-      alt={profile.name}
-      class="w-full h-full object-cover rounded-full shadow-sm group-hover:scale-105 transition-transform duration-300"
-    />
-    <div class="absolute bottom-1 right-1 w-6 h-6 bg-primary border-[4px] border-white rounded-full"></div>
-  </div>
 
-  <h1 class="text-2xl font-bold mb-1 text-gray-900">{profile.name}</h1>
-  <p class="text-gray-400 text-[13px] mb-6 italic">{profile.tagline}</p>
+<!-- Gradient border wrapper (anime.astro card ring pattern) -->
+<div class="relative">
+  <div class="absolute -inset-[2px] rounded-[34px] bg-gradient-to-br from-[#39c5bb]/40 to-orange-300/30 -z-10"></div>
 
-  <div class="flex flex-wrap justify-center gap-3 mb-8">
-  {profile.tags.map((tag) => (
-    <span class="bg-blue-50 text-blue-500 px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border border-blue-100">
-      {tag}
-    </span>
-  ))}
-</div>
+  <div class="bg-white rounded-[32px] p-8 flex flex-col items-center text-center shadow-[0_8px_40px_rgba(57,197,187,0.08)]">
 
-  <div class="w-full text-left pt-6 border-t border-gray-100">
-    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Directory / Pages</p>
-    <div class="space-y-3">
-      <div class="flex items-center gap-3 text-[13px] text-gray-600 font-mono">
-        <div class="w-2 h-2 rounded-full bg-[#6EE7B7]"></div> anime.astro
-      </div>
-      <div class="flex items-center gap-3 text-[13px] text-gray-600 font-mono">
-        <div class="w-2 h-2 rounded-full bg-[#60A5FA]"></div> projects.astro
+    <!-- Avatar -->
+    <div class="relative w-[110px] h-[110px] mb-5 group cursor-pointer" id="profilePicContainer">
+      <div id="avatar-loader" class="absolute inset-0 z-10 loading-shimmer rounded-full hidden"></div>
+
+      <!-- Teal ring around avatar -->
+      <div class="absolute -inset-[3px] rounded-full bg-gradient-to-br from-[#39c5bb] via-orange-300 to-[#39c5bb] opacity-70"></div>
+      <img
+        id="profilePic"
+        src={profile.avatarFallback}
+        alt={profile.name}
+        class="relative w-full h-full object-cover rounded-full border-[3px] border-white group-hover:scale-105 transition-transform duration-300"
+      />
+      <!-- Online dot -->
+      <div class="absolute bottom-1 right-1 w-6 h-6 bg-[#39c5bb] border-[3px] border-white rounded-full shadow-sm z-10"></div>
+    </div>
+
+    <!-- Name -->
+    <h1 class="text-2xl font-black mb-1 text-slate-900 tracking-tight font-[Plus_Jakarta_Sans,sans-serif]">
+      {profile.name}
+    </h1>
+    <!-- Tagline -->
+    <p class="text-slate-400 text-[13px] mb-6 italic">{profile.tagline}</p>
+
+    <!-- Tags -->
+    <div class="flex flex-wrap justify-center gap-2 mb-8">
+      {profile.tags.map((tag) => {
+        const [bg, text, border] = tagColors[tag] ?? defaultTagStyle;
+        return (
+          <span class={`${bg} ${text} ${border} px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border`}>
+            {tag}
+          </span>
+        );
+      })}
+    </div>
+
+    <!-- Current focus row -->
+    <div class="w-full bg-[#f1f5f9] rounded-2xl px-4 py-3 mb-6 flex items-center gap-3">
+      <div class="w-2 h-2 rounded-full bg-[#39c5bb] animate-pulse shrink-0"></div>
+      <div class="text-left">
+        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Current Focus</p>
+        <p class="text-[12px] font-bold text-slate-700">{profile.currentFocus}</p>
       </div>
     </div>
+
+    <!-- Directory section -->
+    <div class="w-full text-left pt-5 border-t border-slate-100">
+      <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+        </svg>
+        Directory / Pages
+      </p>
+      <div class="space-y-2.5">
+        <a href="/anime" class="flex items-center gap-3 text-[12px] text-slate-600 font-mono hover:text-[#39c5bb] transition-colors group/link">
+          <div class="w-2 h-2 rounded-full bg-[#39c5bb] shrink-0 group-hover/link:scale-125 transition-transform"></div>
+          anime.astro
+          <span class="ml-auto text-[9px] text-orange-400 font-black opacity-0 group-hover/link:opacity-100 transition-opacity">→</span>
+        </a>
+        <a href="/projects" class="flex items-center gap-3 text-[12px] text-slate-600 font-mono hover:text-orange-500 transition-colors group/link">
+          <div class="w-2 h-2 rounded-full bg-orange-400 shrink-0 group-hover/link:scale-125 transition-transform"></div>
+          projects.astro
+          <span class="ml-auto text-[9px] text-orange-400 font-black opacity-0 group-hover/link:opacity-100 transition-opacity">→</span>
+        </a>
+        <a href="/resume" class="flex items-center gap-3 text-[12px] text-slate-600 font-mono hover:text-slate-800 transition-colors group/link">
+          <div class="w-2 h-2 rounded-full bg-slate-300 shrink-0 group-hover/link:scale-125 transition-transform"></div>
+          resume.astro
+          <span class="ml-auto text-[9px] text-orange-400 font-black opacity-0 group-hover/link:opacity-100 transition-opacity">→</span>
+        </a>
+      </div>
+    </div>
+
   </div>
 </div>

@@ -29,27 +29,64 @@ const playlist = [
 ];
 ---
 
+<!--
+  Root background: #f1f5f9 (slate-100) — matches anime.astro exactly.
+  Font: Plus Jakarta Sans (add to BaseLayout <head> via Google Fonts).
+-->
 <BaseLayout title="Portfolio // Fidelity System">
-  <!-- Navigation Header inserted outside the main grid but inside the BaseLayout -->
-  <Navigation />
-  
-  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- ================= SIDEBAR (Left - 4 columns) ================= -->
-      <aside class="lg:col-span-4 space-y-6">
-        <SidebarProfile profile={profile} />
-        <MusicPlayer playlist={playlist} />
-      </aside>
 
-      <!-- ================= MAIN CONTENT (Right - 8 columns) ================= -->
-      <section class="lg:col-span-8 space-y-10">
-        <HeroBanner />
-        <ProjectCollections posts={posts} />
-      </section>
-      
-    </div>
-  </main>
+  <!-- Global font import (add this once in BaseLayout if not already present) -->
+  <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+  <!-- <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"> -->
+
+  <div class="min-h-screen bg-[#f1f5f9] text-slate-800">
+
+    <!-- Subtle decorative radial glows in background -->
+    <div class="fixed top-0 left-1/4 w-96 h-96 bg-[#39c5bb]/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <div class="fixed bottom-1/4 right-1/4 w-80 h-80 bg-orange-300/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+
+    <Navigation />
+
+    <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- ================= SIDEBAR (Left - 4 columns) ================= -->
+        <aside class="lg:col-span-4 space-y-5">
+          <SidebarProfile profile={profile} />
+          <MusicPlayer playlist={playlist} />
+
+          <!-- Decorative system status card -->
+          <div class="bg-white rounded-[24px] px-5 py-4 shadow-[0_4px_20px_rgba(0,0,0,0.04)] border-l-4 border-[#39c5bb]">
+            <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.25em] mb-2">系统状态 · SYSTEM</p>
+            <div class="flex items-center justify-between text-[11px] text-slate-600">
+              <span class="font-mono">Astro v4 · Live</span>
+              <div class="flex items-center gap-1.5">
+                <div class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] animate-pulse"></div>
+                <span class="text-[#39c5bb] font-bold">Online</span>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- ================= MAIN CONTENT (Right - 8 columns) ================= -->
+        <section class="lg:col-span-8 space-y-8">
+          <HeroBanner />
+          <ProjectCollections posts={posts} />
+
+          <!-- Footer-style attribution row (matches anime.astro footer) -->
+          <div class="flex items-center justify-center gap-3 pt-4 border-t border-slate-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path d="M3 20L12 4l9 16H3z"/><path d="M12 4v8"/>
+            </svg>
+            <span class="text-[9px] tracking-[0.35em] uppercase font-bold text-slate-400">Fidelity × Portfolio System</span>
+            <span class="text-orange-400 text-xs font-bold">×</span>
+            <span class="text-[9px] tracking-[0.2em] uppercase font-bold text-slate-400">index.astro</span>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
 </BaseLayout>
 
 <script>
@@ -100,7 +137,6 @@ const playlist = [
     await attemptFetch();
   }
 
-  // Hook up the Anime Labs button
   if (triggerBtn) {
     triggerBtn.addEventListener('click', () => {
       const vibes = [
@@ -114,7 +150,6 @@ const playlist = [
     });
   }
 
-  // Click avatar to generate a new character
   if (avatarTrigger) {
     avatarTrigger.addEventListener('click', () => {
       generateImage("High-end anime style profile picture, male designer character with teal highlights, techwear aesthetic, clean white background, pixiv style illustration", "profilePic", avatarLoader);
