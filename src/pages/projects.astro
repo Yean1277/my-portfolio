@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Navigation from '../components/Navigation.astro';
 import { getCollection } from 'astro:content';
  
 const pageData = await getCollection('pageData');
@@ -9,6 +10,7 @@ if (!projectsPage) return Astro.redirect('/');
 const { Content } = await projectsPage.render();
 ---
 <BaseLayout title="Projects | Personal Workspace">
+  <Navigation />
   <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
     <Content />
   </main>

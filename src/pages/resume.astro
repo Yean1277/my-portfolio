@@ -1,15 +1,22 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import { getCollection } from 'astro:content';
-
-const pageData = await getCollection('pageData');
-const resumePage = pageData.find(p => p.slug === 'resume');
-
-if (!resumePage) return Astro.redirect('/');
-const { Content } = await resumePage.render();
+import Navigation from '../components/Navigation.astro';
 ---
-<BaseLayout title="Resume | Personal Workspace">
-  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
-    <Content />
-  </main>
+<BaseLayout title="Resume">
+
+  <Navigation />
+
+  <div class="px-6 pb-6">
+    <div class="max-w-4xl mx-auto">
+      <div class="rounded-[16px] overflow-hidden">
+        <iframe
+          src="/resume.pdf#toolbar=0&navpanes=0&scrollbar=0"
+          class="w-full block"
+          style="height: 85vh; min-height: 600px;"
+          title="Resume PDF"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+
 </BaseLayout>

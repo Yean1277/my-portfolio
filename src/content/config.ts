@@ -15,11 +15,13 @@ const postsCollection = defineCollection({
 
 const pagesCollection = defineCollection({
   schema: z.object({
-    title: z.string(),
+    title: z.string().optional(),
     animeList: z.array(
       z.object({
         title: z.string(),
         poster: z.string(),
+        isPremium: z.boolean().optional(),
+        quote: z.string().optional(),
       })
     ).optional(),
   }),

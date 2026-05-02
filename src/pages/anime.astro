@@ -7,10 +7,12 @@ import { getCollection } from 'astro:content';
 const pageData = await getCollection('pageData');
 const animePage = pageData.find((p: any) => p.slug === 'anime' || p.id === 'anime');
 
-const Content = animePage ? (await animePage.render()).Content : null;
-
-const baseAnimeData: { title: string; poster?: string; isPremium?: boolean }[] =
-  animePage?.data?.animeList ?? [];
+const baseAnimeData: {
+  title: string;
+  poster?: string;
+  isPremium?: boolean;
+  quote?: string;
+}[] = animePage?.data?.animeList ?? [];
 
 const entries = baseAnimeData.map((item, i) => ({
   ...item,
@@ -19,8 +21,8 @@ const entries = baseAnimeData.map((item, i) => ({
   serialNumber: `03-ANM-${String(i + 1).padStart(3, '0')}`,
 }));
 
-const title: string = animePage?.data?.title ?? '我看过的动漫';
 const total = entries.length;
+const year = new Date().getFullYear();
 ---
 
 <BaseLayout>
@@ -28,82 +30,103 @@ const total = entries.length;
   <Navigation/>
   <div class="min-h-screen bg-[#f1f5f9] text-slate-800 p-8">
 
-    <!-- ── MDX body prose ──────────────────────────────────────────────────── -->
-    {Content && (
-      <div class="max-w-7xl mx-auto mb-10 prose prose-slate text-sm">
-        <Content />
-      </div>
-    )}
-
     <!-- ── Card grid ───────────────────────────────────────────────────────── -->
     <main class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8 justify-items-center">
       {entries.map((anime) => (
-        <div class="relative group w-[220px] h-[308px] transition-all duration-300 hover:-translate-y-2">
+        <div class="card-outer relative group w-[220px] h-[308px]">
 
           <!-- Gradient border ring -->
           <div class:list={[
-            "absolute -inset-[3px] rounded-[24px] transition-all duration-500",
+            "absolute -inset-[3px] rounded-[24px] transition-all duration-500 pointer-events-none",
             anime.isPremium
               ? "premium-ring bg-gradient-to-br from-orange-400 via-[#39c5bb] to-orange-400"
               : "bg-gradient-to-br from-[#39c5bb]/40 to-orange-300/40",
           ]}></div>
 
-          <!-- Card body -->
-          <div class="relative h-full w-full bg-white rounded-[20px] p-[5px] flex flex-col shadow-xl overflow-hidden border border-slate-200">
-            <div class="relative flex-1 rounded-[16px] overflow-hidden flex flex-col bg-[#f8fafc]">
+          <!-- Flip wrapper -->
+          <div class="flip-inner w-full h-full relative [transform-style:preserve-3d] cursor-pointer">
 
-              <!-- Poster -->
-              <div class="relative flex-1 overflow-hidden">
-                <img
-                  src={anime.poster || `https://picsum.photos/seed/${encodeURIComponent(anime.title)}/600/840`}
-                  alt={anime.title}
-                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                  decoding="async"
-                  onerror={`this.src='https://picsum.photos/seed/${encodeURIComponent(anime.title)}/600/840'`}
-                />
+            <!-- ── FRONT FACE ─────────────────────────────────────────────── -->
+            <div class="face-front absolute inset-0 bg-white rounded-[20px] p-[5px] flex flex-col shadow-xl overflow-hidden border border-slate-200 [backface-visibility:hidden]">
+              <div class="relative flex-1 rounded-[16px] overflow-hidden flex flex-col bg-[#f8fafc]">
 
-                <!-- CV badge -->
-                <div class="absolute top-2 left-2 px-2 py-0.5 bg-[#39c5bb]/90 backdrop-blur-sm rounded-md border border-white/20">
-                  <span class="text-[9px] font-black text-white italic">CV:01</span>
+                <!-- Poster -->
+                <div class="relative flex-1 overflow-hidden">
+                  <img
+                    src={anime.poster || `https://picsum.photos/seed/${encodeURIComponent(anime.title)}/600/840`}
+                    alt={anime.title}
+                    class="poster-img w-full h-full object-cover object-top"
+                    loading="lazy"
+                    decoding="async"
+                    onerror={`this.src='https://picsum.photos/seed/${encodeURIComponent(anime.title)}/600/840'`}
+                  />
+                  <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
                 </div>
 
-                <!-- Serial badge -->
-                <div class="absolute top-2 right-2 px-2 py-0.5 bg-orange-500/90 backdrop-blur-sm rounded-md border border-white/20">
-                  <span class="text-[9px] font-mono text-white font-bold">{anime.serialNumber}</span>
+                <!-- Title area -->
+                <div class="px-3 py-3 bg-white relative">
+                  <div class="absolute right-2 bottom-2 opacity-5">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                      <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+                    </svg>
+                  </div>
+                  <div class="relative z-10 flex flex-col gap-0.5">
+                    <div class="flex items-center gap-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 text-[#39c5bb]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
+                        <line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
+                      </svg>
+                      <span class="text-[8px] text-[#39c5bb] font-bold tracking-widest">ANIME_COLLECTION</span>
+                    </div>
+                    <h3 class="text-[11px] font-black text-slate-800 line-clamp-2 leading-tight tracking-tight">
+                      {anime.title}
+                    </h3>
+                  </div>
                 </div>
 
-                <!-- Fade -->
-                <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
               </div>
 
-              <!-- Title area -->
-              <div class="px-3 py-3 bg-white relative">
-                <div class="absolute right-2 bottom-2 opacity-5">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
-                  </svg>
-                </div>
+              <!-- Flip hint icon (top-right, appears on hover) -->
+              <div class="flip-hint absolute top-2 right-2 w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 transition-opacity duration-300 pointer-events-none">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+              </div>
 
-                <div class="relative z-10 flex flex-col gap-0.5">
-                  <div class="flex items-center gap-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-2 h-2 text-[#39c5bb]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                      <line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/>
-                      <line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>
-                    </svg>
-                    <span class="text-[8px] text-[#39c5bb] font-bold tracking-widest">ANIME_COLLECTION</span>
-                  </div>
-                  <h3 class="text-[11px] font-black text-slate-800 line-clamp-2 leading-tight tracking-tight">
-                    {anime.title}
-                  </h3>
+              <!-- Hover shimmer -->
+              <div class="front-shimmer pointer-events-none absolute inset-0 rounded-[20px] bg-gradient-to-br from-white/0 via-orange-100/20 to-[#39c5bb]/10 opacity-0 transition-opacity duration-500"></div>
+            </div>
+
+            <!-- ── BACK FACE ──────────────────────────────────────────────── -->
+            <div class="absolute inset-0 rounded-[20px] overflow-hidden [backface-visibility:hidden] [transform:rotateY(180deg)] bg-slate-900 border border-slate-700/50 shadow-xl flex flex-col">
+
+              <!-- Teal + orange accent bar -->
+              <div class="h-1 w-full bg-gradient-to-r from-[#39c5bb] to-orange-400 flex-shrink-0"></div>
+
+              <!-- Quote body -->
+              <div class="flex-1 flex flex-col justify-center px-5 py-4 relative overflow-hidden">
+                <!-- Decorative large open-quote -->
+                <div class="absolute top-0 left-3 text-[80px] leading-none text-[#39c5bb]/10 font-serif select-none pointer-events-none">"</div>
+
+                {anime.quote ? (
+                  <p class="relative z-10 text-white/90 text-[11px] italic leading-relaxed text-center">
+                    {anime.quote}
+                  </p>
+                ) : (
+                  <p class="relative z-10 text-slate-500 text-[10px] italic text-center">No quote yet...</p>
+                )}
+              </div>
+
+              <!-- Character + title footer -->
+              <div class="px-4 pb-4 flex flex-col gap-1.5">
+                <div class="border-t border-slate-700 pt-2 flex flex-col gap-1">
+                  <p class="text-slate-400 text-[9px] text-center line-clamp-2 leading-tight">{anime.title}</p>
+                  <p class="text-slate-600 text-[8px] text-center tracking-[0.2em] uppercase">tap to flip back</p>
                 </div>
               </div>
 
             </div>
           </div>
-
-          <!-- Hover shimmer -->
-          <div class="pointer-events-none absolute inset-0 rounded-[20px] bg-gradient-to-br from-white/0 via-orange-100/20 to-[#39c5bb]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
         </div>
       ))}
     </main>
@@ -119,7 +142,7 @@ const total = entries.length;
           <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
         </svg>
       </div>
-      <p class="text-[9px] text-slate-400">© 2024 Miku Camp Design — {total} entries · anime.astro</p>
+      <p class="text-[9px] text-slate-400">© {year} Miku Camp Design — {total} entries · anime.astro</p>
     </footer>
 
   </div>
@@ -131,4 +154,45 @@ const total = entries.length;
     50%       { opacity: 0.6; }
   }
   .premium-ring { animation: pulse-border 2s ease-in-out infinite; }
+
+  /* ── Flip card ────────────────────────────────────────────────────────────── */
+  .card-outer { perspective: 1000px; }
+
+  .flip-inner {
+    transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Hover lift — suppressed when flipped */
+  .card-outer:hover .flip-inner:not(.flipped) {
+    transform: translateY(-8px);
+  }
+
+  /* Flip state */
+  .flip-inner.flipped {
+    transform: rotateY(180deg);
+  }
+
+  /* Image scale — front face only, hover only */
+  .poster-img {
+    transition: transform 0.7s ease;
+  }
+  .card-outer:hover .flip-inner:not(.flipped) .poster-img {
+    transform: scale(1.1);
+  }
+
+  /* Shimmer — front face only */
+  .card-outer:hover .flip-inner:not(.flipped) .front-shimmer {
+    opacity: 1;
+  }
+
+  /* Flip hint icon */
+  .card-outer:hover .flip-inner:not(.flipped) .flip-hint {
+    opacity: 1;
+  }
 </style>
+
+<script>
+  document.querySelectorAll('.flip-inner').forEach(el => {
+    el.addEventListener('click', () => el.classList.toggle('flipped'));
+  });
+</script>
