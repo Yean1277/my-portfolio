@@ -2,12 +2,16 @@
 /**
  * src/pages/index.astro
  *
- * Layout:
- *  1. HeroSection (100vh, full-bleed)  — Navigation + HeroTicker slotted inside
- *  2. 12-col grid
- *      col-4 sidebar: SidebarProfile + MusicPlayer
- *      col-8 main:    RecentPosts (replaces ProjectCollections)
- *  3. SiteFooter (full-bleed)
+ * Layout (May 2026 prototype):
+ *  1. HeroSection (100vh, full-bleed)
+ *      • Navigation slotted in (overlay mode)
+ *      • Centered title + tagline + two CTAs (Browse Work / Anime Labs)
+ *      • Bottom-center slide nav
+ *  2. 12-col grid on a light gray bg
+ *      col-4 sidebar: LocalTime + SidebarProfile + MusicPlayer
+ *      col-8 main:    RecentPosts (no top divider)
+ *  3. SiteStats  (full-bleed — 4 white cards on the gray strip)
+ *  4. SiteFooter (full-bleed — brand + pages + tags + bottom bar)
  */
 
 import { getCollection } from 'astro:content';
@@ -15,10 +19,11 @@ import { getCollection } from 'astro:content';
 import BaseLayout      from '../layouts/BaseLayout.astro';
 import Navigation      from '../components/Navigation.astro';
 import HeroSection     from '../components/HeroSection.astro';
-import HeroTicker      from '../components/HeroTicker.astro';
+import LocalTime       from '../components/LocalTime.astro';
 import SidebarProfile  from '../components/SidebarProfile.astro';
 import MusicPlayer     from '../components/MusicPlayer.astro';
 import RecentPosts     from '../components/RecentPosts.astro';
+import SiteStats       from '../components/SiteStats.astro';
 import SiteFooter      from '../components/SiteFooter.astro';
 
 // ── Data ─────────────────────────────────────────────────────────────────────
@@ -28,50 +33,51 @@ const sortedPosts = [...allPosts].sort(
   (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
 );
 
-// Ticker — 5 most recent post titles
-const tickerPosts = sortedPosts.slice(0, 5).map(p => ({
-  title: p.data.title,
-  href:  `/posts/${p.slug}`,
-  date:  p.data.date,
-}));
-
-// Footer tags + word count
+// Stats derived values
 const allTags    = allPosts.flatMap(p => p.data.tags ?? []);
+const uniqueTags = [...new Set(allTags)];
 const totalWords = allPosts.reduce((n, p) => n + (p.data.wordCount ?? 500), 0);
 
-// ── Static config — edit these ────────────────────────────────────────────────
+// Days online — counted from site launch
+const launchDate = new Date('2024-01-01');
+const daysOnline = Math.floor((Date.now() - launchDate.getTime()) / 86_400_000);
+
+// ── Profile config ────────────────────────────────────────────────────────────
 const profile = {
-  name:           'Your Name',
+  name:           'Yean Ter',
   tagline:        'Frontend Developer · Anime Enjoyer',
   tags:           ['UI/UX', 'Astro', 'Next.js', 'Otaku'],
   currentFocus:   'Building portfolio with Astro + Three.js',
-  avatarFallback: '/avatar.jpg',
+  avatarFallback: 'YT',   // initials fallback — swap for '/avatar.jpg' once you have one
 };
 
+// ── Hero wallpaper slideshow ─────────────────────────────────────────────────
+// First slide is the cinema-style neon image from the prototype.
+const heroWallpapers = [
+  { src: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80', alt: 'Central Cinema neon storefront' },
+  { src: 'https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=1920&q=80', alt: 'Tokyo neon street at night' },
+  { src: 'https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?w=1920&q=80', alt: 'City lights from above' },
+  { src: 'https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?w=1920&q=80', alt: 'Cinema marquee' },
+];
 ---
 
-<BaseLayout title="Portfolio — Where All Miracles Begin">
+<BaseLayout title="Yean Ter — 所有奇迹的始发点">
 
   <!-- 1 ── HERO ─────────────────────────────────────────────────────────── -->
   <HeroSection
-    title="Your Name Here"
+    title="Yean Ter"
     tagline="所有奇迹的始发点 · Where All Miracles Begin"
     greeting="👋 Hey, welcome to my little corner of the web"
-    wallpaper="/your-wallpaper.jpg"
-    badge="HRO-001"
+    wallpapers={heroWallpapers}
     liveLabel="LIVE"
+    primaryCta={{ label: 'Browse Work', href: '/projects' }}
+    secondaryCta={{ label: 'Anime Labs', href: '/anime', badge: 'New' }}
   >
     <Navigation slot="nav" heroOverlay={true} />
-    <HeroTicker
-      slot="ticker"
-      posts={tickerPosts}
-      authorName="Your Name"
-      authorAvatar="/avatar.jpg"
-    />
   </HeroSection>
 
   <!-- 2 ── MAIN GRID ───────────────────────────────────────────────────── -->
-  <div class="min-h-screen bg-[#f1f5f9] relative">
+  <div class="bg-[#f1f5f9] relative">
 
     <!-- Ambient glow — below the fold only -->
     <div
@@ -83,13 +89,14 @@ const profile = {
     <main class="max-w-[1100px] mx-auto px-6 pt-10 pb-16">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-        <!-- Sidebar col-4 -->
+        <!-- Sidebar col-4: LocalTime + Profile + MusicPlayer -->
         <aside class="lg:col-span-4 space-y-5">
+          <LocalTime label="LOCAL TIME · CHINA" timezone="Asia/Shanghai" />
           <SidebarProfile profile={profile} />
           <MusicPlayer />
         </aside>
 
-        <!-- Main col-8 -->
+        <!-- Main col-8: Recent posts list -->
         <section class="lg:col-span-8">
           <RecentPosts posts={sortedPosts} maxItems={8} />
         </section>
@@ -98,12 +105,18 @@ const profile = {
     </main>
   </div>
 
-  <!-- 3 ── FOOTER ──────────────────────────────────────────────────────── -->
-  <SiteFooter
+  <!-- 3 ── SITE STATS ──────────────────────────────────────────────────── -->
+  <SiteStats
     postCount={allPosts.length}
-    totalWords={totalWords}
-    tags={allTags}
-    startYear={2024}
+    totalWords={Math.round(totalWords / 1000)}
+    tagCount={uniqueTags.length}
+    daysOnline={daysOnline}
+  />
+
+  <!-- 4 ── FOOTER ──────────────────────────────────────────────────────── -->
+  <SiteFooter
+    tags={uniqueTags}
+    ownerName="Yean Ter"
   />
 
 </BaseLayout>
