@@ -1,9 +1,11 @@
 ---
 /**
  * RecentPosts.astro
- * Full-width post list for the main col-8 area.
- * Each row: left accent bar + category badge + title + excerpt + thumbnail right.
- * Mirrors kfdzcoffee 最新动态 style.
+ * White card list — left accent bar, category badge + #tags + date meta row,
+ * title, excerpt, and a tinted square code-badge on the right (e.g. "AN", "DE", "JO").
+ *
+ * Matches the May 2026 prototype: no centered "Recent Posts" divider — the list
+ * starts straight away. Cards are larger, more padded, and scan top-to-bottom.
  */
 
 interface Post {
@@ -40,49 +42,47 @@ const items = posts.slice(0, maxItems).map((p, i) => ({
 }));
 
 const demo = [
-  { title: 'My Top 5 Anime This Season',           excerpt: 'Ranked by vibe, animation quality, and whether I actually cried.',                                         href: '#', date: 'May 1, 2026',  category: 'Anime',   tags: ['ACGN', 'Review'],    image: null, idx: 0 },
-  { title: 'Designing Card-Based UI Systems',       excerpt: 'Gradient rings, shimmer overlays, and composable components in Astro.',                                    href: '#', date: 'Apr 24, 2026', category: 'Design',  tags: ['UI', 'Astro'],       image: null, idx: 1 },
-  { title: 'Building a Music Player in Astro',      excerpt: 'No framework JS — just Astro islands and a spinning vinyl record made from plain SVG.',                   href: '#', date: 'Apr 17, 2026', category: 'Dev',     tags: ['Astro', 'Audio'],    image: null, idx: 2 },
-  { title: 'Honkai: Star Rail Lore Deep Dive',      excerpt: 'Catching up before the next arc. Spoilers for Penacony. Why is Firefly so good.',                         href: '#', date: 'Apr 10, 2026', category: 'Anime',   tags: ['ACGN', 'Honkai'],    image: null, idx: 3 },
-  { title: 'Three.js Particle Systems on a Budget', excerpt: '60fps star-field effects without a beefy GPU — instanced mesh and frustum culling.',                      href: '#', date: 'Apr 3, 2026',  category: 'Dev',     tags: ['Three.js', 'WebGL'], image: null, idx: 4 },
-  { title: 'Weekly Journal #14',                    excerpt: 'Oral exams finished. First real week of summer break. Coffee, rain, Honkai.',                              href: '#', date: 'Mar 27, 2026', category: 'Journal', tags: ['Life'],              image: null, idx: 5 },
-  { title: 'Why I Switched from Next.js to Astro',  excerpt: 'Hydration budget, island architecture, the joy of zero JS by default.',                                   href: '#', date: 'Mar 20, 2026', category: 'Dev',     tags: ['Astro', 'Next.js'],  image: null, idx: 6 },
-  { title: 'Rewatching Steins;Gate in 2026',        excerpt: 'Still hits. Okabe is peak fiction. The VN-to-anime choices hold up better than I remembered.',            href: '#', date: 'Mar 13, 2026', category: 'Anime',   tags: ['ACGN', 'Classic'],   image: null, idx: 7 },
+  { title: 'My Top 5 Anime This Season',           excerpt: "A personal tracking system for anime I'm loving right now—and why I built this portfolio partly to show them off.", href: '#', date: 'Jul 15, 2024', category: 'Anime',   tags: ['ACGN', 'Review'],    image: null, idx: 0 },
+  { title: 'Designing Card-Based UI Systems',       excerpt: 'Gradient rings, shimmer overlays, and composable components in Astro.',                                            href: '#', date: 'Apr 24, 2026', category: 'Design',  tags: ['UI', 'Astro'],       image: null, idx: 1 },
+  { title: 'Building a Music Player in Astro',      excerpt: 'No framework JS — just Astro islands and a spinning vinyl record made from plain SVG.',                            href: '#', date: 'Apr 17, 2026', category: 'Dev',     tags: ['Astro', 'Audio'],    image: null, idx: 2 },
+  { title: 'Honkai: Star Rail Lore Deep Dive',      excerpt: 'Catching up before the next arc. Spoilers for Penacony. Why is Firefly so good.',                                  href: '#', date: 'Apr 10, 2026', category: 'Anime',   tags: ['ACGN', 'Honkai'],    image: null, idx: 3 },
+  { title: 'Three.js Particle Systems on a Budget', excerpt: '60fps star-field effects without a beefy GPU — instanced mesh and frustum culling.',                               href: '#', date: 'Apr 3, 2026',  category: 'Dev',     tags: ['Three.js', 'WebGL'], image: null, idx: 4 },
+  { title: 'Weekly Journal #14',                    excerpt: 'Oral exams finished. First real week of summer break. Coffee, rain, Honkai.',                                      href: '#', date: 'Mar 27, 2026', category: 'Journal', tags: ['Life'],              image: null, idx: 5 },
+  { title: 'Why I Switched from Next.js to Astro',  excerpt: 'Hydration budget, island architecture, the joy of zero JS by default.',                                            href: '#', date: 'Mar 20, 2026', category: 'Dev',     tags: ['Astro', 'Next.js'],  image: null, idx: 6 },
+  { title: 'Rewatching Steins;Gate in 2026',        excerpt: 'Still hits. Okabe is peak fiction. The VN-to-anime choices hold up better than I remembered.',                     href: '#', date: 'Mar 13, 2026', category: 'Anime',   tags: ['ACGN', 'Classic'],   image: null, idx: 7 },
 ];
 
 const display = items.length ? items : demo;
 
-const catStyle: Record<string, { accent: string; bg: string; border: string }> = {
-  Anime:   { accent: '#e07800', bg: 'rgba(255,149,0,0.08)',   border: 'rgba(255,149,0,0.22)'   },
-  Design:  { accent: '#2ba8a0', bg: 'rgba(57,197,187,0.08)',  border: 'rgba(57,197,187,0.22)'  },
-  Dev:     { accent: '#475569', bg: 'rgba(100,116,139,0.08)', border: 'rgba(100,116,139,0.2)'  },
-  Journal: { accent: '#7c3aed', bg: 'rgba(139,92,246,0.08)',  border: 'rgba(139,92,246,0.2)'   },
+// Category style map — accent bar, category-pill bg/text, right-side code-box bg/text
+const catStyle: Record<string, {
+  accent: string;
+  pillBg: string; pillText: string; pillBorder: string;
+  boxBg:  string; boxText:  string;
+  code:   string;
+}> = {
+  Anime:   { accent: '#f59e0b', pillBg: 'rgba(245,158,11,0.10)',  pillText: '#d97706', pillBorder: 'rgba(245,158,11,0.30)', boxBg: 'rgba(245,158,11,0.08)',  boxText: '#d97706', code: 'AN' },
+  Design:  { accent: '#39c5bb', pillBg: 'rgba(57,197,187,0.10)',  pillText: '#2ba8a0', pillBorder: 'rgba(57,197,187,0.32)', boxBg: 'rgba(57,197,187,0.08)',  boxText: '#2ba8a0', code: 'DE' },
+  Dev:     { accent: '#475569', pillBg: 'rgba(71,85,105,0.10)',   pillText: '#334155', pillBorder: 'rgba(71,85,105,0.25)',  boxBg: 'rgba(71,85,105,0.06)',   boxText: '#475569', code: 'DE' },
+  Journal: { accent: '#8b5cf6', pillBg: 'rgba(139,92,246,0.10)',  pillText: '#7c3aed', pillBorder: 'rgba(139,92,246,0.30)', boxBg: 'rgba(139,92,246,0.08)',  boxText: '#7c3aed', code: 'JO' },
 };
-const fallback = { accent: '#475569', bg: 'rgba(100,116,139,0.08)', border: 'rgba(100,116,139,0.2)' };
+const fallback = { accent: '#475569', pillBg: 'rgba(71,85,105,0.10)', pillText: '#334155', pillBorder: 'rgba(71,85,105,0.25)', boxBg: 'rgba(71,85,105,0.06)', boxText: '#475569', code: 'PO' };
 ---
 
 <section style="font-family:'Plus Jakarta Sans',sans-serif;" aria-label="Recent posts">
 
-  <!-- Centered kfdzcoffee-style section divider -->
-  <div class="flex items-center gap-4 mb-6">
-    <div class="flex-1 h-px" style="background:linear-gradient(to right,transparent,rgba(57,197,187,0.4))"></div>
-    <span class="text-[10px] font-black tracking-[0.22em] uppercase" style="color:#39c5bb">Recent Posts</span>
-    <div class="flex-1 h-px" style="background:linear-gradient(to left,transparent,rgba(57,197,187,0.4))"></div>
-  </div>
-
-  <!-- Post list -->
-  <div class="space-y-2.5">
+  <!-- Post list — no top divider, content starts immediately -->
+  <div class="space-y-3">
     {display.map((post) => {
       const cs = catStyle[post.category] ?? fallback;
       return (
         <a
           href={post.href}
-          class="group flex items-stretch bg-white rounded-2xl border overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(57,197,187,0.10)]"
-          style="border-color:rgba(226,232,240,0.9);"
+          class="group flex items-stretch bg-white rounded-2xl border border-slate-100 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(15,23,42,0.06)]"
         >
           <!-- Left accent bar -->
           <div
-            class="w-[3px] shrink-0 transition-all duration-300 group-hover:w-1"
+            class="w-[4px] shrink-0 transition-all duration-300 group-hover:w-1.5"
             style={`background:${cs.accent};`}
           ></div>
 
@@ -90,18 +90,21 @@ const fallback = { accent: '#475569', bg: 'rgba(100,116,139,0.08)', border: 'rgb
           <div class="flex-1 flex items-center gap-4 px-5 py-4 min-w-0">
 
             <div class="flex-1 min-w-0">
-              <!-- Meta row -->
-              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+
+              <!-- Meta row: category pill + #tags … (right) date -->
+              <div class="flex items-center gap-2.5 mb-1.5 flex-wrap">
                 <span
-                  class="px-2.5 py-0.5 rounded-full text-[9px] font-black uppercase tracking-wider border"
-                  style={`background:${cs.bg};color:${cs.accent};border-color:${cs.border};`}
+                  class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-[0.12em] border"
+                  style={`background:${cs.pillBg};color:${cs.pillText};border-color:${cs.pillBorder};`}
                 >
                   {post.category}
                 </span>
                 {post.tags.map(tag => (
-                  <span class="text-[10px] font-mono" style="color:#cbd5e1">#{tag}</span>
+                  <span class="text-[10px] font-mono text-slate-300">#{tag}</span>
                 ))}
-                <span class="text-[10px] font-mono ml-auto" style="color:#cbd5e1">{post.date}</span>
+                <span class="text-[10px] font-mono text-slate-300 ml-auto tabular-nums">
+                  {post.date}
+                </span>
               </div>
 
               <!-- Title -->
@@ -120,24 +123,25 @@ const fallback = { accent: '#475569', bg: 'rgba(100,116,139,0.08)', border: 'rgb
               )}
             </div>
 
-            <!-- Thumbnail -->
+            <!-- Right-side tinted code badge -->
             <div
-              class="shrink-0 w-[76px] h-[76px] rounded-xl overflow-hidden"
-              style={`background:${cs.bg};`}
+              class="shrink-0 w-[78px] h-[78px] rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105 overflow-hidden"
+              style={`background:${cs.boxBg};`}
             >
               {post.image ? (
                 <img
                   src={post.image}
                   alt={post.title}
-                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  class="w-full h-full object-cover"
                   loading="lazy"
                 />
               ) : (
-                <div class="w-full h-full flex items-center justify-center">
-                  <span class="text-[11px] font-black" style={`color:${cs.accent};opacity:0.45;`}>
-                    {post.category.slice(0,2).toUpperCase()}
-                  </span>
-                </div>
+                <span
+                  class="text-[13px] font-black tracking-[0.12em]"
+                  style={`color:${cs.boxText};opacity:0.55;`}
+                >
+                  {cs.code}
+                </span>
               )}
             </div>
           </div>
@@ -147,7 +151,7 @@ const fallback = { accent: '#475569', bg: 'rgba(100,116,139,0.08)', border: 'rgb
   </div>
 
   <!-- View all -->
-  <div class="mt-5 flex justify-center">
+  <div class="mt-7 flex justify-center">
     <a
       href="/posts"
       class="inline-flex items-center gap-1.5 text-[12px] font-bold transition-colors duration-200 text-slate-400 hover:text-[#39c5bb]"
@@ -158,5 +162,4 @@ const fallback = { accent: '#475569', bg: 'rgba(100,116,139,0.08)', border: 'rgb
       </svg>
     </a>
   </div>
-
 </section>
