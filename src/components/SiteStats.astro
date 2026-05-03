@@ -1,0 +1,67 @@
+---
+/**
+ * SiteStats.astro
+ * Full-bleed stats strip between the main grid and the footer.
+ * Shows 4 headline numbers: Posts · Words · Tags · Days Online — each in its own
+ * white rounded card on a light gray background.
+ *
+ * Props:
+ *   postCount   — total number of posts
+ *   totalWords  — total words already rounded to k (e.g. 4 → "4k")
+ *   tagCount    — number of unique tags
+ *   daysOnline  — days since site launched
+ */
+
+interface Props {
+  postCount:  number;
+  totalWords: number;  // already in k
+  tagCount:   number;
+  daysOnline: number;
+}
+
+const { postCount, totalWords, tagCount, daysOnline } = Astro.props;
+
+const stats = [
+  { value: postCount  || '—',                    label: 'Posts'       },
+  { value: totalWords ? `${totalWords}k` : '—', label: 'Words'       },
+  { value: tagCount   || '—',                    label: 'Tags'        },
+  { value: daysOnline || '—',                    label: 'Days Online' },
+];
+---
+
+<section
+  class="w-full bg-[#f1f5f9]"
+  style="font-family:'Plus Jakarta Sans',sans-serif;"
+  aria-label="Site statistics"
+>
+  <!-- Centered section label -->
+  <div class="max-w-[1100px] mx-auto px-6 pt-10">
+    <div class="flex items-center gap-4 mb-6">
+      <div class="flex-1 h-px" style="background:linear-gradient(to right,transparent,rgba(57,197,187,0.4))"></div>
+      <span class="text-[10px] font-black tracking-[0.22em] uppercase" style="color:#39c5bb">Site Stats</span>
+      <div class="flex-1 h-px" style="background:linear-gradient(to left,transparent,rgba(57,197,187,0.4))"></div>
+    </div>
+  </div>
+
+  <!-- Stat cards — 4 separate white rounded cards on the gray strip -->
+  <div class="max-w-[1100px] mx-auto px-6 pb-12">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {stats.map((s) => (
+        <div class="flex flex-col items-center gap-1.5 py-6 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_rgba(15,23,42,0.03)]">
+          <span
+            class="font-black tabular-nums leading-none"
+            style="font-size: clamp(1.85rem, 3.5vw, 2.4rem); color:#0f172a;"
+          >
+            {s.value}
+          </span>
+          <span
+            class="text-[10px] font-bold uppercase tracking-[0.18em]"
+            style="color:#94a3b8;"
+          >
+            {s.label}
+          </span>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
