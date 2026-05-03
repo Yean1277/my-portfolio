@@ -1,4 +1,20 @@
 ---
+/**
+ * MusicPlayer.astro — Floating mini-player
+ *
+ * Pinned to the bottom-left corner of the viewport. Persistent across scroll.
+ *
+ * Three states:
+ *  • collapsed  → just a 56px circular vinyl disc (default)
+ *  • expanded   → horizontal pill with vinyl + title + prev/play/next + list + close
+ *  • playlist   → drawer slides up from above the expanded pill
+ *
+ * Behaviour notes:
+ *  • Hidden on initial paint; fades in once the user scrolls past the hero CTAs.
+ *  • Click the vinyl when collapsed → expands. Click ✕ → collapses.
+ *  • Auto-collapses after 8s of no interaction when paused.
+ */
+
 import { playlist } from '../data/playlist';
 
 const first = playlist[0];
@@ -8,62 +24,262 @@ const serialized = JSON.stringify(
 ---
 
 <style>
-  .playlist-drawer {
-    overflow: hidden;
-    max-height: 0;
+  /* ── Container reveal ─────────────────────────────────────────────── */
+  #floating-player {
+    transform: translateY(20px);
     opacity: 0;
-    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
   }
-  .playlist-drawer.open {
-    max-height: 320px;
+  #floating-player.visible {
+    transform: translateY(0);
     opacity: 1;
+    pointer-events: auto;
   }
 
-  .playlist-inner {
-    border-top: 1px solid #f1f5f9;
-    padding-top: 10px;
-    margin-top: 10px;
+  /* ── Disc base styles ─────────────────────────────────────────────── */
+  .fp-disc {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border: 3px solid rgba(57, 197, 187, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4);
+    transition: box-shadow 0.3s ease, border-color 0.2s ease, transform 0.2s ease;
+    position: relative;
+  }
+  .fp-disc:hover {
+    border-color: rgba(57, 197, 187, 0.6);
+    transform: scale(1.05);
+  }
+  .fp-disc-core {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #39c5bb;
+    box-shadow: 0 0 12px rgba(57, 197, 187, 0.8);
+  }
+
+  /* Hover overlay: show play/pause icon */
+  .fp-disc-hover {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(2px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+  .fp-disc:hover .fp-disc-hover { opacity: 1; }
+
+  /* Pulsing ring when playing */
+  .fp-disc.playing {
+    animation: fpPulse 2s ease-in-out infinite;
+  }
+  @keyframes fpPulse {
+    0%, 100% { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4); }
+    50%      { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.18), 0 0 0 8px rgba(57, 197, 187, 0); }
+  }
+
+  /* Vinyl spin */
+  .fp-vinyl-spin {
+    animation: fpSpin 4s linear infinite;
+    animation-play-state: paused;
+  }
+  .fp-disc.playing .fp-vinyl-spin {
+    animation-play-state: running;
+  }
+  @keyframes fpSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* ── Expanded pill ────────────────────────────────────────────────── */
+  .fp-pill {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 999px;
+    padding: 8px 12px 8px 8px;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.14);
+    min-width: 320px;
+    max-width: calc(100vw - 48px);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    position: relative;
+  }
+  #floating-player.expanded .fp-pill { display: flex; }
+  #floating-player.expanded .fp-disc-standalone { display: none; }
+
+  .fp-pill .fp-disc { width: 44px; height: 44px; border-width: 2px; }
+  .fp-pill .fp-disc-core { width: 10px; height: 10px; }
+
+  .fp-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .fp-label {
+    font-size: 8px;
+    font-weight: 900;
+    color: #39c5bb;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 1px;
+  }
+  .fp-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f172a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+  .fp-artist {
+    font-size: 10px;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+  }
+
+  .fp-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+  .fp-ctrl {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .fp-ctrl:hover { color: #39c5bb; background: rgba(57, 197, 187, 0.08); }
+
+  .fp-ctrl.fp-play {
+    width: 36px;
+    height: 36px;
+    color: #fff;
+    background: #39c5bb;
+    margin: 0 2px;
+  }
+  .fp-ctrl.fp-play:hover { background: #2ba8a0; }
+
+  .fp-ctrl.fp-close {
+    color: #cbd5e1;
+    margin-left: 4px;
+  }
+  .fp-ctrl.fp-close:hover { color: #ef4444; background: rgba(239, 68, 68, 0.08); }
+
+  .fp-list-btn.active { color: #39c5bb; background: rgba(57, 197, 187, 0.12); }
+
+  /* ── Playlist drawer (above the pill) ─────────────────────────────── */
+  .fp-drawer {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: 0;
+    width: 320px;
+    max-width: calc(100vw - 48px);
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.14);
+    padding: 12px;
+    transform-origin: bottom left;
+    transform: scale(0.95) translateY(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    max-height: 280px;
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    overflow-y: auto;
-    max-height: 210px;
   }
-  .playlist-inner::-webkit-scrollbar { width: 5px; }
-  .playlist-inner::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 99px; }
-  .playlist-inner::-webkit-scrollbar-thumb { background: rgba(57,197,187,0.6); border-radius: 99px; }
-  .playlist-inner::-webkit-scrollbar-thumb:hover { background: #39c5bb; }
-
-  :global(.playlist-track) {
+  #floating-player.playlist-open .fp-drawer {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .fp-drawer-header {
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px 8px;
+    border-bottom: 1px solid #f1f5f9;
+    margin-bottom: 6px;
+    flex-shrink: 0;
+  }
+  .fp-drawer-title {
+    font-size: 9px;
+    font-weight: 900;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .fp-drawer-count {
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #cbd5e1;
+  }
+  .fp-list {
+    overflow-y: auto;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+  }
+  .fp-list::-webkit-scrollbar { width: 4px; }
+  .fp-list::-webkit-scrollbar-track { background: transparent; }
+  .fp-list::-webkit-scrollbar-thumb { background: rgba(57,197,187,0.4); border-radius: 99px; }
+
+  /* Track row */
+  :global(.fp-track) {
+    display: flex;
     align-items: center;
     gap: 10px;
-    padding: 6px 8px;
+    padding: 7px 8px;
     border-radius: 10px;
     cursor: pointer;
-    transition: background 0.15s;
     border: none;
     background: transparent;
     text-align: left;
     width: 100%;
-    box-sizing: border-box;
+    transition: background 0.15s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
-  :global(.playlist-track:hover) { background: rgba(57,197,187,0.07); }
-  :global(.playlist-track.active) { background: rgba(57,197,187,0.12); }
+  :global(.fp-track:hover) { background: rgba(57, 197, 187, 0.07); }
+  :global(.fp-track.active) { background: rgba(57, 197, 187, 0.12); }
 
-  :global(.track-num) {
+  :global(.fp-track-num) {
     font-size: 9px;
-    font-family: monospace;
+    font-family: 'JetBrains Mono', monospace;
     color: #cbd5e1;
     width: 14px;
     text-align: right;
     flex-shrink: 0;
   }
-  :global(.playlist-track.active .track-num) { color: #39c5bb; }
+  :global(.fp-track.active .fp-track-num) { color: #39c5bb; }
 
-  :global(.playing-indicator) {
+  :global(.fp-eq) {
     display: none;
     width: 14px;
     height: 14px;
@@ -72,24 +288,29 @@ const serialized = JSON.stringify(
     justify-content: center;
     gap: 1.5px;
   }
-  :global(.playlist-track.active.is-playing .playing-indicator) { display: flex; }
-  :global(.playlist-track.active.is-playing .track-num) { display: none; }
+  :global(.fp-track.active.is-playing .fp-eq) { display: flex; }
+  :global(.fp-track.active.is-playing .fp-track-num) { display: none; }
 
-  :global(.playing-bar) {
+  :global(.fp-eq-bar) {
     width: 2px;
     border-radius: 1px;
     background: #39c5bb;
-    animation: eq 0.8s ease-in-out infinite alternate;
+    animation: fpEq 0.8s ease-in-out infinite alternate;
   }
-  :global(.playing-bar:nth-child(1)) { height: 5px;  animation-delay: 0s; }
-  :global(.playing-bar:nth-child(2)) { height: 9px;  animation-delay: 0.15s; }
-  :global(.playing-bar:nth-child(3)) { height: 6px;  animation-delay: 0.3s; }
-  @keyframes eq {
+  :global(.fp-eq-bar:nth-child(1)) { height: 5px; animation-delay: 0s; }
+  :global(.fp-eq-bar:nth-child(2)) { height: 9px; animation-delay: 0.15s; }
+  :global(.fp-eq-bar:nth-child(3)) { height: 6px; animation-delay: 0.3s; }
+  @keyframes fpEq {
     from { transform: scaleY(0.4); }
     to   { transform: scaleY(1.2); }
   }
 
-  :global(.pl-title) {
+  :global(.fp-track-info) {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  :global(.fp-track-title) {
     font-size: 11px;
     font-weight: 600;
     color: #1e293b;
@@ -97,216 +318,263 @@ const serialized = JSON.stringify(
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  :global(.playlist-track.active .pl-title) { color: #39c5bb; }
-
-  :global(.pl-artist) {
+  :global(.fp-track.active .fp-track-title) { color: #39c5bb; }
+  :global(.fp-track-artist) {
     font-size: 9px;
     color: #94a3b8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
-  :global(.pl-info) {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  :global(.pl-dur) {
+  :global(.fp-track-dur) {
     font-size: 9px;
-    font-family: monospace;
+    font-family: 'JetBrains Mono', monospace;
     color: #cbd5e1;
     flex-shrink: 0;
   }
-  :global(.playlist-track.active .pl-dur) { color: #39c5bb; }
+  :global(.fp-track.active .fp-track-dur) { color: #39c5bb; }
 
-  .list-btn.active {
-    color: #39c5bb;
-    background: rgba(57,197,187,0.1);
+  /* ── Mobile tweaks ────────────────────────────────────────────────── */
+  @media (max-width: 480px) {
+    #floating-player { bottom: 16px; left: 16px; }
+    .fp-pill { min-width: 0; width: calc(100vw - 32px); }
+    .fp-drawer { width: calc(100vw - 32px); }
   }
 </style>
 
 <!-- Hidden audio engine -->
 <audio id="audioEngine" preload="metadata"></audio>
 
-<!-- Clean white card — soft border, no gradient ring -->
+<!-- Fixed floating container -->
 <div
-  id="musicPlayerRoot"
+  id="floating-player"
   data-playlist={serialized}
-  class="bg-white rounded-2xl border border-slate-100 px-5 py-4 shadow-[0_4px_20px_rgba(15,23,42,0.04)] hover:shadow-[0_6px_24px_rgba(57,197,187,0.08)] transition-shadow duration-300"
-  style="font-family:'Plus Jakarta Sans',sans-serif;"
+  class="fixed bottom-6 left-6 z-40"
+  aria-label="Music player"
 >
-
   {playlist.length === 0 ? (
-    <!-- Empty state -->
-    <div class="flex items-center gap-3 py-1">
-      <div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center border-[3px] border-slate-200 shrink-0">
-        <div class="w-3 h-3 bg-slate-300 rounded-full"></div>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="text-[9px] font-black text-[#39c5bb] uppercase tracking-[0.2em] mb-0.5">Now Playing</p>
-        <p class="text-[11px] text-slate-400 italic">No tracks — add MP3s to <code class="font-mono">src/data/playlist.ts</code></p>
-      </div>
+    <!-- Empty state: a static dim disc that does nothing -->
+    <div class="fp-disc fp-disc-standalone" title="No tracks loaded" aria-label="Music player (empty)">
+      <span class="fp-disc-core" style="background:#cbd5e1;box-shadow:none;"></span>
     </div>
   ) : (
-    <!-- Player UI -->
-    <div class="flex items-center gap-4">
-
-      <!-- Vinyl disc -->
-      <div
-        class="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center border-[3px] border-[#39c5bb]/20 shrink-0 vinyl-record relative"
-        id="vinyl"
-        style="cursor: pointer;"
-        title="Next track"
+    <>
+      <!-- ── COLLAPSED: standalone disc ─────────────────────────────── -->
+      <button
+        id="fp-disc-toggle"
+        type="button"
+        class="fp-disc fp-disc-standalone fp-vinyl-spin"
+        aria-label="Open music player"
+        title={first?.title ?? 'Open music player'}
       >
-        <div class="w-3 h-3 bg-[#39c5bb] rounded-full shadow-[0_0_8px_rgba(57,197,187,0.8)]"></div>
-      </div>
-
-      <!-- Track info -->
-      <div class="flex-1 min-w-0">
-        <p class="text-[9px] font-black text-[#39c5bb] uppercase tracking-[0.2em] mb-0.5">Now Playing</p>
-        <h4 id="trackTitle" class="text-[13px] font-bold text-slate-900 truncate">{first?.title ?? ''}</h4>
-        <p id="trackArtist" class="text-[10px] text-slate-400 truncate">{first?.artist ?? ''}</p>
-      </div>
-
-      <!-- Controls -->
-      <div class="flex items-center gap-2 shrink-0">
-        <button
-          id="playBtn"
-          class="w-9 h-9 flex items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:border-[#39c5bb] hover:text-[#39c5bb] hover:bg-[#39c5bb]/10 transition-all outline-none"
-          aria-label="Play / Pause"
-        >
-          <svg id="playIcon" class="h-4 w-4 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+        <span class="fp-disc-core"></span>
+        <span class="fp-disc-hover" aria-hidden="true">
+          <svg id="fp-disc-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z"/>
           </svg>
-        </button>
+        </span>
+      </button>
 
-        <button
-          id="listBtn"
-          class="list-btn w-7 h-7 flex items-center justify-center rounded-full text-slate-400 hover:text-[#39c5bb] hover:bg-[#39c5bb]/10 transition-all outline-none"
-          aria-label="Toggle playlist"
-          title="Playlist"
-        >
-          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
-          </svg>
-        </button>
+      <!-- ── EXPANDED: horizontal pill ──────────────────────────────── -->
+      <div class="fp-pill" role="region" aria-label="Now playing controls">
+        <!-- Vinyl -->
+        <div class="fp-disc fp-vinyl-spin" id="fp-pill-disc" title="Toggle play/pause">
+          <span class="fp-disc-core"></span>
+        </div>
+
+        <!-- Track info -->
+        <div class="fp-info">
+          <p class="fp-label">Now Playing</p>
+          <p class="fp-title" id="fp-title">{first?.title ?? ''}</p>
+          <p class="fp-artist" id="fp-artist">{first?.artist ?? ''}</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="fp-controls">
+          <button id="fp-prev" class="fp-ctrl" aria-label="Previous track" title="Previous">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+          </button>
+          <button id="fp-play" class="fp-ctrl fp-play" aria-label="Play / Pause" title="Play / Pause">
+            <svg id="fp-play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button id="fp-next" class="fp-ctrl" aria-label="Next track" title="Next">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+          </button>
+          <button id="fp-list" class="fp-ctrl fp-list-btn" aria-label="Toggle playlist" title="Playlist">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+          </button>
+          <button id="fp-close" class="fp-ctrl fp-close" aria-label="Collapse player" title="Collapse">
+            <svg width="11" height="11" viewBox="0 0 14 14" fill="none">
+              <path d="M3 3L11 11M11 3L3 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Playlist drawer -->
+        <div class="fp-drawer" id="fp-drawer">
+          <div class="fp-drawer-header">
+            <span class="fp-drawer-title">Up Next</span>
+            <span class="fp-drawer-count" id="fp-drawer-count">0 tracks</span>
+          </div>
+          <div class="fp-list" id="fp-list-inner"></div>
+        </div>
       </div>
-    </div>
-  )}
-
-  <!-- Playlist drawer (hidden when empty) -->
-  {playlist.length > 0 && (
-    <div class="playlist-drawer" id="playlistDrawer">
-      <div class="playlist-inner" id="playlistInner"></div>
-    </div>
+    </>
   )}
 </div>
 
 <script>
-  const root    = document.getElementById('musicPlayerRoot');
-  const tracks  = JSON.parse(root?.dataset.playlist ?? '[]') as Array<{
-    id: number; title: string; artist: string; src: string; durationStr?: string;
-  }>;
+  const root = document.getElementById('floating-player');
+  if (root) {
+    const tracks = JSON.parse(root.dataset.playlist ?? '[]') as Array<{
+      id: number; title: string; artist: string; src: string; durationStr?: string;
+    }>;
 
-  if (tracks.length === 0) {
-    // Nothing to wire up.
-  } else {
-    const audio          = document.getElementById('audioEngine') as HTMLAudioElement;
-    const playBtn        = document.getElementById('playBtn')!;
-    const playIcon       = document.getElementById('playIcon')!;
-    const vinyl          = document.getElementById('vinyl')!;
-    const titleEl        = document.getElementById('trackTitle')!;
-    const artistEl       = document.getElementById('trackArtist')!;
-    const listBtn        = document.getElementById('listBtn')!;
-    const playlistDrawer = document.getElementById('playlistDrawer')!;
-    const playlistInner  = document.getElementById('playlistInner')!;
+    // ── Reveal on scroll past hero ─────────────────────────────────────
+    const REVEAL_AT = 200; // px scrolled
+    const updateVisible = () => {
+      root.classList.toggle('visible', window.scrollY > REVEAL_AT);
+    };
+    updateVisible();
+    window.addEventListener('scroll', updateVisible, { passive: true });
 
-    let currentIdx = 0;
+    if (tracks.length > 0) {
+      const audio        = document.getElementById('audioEngine') as HTMLAudioElement;
+      const discToggle   = document.getElementById('fp-disc-toggle')!;
+      const discIcon     = document.getElementById('fp-disc-icon')!;
+      const pillDisc     = document.getElementById('fp-pill-disc')!;
+      const titleEl      = document.getElementById('fp-title')!;
+      const artistEl     = document.getElementById('fp-artist')!;
+      const playBtn      = document.getElementById('fp-play')!;
+      const playIcon     = document.getElementById('fp-play-icon')!;
+      const prevBtn      = document.getElementById('fp-prev')!;
+      const nextBtn      = document.getElementById('fp-next')!;
+      const listBtn      = document.getElementById('fp-list')!;
+      const closeBtn     = document.getElementById('fp-close')!;
+      const listInner    = document.getElementById('fp-list-inner')!;
+      const drawerCount  = document.getElementById('fp-drawer-count')!;
 
-    const PLAY_PATH  = '<path d="M8 5v14l11-7z"/>';
-    const PAUSE_PATH = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+      let currentIdx = 0;
 
-    /* ─── Playlist UI ── */
-    function buildPlaylist() {
+      const PLAY_PATH  = '<path d="M8 5v14l11-7z"/>';
+      const PAUSE_PATH = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+      // ── Build playlist DOM ───────────────────────────────────────────
       tracks.forEach((track, idx) => {
         const btn = document.createElement('button');
-        btn.className = 'playlist-track';
+        btn.className = 'fp-track';
         btn.innerHTML = `
-          <div class="track-num">${idx + 1}</div>
-          <div class="playing-indicator">
-            <div class="playing-bar"></div>
-            <div class="playing-bar"></div>
-            <div class="playing-bar"></div>
+          <div class="fp-track-num">${String(idx + 1).padStart(2, '0')}</div>
+          <div class="fp-eq">
+            <div class="fp-eq-bar"></div>
+            <div class="fp-eq-bar"></div>
+            <div class="fp-eq-bar"></div>
           </div>
-          <div class="pl-info">
-            <div class="pl-title">${track.title}</div>
-            <div class="pl-artist">${track.artist}</div>
+          <div class="fp-track-info">
+            <div class="fp-track-title">${track.title}</div>
+            <div class="fp-track-artist">${track.artist}</div>
           </div>
-          <span class="pl-dur">${track.durationStr ?? ''}</span>
+          <span class="fp-track-dur">${track.durationStr ?? ''}</span>
         `;
         btn.addEventListener('click', () => goTo(idx, true));
-        playlistInner.appendChild(btn);
+        listInner.appendChild(btn);
       });
-    }
+      drawerCount.textContent = `${tracks.length} track${tracks.length === 1 ? '' : 's'}`;
 
-    function syncPlaylistUI() {
-      playlistInner.querySelectorAll('.playlist-track').forEach((el, idx) => {
-        el.classList.toggle('active', idx === currentIdx);
-        el.classList.toggle('is-playing', idx === currentIdx && !audio.paused);
+      function syncPlaylistUI() {
+        listInner.querySelectorAll('.fp-track').forEach((el, idx) => {
+          el.classList.toggle('active', idx === currentIdx);
+          el.classList.toggle('is-playing', idx === currentIdx && !audio.paused);
+        });
+      }
+
+      function goTo(idx: number, play = false) {
+        currentIdx = ((idx % tracks.length) + tracks.length) % tracks.length;
+        const track = tracks[currentIdx];
+        audio.src = track.src;
+        titleEl.textContent  = track.title;
+        artistEl.textContent = track.artist;
+        if (play) audio.play();
+        syncPlaylistUI();
+        discToggle.setAttribute('title', track.title);
+      }
+
+      // ── Audio events drive vinyl + icon state ────────────────────────
+      function setPlayingVisuals(isPlaying: boolean) {
+        discToggle.classList.toggle('playing', isPlaying);
+        pillDisc.classList.toggle('playing', isPlaying);
+        playIcon.innerHTML = isPlaying ? PAUSE_PATH : PLAY_PATH;
+        discIcon.innerHTML = isPlaying ? PAUSE_PATH : PLAY_PATH;
+        syncPlaylistUI();
+      }
+      audio.addEventListener('play',  () => setPlayingVisuals(true));
+      audio.addEventListener('pause', () => setPlayingVisuals(false));
+      audio.addEventListener('ended', () => goTo(currentIdx + 1, true));
+
+      // ── Auto-collapse when paused & idle ─────────────────────────────
+      let idleTimer: ReturnType<typeof setTimeout> | null = null;
+      function scheduleAutoCollapse() {
+        if (idleTimer) clearTimeout(idleTimer);
+        if (audio.paused && root.classList.contains('expanded')) {
+          idleTimer = setTimeout(() => {
+            root.classList.remove('expanded');
+            root.classList.remove('playlist-open');
+            listBtn.classList.remove('active');
+          }, 8000);
+        }
+      }
+      function cancelAutoCollapse() {
+        if (idleTimer) { clearTimeout(idleTimer); idleTimer = null; }
+      }
+
+      function togglePlay() {
+        if (audio.src === '') goTo(currentIdx, true);
+        else audio.paused ? audio.play() : audio.pause();
+      }
+
+      // First click on disc: expand.
+      discToggle.addEventListener('click', () => {
+        root.classList.add('expanded');
+        if (audio.src === '') goTo(0, true);
+        scheduleAutoCollapse();
       });
+
+      // Vinyl inside the pill: toggle play/pause
+      pillDisc.addEventListener('click', () => {
+        togglePlay();
+        cancelAutoCollapse();
+      });
+
+      playBtn.addEventListener('click', () => { togglePlay(); cancelAutoCollapse(); });
+      prevBtn.addEventListener('click', () => { goTo(currentIdx - 1, !audio.paused); cancelAutoCollapse(); });
+      nextBtn.addEventListener('click', () => { goTo(currentIdx + 1, !audio.paused); cancelAutoCollapse(); });
+
+      listBtn.addEventListener('click', () => {
+        const isOpen = root.classList.toggle('playlist-open');
+        listBtn.classList.toggle('active', isOpen);
+        cancelAutoCollapse();
+      });
+
+      closeBtn.addEventListener('click', () => {
+        root.classList.remove('expanded');
+        root.classList.remove('playlist-open');
+        listBtn.classList.remove('active');
+      });
+
+      // Click outside the player closes the playlist drawer
+      document.addEventListener('click', (e) => {
+        if (!root.contains(e.target as Node)) {
+          root.classList.remove('playlist-open');
+          listBtn.classList.remove('active');
+        }
+      });
+
+      // Keep auto-collapse fresh when the user interacts with the pill
+      root.addEventListener('mouseenter', cancelAutoCollapse);
+      root.addEventListener('mouseleave', scheduleAutoCollapse);
+
+      // ── Init ─────────────────────────────────────────────────────────
+      goTo(0); // Load first track but don't autoplay
     }
-
-    /* ─── Track switching ── */
-    function goTo(idx: number, play = false) {
-      currentIdx = idx;
-      const track = tracks[idx];
-      audio.src         = track.src;
-      titleEl.textContent  = track.title;
-      artistEl.textContent = track.artist;
-      if (play) audio.play();
-      syncPlaylistUI();
-    }
-
-    /* ─── Vinyl spin follows audio state ── */
-    audio.addEventListener('play',  () => {
-      vinyl.classList.add('playing');
-      playIcon.innerHTML = PAUSE_PATH;
-      playIcon.classList.remove('ml-0.5');
-      syncPlaylistUI();
-    });
-    audio.addEventListener('pause', () => {
-      vinyl.classList.remove('playing');
-      playIcon.innerHTML = PLAY_PATH;
-      playIcon.classList.add('ml-0.5');
-      syncPlaylistUI();
-    });
-
-    /* ─── Auto-advance ── */
-    audio.addEventListener('ended', () => {
-      goTo((currentIdx + 1) % tracks.length, true);
-    });
-
-    /* ─── Controls ── */
-    playBtn.addEventListener('click', () => {
-      if (audio.src === '') goTo(currentIdx, true);
-      else audio.paused ? audio.play() : audio.pause();
-    });
-
-    vinyl.addEventListener('click', () => {
-      const wasPlaying = !audio.paused;
-      vinyl.classList.remove('playing');
-      setTimeout(() => goTo((currentIdx + 1) % tracks.length, wasPlaying), 50);
-    });
-
-    listBtn.addEventListener('click', () => {
-      const isOpen = playlistDrawer.classList.toggle('open');
-      listBtn.classList.toggle('active', isOpen);
-    });
-
-    /* ─── Init ── */
-    buildPlaylist();
-    goTo(0);
   }
 </script>
