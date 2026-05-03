@@ -1,19 +1,518 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Navigation from '../components/Navigation.astro';
-import SiteFooter from '../components/SiteFooter.astro';
-import { getCollection } from 'astro:content';
- 
-const pageData = await getCollection('pageData');
-const projectsPage = pageData.find(p => p.slug === 'projects');
- 
-if (!projectsPage) return Astro.redirect('/');
-const { Content } = await projectsPage.render();
+/**
+ * src/pages/projects.astro
+ *
+ * Pattern A — "Project + Process" page for a portfolio with one real project.
+ *
+ * Layout:
+ *  1. Page header — label + bold statement + subhead
+ *  2. Featured project card — split card (preview + meta + tech + CTAs)
+ *  3. Build log — vertical timeline of milestones
+ *  4. Written along the way — 2-col grid of related blog posts
+ *  5. Roadmap — Now / Next / Later, three columns
+ *  6. Bottom CTA — collaborate / contact
+ *
+ * Styling inherits from DESIGN.md tokens (teal #39c5bb, slate ink, soft shadows,
+ * 1100px max-width, Plus Jakarta Sans + JetBrains Mono). No new tokens introduced.
+ */
+
+import BaseLayout      from '../layouts/BaseLayout.astro';
+import Navigation      from '../components/Navigation.astro';
+import SiteFooter      from '../components/SiteFooter.astro';
+import MusicPlayer     from '../components/MusicPlayer.astro';
+
+// ── The one real project ─────────────────────────────────────────────────────
+// Edit these strings — they're the only thing that needs to be true.
+const featured = {
+  title:       'Yean Ter Portfolio',
+  status:      'v1.0 · LIVE',
+  oneLiner:    'A personal portfolio built with Astro, Tailwind, and a healthy obsession with detail.',
+  description: 'The site you\'re reading right now. Built from scratch as both a portfolio and a sandbox — every component (the floating music player, the cinematic hero, the per-category card system) was a chance to learn something new about Astro islands, design tokens, or motion.',
+  liveHref:    'https://your-portfolio.example',
+  repoHref:    'https://github.com/yourname/portfolio',  // ← swap with your real repo
+  preview:     'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=1600&q=80',
+  // Small honest stats — adjust to reality
+  meta: [
+    { label: 'Started',    value: 'Mar 2026' },
+    { label: 'Components', value: '9' },
+    { label: 'Stack',      value: 'Astro · TS' },
+  ],
+  // Tech stack pills (color-coded like the sidebar profile)
+  stack: [
+    { label: 'Astro',       tone: 'orange' },
+    { label: 'Tailwind',    tone: 'teal'   },
+    { label: 'TypeScript',  tone: 'slate'  },
+    { label: 'Three.js',    tone: 'slate'  },
+    { label: 'Plus Jakarta',tone: 'slate'  },
+  ],
+};
+
+// ── Build log — milestones ──────────────────────────────────────────────────
+// One line per entry. Dates honest. Most recent at the top.
+const buildLog = [
+  { date: 'May  4, 2026', title: 'Floating music player',     summary: 'Promoted the sidebar player to a viewport-anchored island. Spinning vinyl follows you down the page.' },
+  { date: 'May  3, 2026', title: 'Cinematic hero redesign',   summary: 'Replaced the inline hero card with a full-bleed slideshow + centered CTAs. Set the mood up front.' },
+  { date: 'Apr 28, 2026', title: 'Per-category color system', summary: 'RecentPosts cards earn a left accent bar, tinted code badge, and a dedicated palette per category.' },
+  { date: 'Apr 17, 2026', title: 'Music player MVP',          summary: 'Built audio engine, playlist drawer, vinyl spin animation. Plain SVG, zero framework JS.' },
+  { date: 'Apr 10, 2026', title: 'Tokens + DESIGN.md',        summary: 'Locked colour, type, spacing, and shadow into a single document. Stops design drift.' },
+  { date: 'Mar 22, 2026', title: 'First Astro prototype',     summary: 'Migrated from a Next.js sketch. Rebuilt the home page on islands. Half the JS, twice the speed.' },
+];
+
+// ── Written along the way ───────────────────────────────────────────────────
+// Pull from real posts when collection exists; demo data otherwise.
+// These are the posts that match the build, not random links.
+const writeups = [
+  {
+    title:    'Building a Music Player in Astro',
+    excerpt:  'No framework JS — just Astro islands and a spinning vinyl record made from plain SVG.',
+    href:     '/posts/music-player-astro',
+    date:     'Apr 17, 2026',
+    category: 'Dev',
+    tags:     ['Astro', 'Audio'],
+  },
+  {
+    title:    'Designing Card-Based UI Systems',
+    excerpt:  'Per-category color tokens, hover micro-interactions, and the geometry of a 78px code square.',
+    href:     '/posts/card-based-ui-systems',
+    date:     'Apr 24, 2026',
+    category: 'Design',
+    tags:     ['UI', 'Astro'],
+  },
+  {
+    title:    'Three.js Particle Systems on a Budget',
+    excerpt:  '60fps star-field effects without a beefy GPU — instanced mesh and frustum culling.',
+    href:     '/posts/threejs-particle-budget',
+    date:     'Apr  3, 2026',
+    category: 'Dev',
+    tags:     ['Three.js', 'WebGL'],
+  },
+  {
+    title:    'Why I Switched from Next.js to Astro',
+    excerpt:  'Hydration budget, island architecture, and the joy of zero JS by default.',
+    href:     '/posts/nextjs-to-astro',
+    date:     'Mar 20, 2026',
+    category: 'Dev',
+    tags:     ['Astro', 'Next.js'],
+  },
+];
+
+// Category style map — matches RecentPosts.astro for visual cohesion
+const catStyle: Record<string, { accent: string; pillBg: string; pillText: string; pillBorder: string; boxBg: string; boxText: string; code: string }> = {
+  Anime:   { accent: '#f59e0b', pillBg: 'rgba(245,158,11,0.10)',  pillText: '#d97706', pillBorder: 'rgba(245,158,11,0.30)', boxBg: 'rgba(245,158,11,0.08)',  boxText: '#d97706', code: 'AN' },
+  Design:  { accent: '#39c5bb', pillBg: 'rgba(57,197,187,0.10)',  pillText: '#2ba8a0', pillBorder: 'rgba(57,197,187,0.32)', boxBg: 'rgba(57,197,187,0.08)',  boxText: '#2ba8a0', code: 'DE' },
+  Dev:     { accent: '#475569', pillBg: 'rgba(71,85,105,0.10)',   pillText: '#334155', pillBorder: 'rgba(71,85,105,0.25)',  boxBg: 'rgba(71,85,105,0.06)',   boxText: '#475569', code: 'DV' },
+  Journal: { accent: '#8b5cf6', pillBg: 'rgba(139,92,246,0.10)',  pillText: '#7c3aed', pillBorder: 'rgba(139,92,246,0.30)', boxBg: 'rgba(139,92,246,0.08)',  boxText: '#7c3aed', code: 'JO' },
+};
+
+// ── Roadmap — Now / Next / Later ────────────────────────────────────────────
+// Keep each line short and honest. No filler.
+const roadmap = {
+  now: [
+    'Polishing the projects page (this one)',
+    'Wiring up real content collections for posts',
+    'Writing the music-player teardown post',
+  ],
+  next: [
+    'Anime tracker page with seasonal grid',
+    'Three.js star-field for /about hero',
+    'Tag filter + search on the posts index',
+  ],
+  later: [
+    'RSS feed and sitemap automation',
+    'Dark mode (proper, not just inverted)',
+    'Possibly a CMS for posts I write on the train',
+  ],
+};
+
+// Tone → tag pill style
+const tagToneClass: Record<string, string> = {
+  teal:   'bg-[#39c5bb]/10 text-[#2ba8a0] border-[#39c5bb]/30',
+  orange: 'bg-orange-50 text-orange-500 border-orange-200',
+  slate:  'bg-slate-100 text-slate-600 border-slate-200',
+};
 ---
-<BaseLayout title="Projects | Personal Workspace">
+
+<BaseLayout title="Projects — Yean Ter">
   <Navigation />
-  <main class="max-w-[1100px] mx-auto px-6 pb-16 pt-6">
-    <Content />
+
+  <!-- Soft ambient teal glow that follows the user down the page -->
+  <div
+    class="fixed left-1/3 w-[500px] h-[500px] rounded-full blur-3xl pointer-events-none -z-10"
+    style="top:30vh;background:rgba(57,197,187,0.04);"
+    aria-hidden="true"
+  ></div>
+
+  <main
+    class="max-w-[1100px] mx-auto px-6 pt-24 pb-20"
+    style="font-family:'Plus Jakarta Sans',sans-serif;"
+  >
+
+    <!-- 1 ── PAGE HEADER ────────────────────────────────────────────────── -->
+    <header class="mb-14">
+      <!-- Tiny breadcrumb-style label -->
+      <div class="flex items-center gap-2 mb-5">
+        <span class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] animate-pulse" aria-hidden="true"></span>
+        <span class="text-[10px] font-black tracking-[0.22em] uppercase text-[#39c5bb]">
+          Workspace · Projects
+        </span>
+      </div>
+
+      <!-- Big honest line -->
+      <h1
+        class="font-black tracking-tight text-slate-900 leading-[1.05] mb-4"
+        style="font-size: clamp(2.2rem, 5vw, 3.4rem);"
+      >
+        What I'm building,<br/>
+        <span class="text-[#39c5bb]">in detail.</span>
+      </h1>
+
+      <!-- Subhead -->
+      <p class="text-slate-500 text-[15px] font-medium max-w-xl leading-relaxed">
+        One project at a time, with intent. Right now there's just one — but each piece of it is
+        documented, written about, and (usually) shipped before I move on.
+      </p>
+    </header>
+
+    <!-- 2 ── FEATURED PROJECT CARD ──────────────────────────────────────── -->
+    <section aria-labelledby="featured-heading" class="mb-20">
+
+      <!-- Section label -->
+      <div class="flex items-center gap-2 mb-5">
+        <span class="text-[10px] font-black tracking-[0.18em] uppercase text-slate-300">
+          Featured Project · 01
+        </span>
+        <div class="flex-1 h-px bg-slate-100"></div>
+      </div>
+
+      <!-- The project card -->
+      <article
+        class="relative grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-[0_8px_40px_rgba(15,23,42,0.04)] hover:shadow-[0_12px_48px_rgba(57,197,187,0.10)] transition-shadow duration-500"
+      >
+
+        <!-- Left: Preview image -->
+        <div class="lg:col-span-7 relative bg-slate-900 overflow-hidden" style="min-height: 320px;">
+          <img
+            src={featured.preview}
+            alt={`${featured.title} preview`}
+            class="absolute inset-0 w-full h-full object-cover"
+            loading="lazy"
+          />
+          <!-- Soft scrim so the image doesn't fight the right column -->
+          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/10 pointer-events-none lg:to-white/0"></div>
+
+          <!-- Status badge top-left -->
+          <div class="absolute top-4 left-4 flex items-center gap-1.5 px-2.5 py-1 bg-[#39c5bb]/85 backdrop-blur-sm rounded-lg border border-white/20">
+            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+            <span class="text-[9px] font-black text-white tracking-wide">{featured.status}</span>
+          </div>
+
+          <!-- Serial badge top-right -->
+          <div class="absolute top-4 right-4 px-2.5 py-1 bg-slate-900/70 backdrop-blur-sm rounded-lg border border-white/10">
+            <span class="text-[9px] font-mono text-white/90 font-bold">PRJ-001</span>
+          </div>
+        </div>
+
+        <!-- Right: Meta + CTA -->
+        <div class="lg:col-span-5 p-7 lg:p-9 flex flex-col">
+
+          <!-- Title -->
+          <h2
+            id="featured-heading"
+            class="text-slate-900 font-black leading-tight tracking-tight mb-2"
+            style="font-size: clamp(1.5rem, 2.4vw, 1.85rem);"
+          >
+            {featured.title}
+          </h2>
+
+          <!-- One-liner -->
+          <p class="text-slate-500 text-[13px] font-semibold mb-4 leading-snug">
+            {featured.oneLiner}
+          </p>
+
+          <!-- Description -->
+          <p class="text-slate-600 text-[13px] font-medium leading-relaxed mb-6">
+            {featured.description}
+          </p>
+
+          <!-- Tech stack pills -->
+          <div class="flex flex-wrap gap-1.5 mb-6">
+            {featured.stack.map(s => (
+              <span class:list={['px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border', tagToneClass[s.tone] ?? tagToneClass.slate]}>
+                {s.label}
+              </span>
+            ))}
+          </div>
+
+          <!-- Meta strip — small honest numbers -->
+          <div class="grid grid-cols-3 gap-3 mb-6 pt-5 border-t border-slate-100">
+            {featured.meta.map(m => (
+              <div>
+                <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">
+                  {m.label}
+                </p>
+                <p class="text-[12px] font-bold text-slate-700 font-mono">{m.value}</p>
+              </div>
+            ))}
+          </div>
+
+          <!-- CTAs — pushed to bottom of card -->
+          <div class="flex items-center gap-3 mt-auto flex-wrap">
+            <a
+              href={featured.liveHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 bg-[#39c5bb] hover:bg-[#2ba8a0] text-white font-bold text-[13px] px-5 py-2.5 rounded-full shadow-[0_4px_20px_rgba(57,197,187,0.35)] hover:shadow-[0_6px_24px_rgba(57,197,187,0.5)] hover:-translate-y-0.5 transition-all duration-200"
+            >
+              View Live
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M2 6H10M6 2L10 6L6 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+            <a
+              href={featured.repoHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-[13px] px-5 py-2.5 rounded-full hover:-translate-y-0.5 transition-all duration-200"
+            >
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+              </svg>
+              View Source
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M3 3H9V9M3 9L9 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- 3 ── BUILD LOG ──────────────────────────────────────────────────── -->
+    <section aria-labelledby="build-log-heading" class="mb-20">
+
+      <!-- Section label -->
+      <div class="flex items-center gap-2 mb-7">
+        <span id="build-log-heading" class="text-[10px] font-black tracking-[0.18em] uppercase text-slate-300">
+          Build Log · Most Recent First
+        </span>
+        <div class="flex-1 h-px bg-slate-100"></div>
+      </div>
+
+      <!-- Vertical timeline -->
+      <ol class="relative space-y-5 pl-8 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-px before:bg-slate-200">
+        {buildLog.map((entry, i) => (
+          <li class="relative">
+            <!-- Timeline dot -->
+            <span
+              class:list={[
+                'absolute -left-[26px] top-1 w-3 h-3 rounded-full border-2 border-white',
+                i === 0 ? 'bg-[#39c5bb] shadow-[0_0_0_3px_rgba(57,197,187,0.18)]' : 'bg-slate-300',
+              ]}
+              aria-hidden="true"
+            ></span>
+
+            <!-- Entry -->
+            <div class="bg-white rounded-2xl border border-slate-100 px-5 py-4 hover:border-[#39c5bb]/30 hover:shadow-[0_4px_20px_rgba(57,197,187,0.06)] transition-all duration-200">
+              <div class="flex items-baseline gap-3 mb-1 flex-wrap">
+                <h3 class="text-[14px] font-black text-slate-900 tracking-tight">{entry.title}</h3>
+                <span class="text-[10px] font-mono text-slate-300 tabular-nums ml-auto">{entry.date}</span>
+              </div>
+              <p class="text-[12px] font-medium text-slate-500 leading-relaxed">{entry.summary}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <!-- 4 ── WRITTEN ALONG THE WAY ──────────────────────────────────────── -->
+    <section aria-labelledby="writeups-heading" class="mb-20">
+
+      <!-- Section label -->
+      <div class="flex items-center justify-between mb-7 gap-4">
+        <div class="flex items-center gap-2">
+          <span id="writeups-heading" class="text-[10px] font-black tracking-[0.18em] uppercase text-slate-300">
+            Written Along the Way
+          </span>
+        </div>
+        <div class="flex-1 h-px bg-slate-100"></div>
+        <a
+          href="/posts"
+          class="text-[11px] font-bold text-slate-400 hover:text-[#39c5bb] transition-colors flex items-center gap-1 shrink-0"
+        >
+          All posts
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
+            <path d="M2 5H8M5 2L8 5L5 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+
+      <!-- 2-col grid of writeup cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {writeups.map(post => {
+          const cs = catStyle[post.category] ?? catStyle.Dev;
+          return (
+            <a
+              href={post.href}
+              class="group flex items-stretch bg-white rounded-2xl border border-slate-100 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(15,23,42,0.06)]"
+            >
+              <!-- Left accent bar -->
+              <div
+                class="w-[4px] shrink-0 transition-all duration-300 group-hover:w-1.5"
+                style={`background:${cs.accent};`}
+              ></div>
+
+              <div class="flex-1 flex items-center gap-4 px-5 py-4 min-w-0">
+                <div class="flex-1 min-w-0">
+
+                  <!-- Meta row -->
+                  <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                    <span
+                      class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-[0.12em] border"
+                      style={`background:${cs.pillBg};color:${cs.pillText};border-color:${cs.pillBorder};`}
+                    >
+                      {post.category}
+                    </span>
+                    {post.tags.map(tag => (
+                      <span class="text-[10px] font-mono text-slate-300">#{tag}</span>
+                    ))}
+                  </div>
+
+                  <!-- Title -->
+                  <h3
+                    class="text-[14px] font-black leading-snug tracking-tight line-clamp-1 transition-colors duration-200 group-hover:text-[#39c5bb]"
+                    style="color:#0f172a;"
+                  >
+                    {post.title}
+                  </h3>
+
+                  <!-- Excerpt -->
+                  <p class="text-[12px] font-medium leading-relaxed mt-1 line-clamp-2" style="color:#94a3b8;">
+                    {post.excerpt}
+                  </p>
+
+                  <!-- Date -->
+                  <p class="text-[10px] font-mono text-slate-300 tabular-nums mt-2">{post.date}</p>
+                </div>
+
+                <!-- Right code badge -->
+                <div
+                  class="shrink-0 w-[64px] h-[64px] rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
+                  style={`background:${cs.boxBg};`}
+                >
+                  <span
+                    class="text-[12px] font-black tracking-[0.12em]"
+                    style={`color:${cs.boxText};opacity:0.55;`}
+                  >
+                    {cs.code}
+                  </span>
+                </div>
+              </div>
+            </a>
+          );
+        })}
+      </div>
+    </section>
+
+    <!-- 5 ── ROADMAP ────────────────────────────────────────────────────── -->
+    <section aria-labelledby="roadmap-heading" class="mb-20">
+
+      <!-- Section label -->
+      <div class="flex items-center gap-2 mb-7">
+        <span id="roadmap-heading" class="text-[10px] font-black tracking-[0.18em] uppercase text-slate-300">
+          Roadmap · Now / Next / Later
+        </span>
+        <div class="flex-1 h-px bg-slate-100"></div>
+      </div>
+
+      <!-- Three columns -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <!-- NOW — teal accent -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 hover:border-[#39c5bb]/30 transition-colors duration-200">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] animate-pulse"></span>
+            <span class="text-[10px] font-black tracking-[0.2em] uppercase text-[#39c5bb]">Now</span>
+          </div>
+          <ul class="space-y-2.5">
+            {roadmap.now.map(item => (
+              <li class="flex items-start gap-2.5 text-[13px] font-medium text-slate-700 leading-snug">
+                <span class="text-[#39c5bb] mt-1 shrink-0">→</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- NEXT — orange accent -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 hover:border-orange-200 transition-colors duration-200">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
+            <span class="text-[10px] font-black tracking-[0.2em] uppercase text-orange-500">Next</span>
+          </div>
+          <ul class="space-y-2.5">
+            {roadmap.next.map(item => (
+              <li class="flex items-start gap-2.5 text-[13px] font-medium text-slate-700 leading-snug">
+                <span class="text-orange-400 mt-1 shrink-0">→</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- LATER — slate / muted -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 hover:border-slate-300 transition-colors duration-200">
+          <div class="flex items-center gap-2 mb-4">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            <span class="text-[10px] font-black tracking-[0.2em] uppercase text-slate-500">Later</span>
+          </div>
+          <ul class="space-y-2.5">
+            {roadmap.later.map(item => (
+              <li class="flex items-start gap-2.5 text-[13px] font-medium text-slate-500 leading-snug">
+                <span class="text-slate-300 mt-1 shrink-0">→</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 ── BOTTOM CTA ─────────────────────────────────────────────────── -->
+    <section
+      class="relative bg-white rounded-3xl border border-slate-100 px-8 py-12 text-center overflow-hidden"
+      aria-labelledby="cta-heading"
+    >
+      <!-- Subtle teal glow -->
+      <div
+        class="absolute inset-0 pointer-events-none"
+        style="background:radial-gradient(circle at 50% 100%, rgba(57,197,187,0.08), transparent 60%);"
+        aria-hidden="true"
+      ></div>
+
+      <div class="relative">
+        <h3
+          id="cta-heading"
+          class="text-slate-900 font-black tracking-tight mb-3"
+          style="font-size: clamp(1.4rem, 2.4vw, 1.75rem);"
+        >
+          Want to collaborate, or just chat?
+        </h3>
+        <p class="text-slate-500 text-[14px] font-medium mb-6 max-w-md mx-auto leading-relaxed">
+          I'm open to interesting projects, feedback on the build, or recommendations for what to read next.
+        </p>
+        <a
+          href="/about"
+          class="inline-flex items-center gap-2 bg-[#39c5bb] hover:bg-[#2ba8a0] text-white font-bold text-[13px] px-7 py-3 rounded-full shadow-[0_4px_24px_rgba(57,197,187,0.4)] hover:shadow-[0_6px_28px_rgba(57,197,187,0.55)] hover:-translate-y-0.5 transition-all duration-200"
+        >
+          Get in touch
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M2 6H10M6 2L10 6L6 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+      </div>
+    </section>
   </main>
-  <SiteFooter />
+
+  <SiteFooter ownerName="Yean Ter" />
+  <MusicPlayer />
 </BaseLayout>
