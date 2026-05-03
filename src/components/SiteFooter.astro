@@ -1,33 +1,24 @@
 ---
 /**
  * SiteFooter.astro
- * Full footer — stats bar + 3-col grid (brand, nav, tags) + bottom bar.
- * Mirrors kfdzcoffee's 走了十年之旅 section.
+ * 3-column footer (brand, pages, tags) + bottom bar.
+ * The stats bar that used to live here has been promoted to its own SiteStats
+ * component above the footer — so this component is now lighter.
  *
  * Props:
- *   postCount  — total number of posts
- *   totalWords — estimated total word count across all posts
  *   tags       — flat array of all tags (duplicates ok, will be deduped)
- *   startYear  — year the site launched
+ *   ownerName  — name shown in the copyright line
  */
 
 interface Props {
-  postCount?:  number;
-  totalWords?: number;
-  tags?:       string[];
-  startYear?:  number;
+  tags?:      string[];
+  ownerName?: string;
 }
 
 const {
-  postCount  = 0,
-  totalWords = 0,
-  tags       = [],
-  startYear  = 2024,
+  tags      = [],
+  ownerName = 'Yean Ter',
 } = Astro.props;
-
-const runningDays = Math.floor(
-  (Date.now() - new Date(`${startYear}-01-01`).getTime()) / 86_400_000
-);
 
 const uniqueTags = [...new Set(tags)].slice(0, 24);
 
@@ -39,44 +30,19 @@ const navLinks = [
   { href: '/about',    label: 'About'    },
 ];
 
-const stats = [
-  { value: postCount  || '—',                                           label: 'Posts'        },
-  { value: totalWords ? `${Math.round(totalWords / 1000)}k` : '—',     label: 'Words'        },
-  { value: uniqueTags.length || '—',                                    label: 'Tags'         },
-  { value: runningDays,                                                  label: 'Days online'  },
-];
+// Demo tags shown when no real posts exist yet
+const demoTags = ['Astro', 'ACGN', 'Anime', 'Design', 'Dev', 'Three.js', 'UI', 'Journal', 'Life', 'Next.js', 'WebGL', 'Honkai'];
+const tagsToShow = uniqueTags.length > 0 ? uniqueTags : demoTags;
+const tagsAreLive = uniqueTags.length > 0;
 ---
 
 <footer
-  class="w-full border-t border-slate-200/70 bg-white"
+  class="w-full bg-white border-t border-slate-100"
   style="font-family:'Plus Jakarta Sans',sans-serif;"
   aria-label="Site footer"
 >
-
-  <!-- Stats bar -->
-  <div class="border-b border-slate-100 bg-[#f8fafc]">
-    <div class="max-w-[1100px] mx-auto px-6 py-6">
-
-      <!-- kfdzcoffee-style centered divider heading -->
-      <div class="flex items-center gap-4 mb-6">
-        <div class="flex-1 h-px" style="background:linear-gradient(to right,transparent,rgba(57,197,187,0.35))"></div>
-        <span class="text-[10px] font-black tracking-[0.22em] uppercase" style="color:#39c5bb">Site stats</span>
-        <div class="flex-1 h-px" style="background:linear-gradient(to left,transparent,rgba(57,197,187,0.35))"></div>
-      </div>
-
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {stats.map(s => (
-          <div class="flex flex-col items-center gap-1 py-3 rounded-2xl bg-white border border-slate-100">
-            <span class="text-2xl font-black" style="color:#0f172a;">{s.value}</span>
-            <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#94a3b8;">{s.label}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-
   <!-- Main footer body -->
-  <div class="max-w-[1100px] mx-auto px-6 py-10">
+  <div class="max-w-[1100px] mx-auto px-6 py-12">
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
 
       <!-- Col 1: Brand -->
@@ -88,7 +54,7 @@ const stats = [
         >
           PORTFOLIO
         </a>
-        <p class="text-[12px] font-medium mt-2 leading-relaxed" style="color:#94a3b8;max-width:180px;">
+        <p class="text-[12px] font-medium mt-2 leading-relaxed" style="color:#94a3b8;max-width:200px;">
           所有奇迹的始发点<br/>Where All Miracles Begin
         </p>
 
@@ -121,13 +87,13 @@ const stats = [
         </div>
 
         <!-- Version pill -->
-        <div class="flex items-center gap-1.5 mt-4">
+        <div class="flex items-center gap-1.5 mt-5">
           <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#39c5bb;"></span>
           <span class="text-[10px] font-mono" style="color:#cbd5e1;">Astro_Sys_v1.0</span>
         </div>
       </div>
 
-      <!-- Col 2: Nav -->
+      <!-- Col 2: Pages -->
       <div>
         <p class="text-[10px] font-black uppercase tracking-[0.18em] mb-4" style="color:#cbd5e1;">Pages</p>
         <nav class="space-y-2.5" aria-label="Footer navigation">
@@ -146,39 +112,33 @@ const stats = [
       <!-- Col 3: Tag cloud -->
       <div>
         <p class="text-[10px] font-black uppercase tracking-[0.18em] mb-4" style="color:#cbd5e1;">Tags</p>
-        {uniqueTags.length > 0 ? (
-          <div class="flex flex-wrap gap-1.5">
-            {uniqueTags.map(tag => (
+        <div class="flex flex-wrap gap-1.5">
+          {tagsToShow.map(tag => (
+            tagsAreLive ? (
               <a
                 href={`/tags/${tag}`}
                 class="px-2.5 py-1 rounded-full text-[10px] font-bold border border-slate-200 text-slate-500 transition-all duration-200 hover:border-[#39c5bb]/40 hover:text-[#39c5bb]"
               >
                 {tag}
               </a>
-            ))}
-          </div>
-        ) : (
-          /* Demo tags when no real posts exist */
-          <div class="flex flex-wrap gap-1.5">
-            {['Astro', 'ACGN', 'Anime', 'Design', 'Dev', 'Three.js', 'UI', 'Journal', 'Life', 'Next.js', 'WebGL', 'Honkai'].map(tag => (
+            ) : (
               <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border border-slate-200 text-slate-400">
                 {tag}
               </span>
-            ))}
-          </div>
-        )}
+            )
+          ))}
+        </div>
       </div>
     </div>
 
     <!-- Bottom bar -->
     <div class="mt-10 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
       <p class="text-[11px] font-medium" style="color:#cbd5e1;">
-        © {new Date().getFullYear()} Your Name · Built with Astro
+        © {new Date().getFullYear()} {ownerName} · Built with Astro
       </p>
       <p class="text-[11px] font-medium" style="color:#e2e8f0;">
         所有奇迹的始发点
       </p>
     </div>
   </div>
-
 </footer>
