@@ -8,10 +8,11 @@
  *      • Centered title + tagline + two CTAs (Browse Work / Anime Labs)
  *      • Bottom-center slide nav
  *  2. 12-col grid on a light gray bg
- *      col-4 sidebar: LocalTime + SidebarProfile + MusicPlayer
+ *      col-4 sidebar: LocalTime + SidebarProfile
  *      col-8 main:    RecentPosts (no top divider)
  *  3. SiteStats  (full-bleed — 4 white cards on the gray strip)
  *  4. SiteFooter (full-bleed — brand + pages + tags + bottom bar)
+ *  5. MusicPlayer (floating, fixed bottom-left, persistent across scroll)
  */
 
 import { getCollection } from 'astro:content';
@@ -48,11 +49,10 @@ const profile = {
   tagline:        'Frontend Developer · Anime Enjoyer',
   tags:           ['UI/UX', 'Astro', 'Next.js', 'Otaku'],
   currentFocus:   'Building portfolio with Astro + Three.js',
-  avatarFallback: 'YT',   // initials fallback — swap for '/avatar.jpg' once you have one
+  avatarFallback: 'YT',
 };
 
 // ── Hero wallpaper slideshow ─────────────────────────────────────────────────
-// First slide is the cinema-style neon image from the prototype.
 const heroWallpapers = [
   { src: 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=1920&q=80', alt: 'Central Cinema neon storefront' },
   { src: 'https://images.unsplash.com/photo-1493514789931-586cb221d7a7?w=1920&q=80', alt: 'Tokyo neon street at night' },
@@ -89,11 +89,10 @@ const heroWallpapers = [
     <main class="max-w-[1100px] mx-auto px-6 pt-10 pb-16">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-        <!-- Sidebar col-4: LocalTime + Profile + MusicPlayer -->
+        <!-- Sidebar col-4: LocalTime + Profile (MusicPlayer is now floating) -->
         <aside class="lg:col-span-4 space-y-5">
           <LocalTime label="LOCAL TIME · CHINA" timezone="Asia/Shanghai" />
           <SidebarProfile profile={profile} />
-          <MusicPlayer />
         </aside>
 
         <!-- Main col-8: Recent posts list -->
@@ -118,5 +117,12 @@ const heroWallpapers = [
     tags={uniqueTags}
     ownerName="Yean Ter"
   />
+
+  <!-- 5 ── FLOATING MUSIC PLAYER ───────────────────────────────────────── -->
+  <!--
+    Renders as position:fixed bottom-left, so it's a viewport-anchored island
+    rather than part of the document flow. Persistent across scroll.
+  -->
+  <MusicPlayer />
 
 </BaseLayout>
