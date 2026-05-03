@@ -1,0 +1,184 @@
+---
+/**
+ * SiteFooter.astro
+ * Full footer — stats bar + 3-col grid (brand, nav, tags) + bottom bar.
+ * Mirrors kfdzcoffee's 走了十年之旅 section.
+ *
+ * Props:
+ *   postCount  — total number of posts
+ *   totalWords — estimated total word count across all posts
+ *   tags       — flat array of all tags (duplicates ok, will be deduped)
+ *   startYear  — year the site launched
+ */
+
+interface Props {
+  postCount?:  number;
+  totalWords?: number;
+  tags?:       string[];
+  startYear?:  number;
+}
+
+const {
+  postCount  = 0,
+  totalWords = 0,
+  tags       = [],
+  startYear  = 2024,
+} = Astro.props;
+
+const runningDays = Math.floor(
+  (Date.now() - new Date(`${startYear}-01-01`).getTime()) / 86_400_000
+);
+
+const uniqueTags = [...new Set(tags)].slice(0, 24);
+
+const navLinks = [
+  { href: '/',         label: 'Home'     },
+  { href: '/projects', label: 'Projects' },
+  { href: '/anime',    label: 'Anime'    },
+  { href: '/resume',   label: 'Resume'   },
+  { href: '/about',    label: 'About'    },
+];
+
+const stats = [
+  { value: postCount  || '—',                                           label: 'Posts'        },
+  { value: totalWords ? `${Math.round(totalWords / 1000)}k` : '—',     label: 'Words'        },
+  { value: uniqueTags.length || '—',                                    label: 'Tags'         },
+  { value: runningDays,                                                  label: 'Days online'  },
+];
+---
+
+<footer
+  class="w-full border-t border-slate-200/70 bg-white"
+  style="font-family:'Plus Jakarta Sans',sans-serif;"
+  aria-label="Site footer"
+>
+
+  <!-- Stats bar -->
+  <div class="border-b border-slate-100 bg-[#f8fafc]">
+    <div class="max-w-[1100px] mx-auto px-6 py-6">
+
+      <!-- kfdzcoffee-style centered divider heading -->
+      <div class="flex items-center gap-4 mb-6">
+        <div class="flex-1 h-px" style="background:linear-gradient(to right,transparent,rgba(57,197,187,0.35))"></div>
+        <span class="text-[10px] font-black tracking-[0.22em] uppercase" style="color:#39c5bb">Site stats</span>
+        <div class="flex-1 h-px" style="background:linear-gradient(to left,transparent,rgba(57,197,187,0.35))"></div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {stats.map(s => (
+          <div class="flex flex-col items-center gap-1 py-3 rounded-2xl bg-white border border-slate-100">
+            <span class="text-2xl font-black" style="color:#0f172a;">{s.value}</span>
+            <span class="text-[10px] font-bold uppercase tracking-widest" style="color:#94a3b8;">{s.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Main footer body -->
+  <div class="max-w-[1100px] mx-auto px-6 py-10">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
+
+      <!-- Col 1: Brand -->
+      <div>
+        <a
+          href="/"
+          class="text-xl font-black tracking-tight"
+          style="background:linear-gradient(to right,#39c5bb,#2ba8a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;"
+        >
+          PORTFOLIO
+        </a>
+        <p class="text-[12px] font-medium mt-2 leading-relaxed" style="color:#94a3b8;max-width:180px;">
+          所有奇迹的始发点<br/>Where All Miracles Begin
+        </p>
+
+        <!-- Social icons -->
+        <div class="flex items-center gap-2 mt-4">
+          <!-- GitHub -->
+          <a
+            href="https://github.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub"
+            class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 transition-all duration-200 hover:text-[#39c5bb] hover:border-[#39c5bb]/40"
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+          </a>
+          <!-- X / Twitter -->
+          <a
+            href="https://x.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="X (Twitter)"
+            class="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 transition-all duration-200 hover:text-[#39c5bb] hover:border-[#39c5bb]/40"
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Version pill -->
+        <div class="flex items-center gap-1.5 mt-4">
+          <span class="w-1.5 h-1.5 rounded-full animate-pulse" style="background:#39c5bb;"></span>
+          <span class="text-[10px] font-mono" style="color:#cbd5e1;">Astro_Sys_v1.0</span>
+        </div>
+      </div>
+
+      <!-- Col 2: Nav -->
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.18em] mb-4" style="color:#cbd5e1;">Pages</p>
+        <nav class="space-y-2.5" aria-label="Footer navigation">
+          {navLinks.map(({ href, label }) => (
+            <a
+              href={href}
+              class="flex items-center gap-2 text-[13px] font-medium transition-colors duration-200 text-slate-500 hover:text-[#39c5bb]"
+            >
+              <span class="w-1 h-1 rounded-full" style="background:#e2e8f0;"></span>
+              {label}
+            </a>
+          ))}
+        </nav>
+      </div>
+
+      <!-- Col 3: Tag cloud -->
+      <div>
+        <p class="text-[10px] font-black uppercase tracking-[0.18em] mb-4" style="color:#cbd5e1;">Tags</p>
+        {uniqueTags.length > 0 ? (
+          <div class="flex flex-wrap gap-1.5">
+            {uniqueTags.map(tag => (
+              <a
+                href={`/tags/${tag}`}
+                class="px-2.5 py-1 rounded-full text-[10px] font-bold border border-slate-200 text-slate-500 transition-all duration-200 hover:border-[#39c5bb]/40 hover:text-[#39c5bb]"
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        ) : (
+          /* Demo tags when no real posts exist */
+          <div class="flex flex-wrap gap-1.5">
+            {['Astro', 'ACGN', 'Anime', 'Design', 'Dev', 'Three.js', 'UI', 'Journal', 'Life', 'Next.js', 'WebGL', 'Honkai'].map(tag => (
+              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border border-slate-200 text-slate-400">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="mt-10 pt-5 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-[11px] font-medium" style="color:#cbd5e1;">
+        © {new Date().getFullYear()} Your Name · Built with Astro
+      </p>
+      <p class="text-[11px] font-medium" style="color:#e2e8f0;">
+        所有奇迹的始发点
+      </p>
+    </div>
+  </div>
+
+</footer>

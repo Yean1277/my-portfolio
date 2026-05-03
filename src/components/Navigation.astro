@@ -8,43 +8,231 @@ const links = [
   { href: '/resume',   label: 'Resume' },
   { href: '/about',    label: 'About' },
 ];
----
-<nav class="max-w-[1100px] mx-auto flex justify-between items-center mb-12 px-6 pt-10">
-  <!-- Logo: teal gradient text -->
-  <div class="text-2xl font-black tracking-tight bg-gradient-to-r from-[#39c5bb] to-[#2ba8a0] bg-clip-text text-transparent">
-    PORTFOLIO
-  </div>
 
-  <!-- Nav links -->
-  <div class="hidden md:flex space-x-8 font-medium text-[13px] text-slate-500 items-center">
-    {links.map(({ href, label, badge }) => {
-      const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
-      return (
-        <div class="flex flex-col items-center">
+/**
+ * heroOverlay — pass true from pages that have a full-viewport hero image.
+ * When true, the nav starts transparent (floats over the hero) and transitions
+ * to frosted-glass on scroll, exactly like blog.kfdzcoffee.cn.
+ * Default: false → always shows frosted-glass background.
+ */
+interface Props {
+  heroOverlay?: boolean;
+}
+const { heroOverlay = false } = Astro.props;
+---
+
+<!--
+  NAV WRAPPER
+  - heroOverlay mode: starts absolute + transparent, becomes sticky+frosted on scroll
+  - default mode: always sticky + frosted
+-->
+<header
+  id="site-nav"
+  data-hero={heroOverlay ? 'true' : 'false'}
+  class:list={[
+    'left-0 right-0 top-0 z-50 transition-all duration-300',
+    heroOverlay ? 'absolute' : 'sticky',
+  ]}
+>
+  <!-- Frosted glass backdrop — hidden in hero mode until scrolled -->
+  <div
+    id="nav-backdrop"
+    class:list={[
+      'absolute inset-0 transition-all duration-300',
+      heroOverlay
+        ? 'bg-white/0 backdrop-blur-none border-b border-transparent'
+        : 'bg-white/80 backdrop-blur-md border-b border-slate-200/60',
+    ]}
+  ></div>
+
+  <nav class="relative max-w-[1100px] mx-auto flex justify-between items-center px-6 h-16">
+
+    <!-- ── LOGO ── -->
+    <a
+      href="/"
+      class="text-[22px] font-black tracking-tight bg-gradient-to-r from-[#39c5bb] to-[#2ba8a0] bg-clip-text text-transparent shrink-0 hover:opacity-80 transition-opacity"
+    >
+      PORTFOLIO
+    </a>
+
+    <!-- ── DESKTOP LINKS ── -->
+    <div class="hidden md:flex items-center gap-1">
+      {links.map(({ href, label, badge }) => {
+        const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+        return (
+          <div class="flex flex-col items-center">
+            <a
+              href={href}
+              class:list={[
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-200',
+                isActive
+                  ? 'text-[#39c5bb] font-bold'
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/80',
+                heroOverlay && !isActive && 'text-white/80 hover:text-white hover:bg-white/10',
+              ]}
+            >
+              {label}
+              {badge && (
+                <span class="text-[8px] bg-orange-100 text-orange-500 font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">
+                  {badge}
+                </span>
+              )}
+            </a>
+            <!-- Active underline indicator -->
+            <div
+              class:list={[
+                'w-3 h-[2px] rounded-full mt-0.5 transition-all duration-200',
+                isActive ? 'bg-[#39c5bb]' : 'bg-transparent',
+              ]}
+            ></div>
+          </div>
+        );
+      })}
+    </div>
+
+    <!-- ── RIGHT: VERSION TAG + CONTACT + HAMBURGER ── -->
+    <div class="flex items-center gap-3">
+
+      <!-- Contact CTA -->
+      <a
+        href="/about"
+        class="hidden md:inline-flex items-center bg-slate-900 text-white px-5 py-2 rounded-full text-[13px] font-bold hover:scale-105 hover:shadow-[0_4px_20px_rgba(57,197,187,0.3)] transition-all duration-200"
+      >
+        Contact
+      </a>
+
+      <!-- Mobile hamburger -->
+      <button
+        id="menu-toggle"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+        class="md:hidden flex flex-col justify-center items-center w-9 h-9 rounded-full bg-slate-100/80 hover:bg-slate-200/80 transition-colors gap-[5px] shrink-0"
+      >
+        <span class="hamburger-line block w-4 h-[1.5px] bg-slate-700 rounded-full transition-all duration-300"></span>
+        <span class="hamburger-line block w-4 h-[1.5px] bg-slate-700 rounded-full transition-all duration-300"></span>
+        <span class="hamburger-line block w-4 h-[1.5px] bg-slate-700 rounded-full transition-all duration-300"></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── MOBILE MENU ── -->
+  <div
+    id="mobile-menu"
+    class="md:hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out"
+  >
+    <div class="bg-white/95 backdrop-blur-md border-t border-slate-100 px-6 py-4 space-y-1">
+      {links.map(({ href, label, badge }) => {
+        const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+        return (
           <a
             href={href}
             class:list={[
-              'flex items-center gap-1 transition-colors',
-              isActive ? 'text-[#39c5bb] font-bold' : 'hover:text-slate-900',
+              'flex items-center justify-between w-full px-4 py-3 rounded-2xl text-[14px] font-medium transition-all duration-200',
+              isActive
+                ? 'bg-[#39c5bb]/10 text-[#39c5bb] font-bold'
+                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900',
             ]}
           >
-            {label}
+            <span class="flex items-center gap-2">
+              {isActive && (
+                <span class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] shrink-0"></span>
+              )}
+              {label}
+            </span>
             {badge && (
               <span class="text-[8px] bg-orange-100 text-orange-500 font-black px-1.5 py-0.5 rounded-full uppercase tracking-wide">
                 {badge}
               </span>
             )}
           </a>
-          <div class:list={["w-3 h-[2px] bg-[#39c5bb] mt-1 rounded-full", isActive ? "visible" : "invisible"]}></div>
-        </div>
-      );
-    })}
-  </div>
+        );
+      })}
 
-  <div class="flex items-center gap-4">
-    <!-- CTA button: slate dark with teal hover glow -->
-    <button class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-[13px] font-bold hover:scale-105 hover:shadow-[0_4px_20px_rgba(57,197,187,0.3)] transition-all duration-200">
-      Contact
-    </button>
+      <!-- Mobile contact -->
+      <div class="pt-3 pb-1">
+        <a
+          href="/about"
+          class="flex items-center justify-center w-full bg-slate-900 text-white py-3 rounded-2xl text-[14px] font-bold hover:shadow-[0_4px_20px_rgba(57,197,187,0.3)] transition-all duration-200"
+        >
+          Contact
+        </a>
+      </div>
+    </div>
   </div>
-</nav>
+</header>
+
+<script>
+  const header      = document.getElementById('site-nav')!;
+  const backdrop    = document.getElementById('nav-backdrop')!;
+  const menuToggle  = document.getElementById('menu-toggle')!;
+  const mobileMenu  = document.getElementById('mobile-menu')!;
+  const lines       = menuToggle.querySelectorAll<HTMLElement>('.hamburger-line');
+  const isHeroMode  = header.dataset.hero === 'true';
+
+  // ── SCROLL: hero overlay → frosted glass transition ──────────────────────
+  if (isHeroMode) {
+    const onScroll = () => {
+      const scrolled = window.scrollY > 60;
+
+      // Switch positioning strategy
+      header.classList.toggle('absolute', !scrolled);
+      header.classList.toggle('sticky',   scrolled);
+
+      // Fade in the frosted glass backdrop
+      backdrop.classList.toggle('bg-white/80',            scrolled);
+      backdrop.classList.toggle('backdrop-blur-md',       scrolled);
+      backdrop.classList.toggle('border-b',               scrolled);
+      backdrop.classList.toggle('border-slate-200/60',    scrolled);
+      backdrop.classList.toggle('bg-white/0',             !scrolled);
+      backdrop.classList.toggle('backdrop-blur-none',     !scrolled);
+      backdrop.classList.toggle('border-transparent',     !scrolled);
+
+      // Flip link colors: white on hero → slate on frosted
+      const links = header.querySelectorAll<HTMLElement>('[data-hero-link]');
+      links.forEach(l => {
+        l.classList.toggle('text-white/80', !scrolled);
+        l.classList.toggle('text-slate-500', scrolled);
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // init on mount
+  }
+
+  // ── MOBILE MENU TOGGLE ───────────────────────────────────────────────────
+  let menuOpen = false;
+
+  const openMenu = () => {
+    menuOpen = true;
+    menuToggle.setAttribute('aria-expanded', 'true');
+    mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+
+    // Animate to ✕
+    lines[0].style.transform = 'translateY(6.5px) rotate(45deg)';
+    lines[1].style.opacity   = '0';
+    lines[2].style.transform = 'translateY(-6.5px) rotate(-45deg)';
+  };
+
+  const closeMenu = () => {
+    menuOpen = false;
+    menuToggle.setAttribute('aria-expanded', 'false');
+    mobileMenu.style.maxHeight = '0';
+
+    // Animate back to ☰
+    lines[0].style.transform = '';
+    lines[1].style.opacity   = '';
+    lines[2].style.transform = '';
+  };
+
+  menuToggle.addEventListener('click', () => {
+    menuOpen ? closeMenu() : openMenu();
+  });
+
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (menuOpen && !header.contains(e.target as Node)) closeMenu();
+  });
+
+  // Close on route change (Astro view transitions)
+  document.addEventListener('astro:page-load', closeMenu);
+</script>

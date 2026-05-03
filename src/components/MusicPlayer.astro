@@ -132,48 +132,11 @@ const serialized = JSON.stringify(
     background: rgba(57,197,187,0.1);
   }
 
-  #autoplayHint {
-    position: fixed;
-    bottom: 1.5rem;
-    left: 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: white;
-    border: 1px solid rgba(57,197,187,0.3);
-    color: #39c5bb;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    padding: 6px 12px;
-    border-radius: 99px;
-    box-shadow: 0 4px 16px rgba(57,197,187,0.15);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-    z-index: 50;
-  }
-  #autoplayHint.visible { opacity: 1; }
-  @keyframes hint-pulse {
-    0%, 100% { transform: scale(1); }
-    50%       { transform: scale(1.15); }
-  }
-  #autoplayHint .hint-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #39c5bb;
-    animation: hint-pulse 1.2s ease-in-out infinite;
-  }
 </style>
 
 <!-- Hidden audio engine -->
 <audio id="audioEngine" preload="metadata"></audio>
 
-<!-- Autoplay hint badge -->
-<div id="autoplayHint">
-  <span class="hint-dot"></span>
-  ♪ click anywhere to play
-</div>
 
 <!-- Gradient border wrapper -->
 <div class="relative" id="musicPlayerRoot" data-playlist={serialized}>
@@ -354,31 +317,5 @@ const serialized = JSON.stringify(
     buildPlaylist();
     goTo(0);
 
-    /* ─── Autoplay ── */
-    const hint = document.getElementById('autoplayHint');
-
-    function hideHint() {
-      hint?.classList.remove('visible');
-    }
-
-    // Step 1: attempt direct autoplay
-    audio.play().then(() => {
-      hideHint();
-    }).catch(() => {
-      // Step 2: show hint and wait for first interaction
-      hint?.classList.add('visible');
-
-      const onInteract = () => {
-        audio.play().catch(() => {});
-        hideHint();
-        document.removeEventListener('click',   onInteract);
-        document.removeEventListener('keydown', onInteract);
-        document.removeEventListener('scroll',  onInteract, true);
-      };
-
-      document.addEventListener('click',   onInteract);
-      document.addEventListener('keydown', onInteract);
-      document.addEventListener('scroll',  onInteract, true);
-    });
   }
 </script>

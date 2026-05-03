@@ -1,140 +1,109 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
-import Navigation from '../components/Navigation.astro';
-import SidebarProfile from '../components/SidebarProfile.astro';
-import MusicPlayer from '../components/MusicPlayer.astro';
-import HeroBanner from '../components/HeroBanner.astro';
-import ProjectCollections from '../components/ProjectCollections.astro';
+/**
+ * src/pages/index.astro
+ *
+ * Layout:
+ *  1. HeroSection (100vh, full-bleed)  — Navigation + HeroTicker slotted inside
+ *  2. 12-col grid
+ *      col-4 sidebar: SidebarProfile + MusicPlayer
+ *      col-8 main:    RecentPosts (replaces ProjectCollections)
+ *  3. SiteFooter (full-bleed)
+ */
+
 import { getCollection } from 'astro:content';
 
-// 1. Fetch Dynamic Posts
-const allPosts = (await getCollection('posts')) || [];
-const posts = allPosts.sort((a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime());
+import BaseLayout      from '../layouts/BaseLayout.astro';
+import Navigation      from '../components/Navigation.astro';
+import HeroSection     from '../components/HeroSection.astro';
+import HeroTicker      from '../components/HeroTicker.astro';
+import SidebarProfile  from '../components/SidebarProfile.astro';
+import MusicPlayer     from '../components/MusicPlayer.astro';
+import RecentPosts     from '../components/RecentPosts.astro';
+import SiteFooter      from '../components/SiteFooter.astro';
 
-// 2. Dynamic Profile Data
+// ── Data ─────────────────────────────────────────────────────────────────────
+const allPosts = await getCollection('posts').catch(() => []);
+
+const sortedPosts = [...allPosts].sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
+
+// Ticker — 5 most recent post titles
+const tickerPosts = sortedPosts.slice(0, 5).map(p => ({
+  title: p.data.title,
+  href:  `/posts/${p.slug}`,
+  date:  p.data.date,
+}));
+
+// Footer tags + word count
+const allTags    = allPosts.flatMap(p => p.data.tags ?? []);
+const totalWords = allPosts.reduce((n, p) => n + (p.data.wordCount ?? 500), 0);
+
+// ── Static config — edit these ────────────────────────────────────────────────
 const profile = {
-  name: "Loo Yean Ter",
-  tagline: '此生无悔入二次元',
-  tags: ["UI/UX", "Astro", "Next.js", "Otaku"],
-  currentFocus: "QA Engineer",
-  avatarFallback: "https://api.dicebear.com/7.x/adventurer/svg?seed=Fidelity"
+  name:           'Your Name',
+  tagline:        'Frontend Developer · Anime Enjoyer',
+  tags:           ['UI/UX', 'Astro', 'Next.js', 'Otaku'],
+  currentFocus:   'Building portfolio with Astro + Three.js',
+  avatarFallback: '/avatar.jpg',
 };
+
 ---
 
-<!--
-  Root background: #f1f5f9 (slate-100) — matches anime.astro exactly.
-  Font: Plus Jakarta Sans (add to BaseLayout <head> via Google Fonts).
--->
-<BaseLayout title="Portfolio">
+<BaseLayout title="Portfolio — Where All Miracles Begin">
 
-  <!-- Global font import (add this once in BaseLayout if not already present) -->
-  <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
-  <!-- <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"> -->
+  <!-- 1 ── HERO ─────────────────────────────────────────────────────────── -->
+  <HeroSection
+    title="Your Name Here"
+    tagline="所有奇迹的始发点 · Where All Miracles Begin"
+    greeting="👋 Hey, welcome to my little corner of the web"
+    wallpaper="/your-wallpaper.jpg"
+    badge="HRO-001"
+    liveLabel="LIVE"
+  >
+    <Navigation slot="nav" heroOverlay={true} />
+    <HeroTicker
+      slot="ticker"
+      posts={tickerPosts}
+      authorName="Your Name"
+      authorAvatar="/avatar.jpg"
+    />
+  </HeroSection>
 
-  <div class="min-h-screen bg-[#f1f5f9] text-slate-800 flex flex-col">
+  <!-- 2 ── MAIN GRID ───────────────────────────────────────────────────── -->
+  <div class="min-h-screen bg-[#f1f5f9] relative">
 
-    <!-- Subtle decorative radial glows in background -->
-    <div class="fixed top-0 left-1/4 w-96 h-96 bg-[#39c5bb]/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
-    <div class="fixed bottom-1/4 right-1/4 w-80 h-80 bg-orange-300/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
+    <!-- Ambient glow — below the fold only -->
+    <div
+      class="fixed left-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none -z-10"
+      style="top:100vh;background:rgba(57,197,187,0.05);"
+      aria-hidden="true"
+    ></div>
 
-    <Navigation />
-
-    <main class="max-w-[1100px] mx-auto px-6 pt-6 flex-1">
+    <main class="max-w-[1100px] mx-auto px-6 pt-10 pb-16">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-        <!-- ================= SIDEBAR (Left - 4 columns) ================= -->
+        <!-- Sidebar col-4 -->
         <aside class="lg:col-span-4 space-y-5">
           <SidebarProfile profile={profile} />
           <MusicPlayer />
-
         </aside>
 
-        <!-- ================= MAIN CONTENT (Right - 8 columns) ================= -->
-        <section class="lg:col-span-8 space-y-8">
-          <HeroBanner />
-          <ProjectCollections posts={posts} />
-
+        <!-- Main col-8 -->
+        <section class="lg:col-span-8">
+          <RecentPosts posts={sortedPosts} maxItems={8} />
         </section>
 
       </div>
     </main>
-
-    <footer class="max-w-[1100px] mx-auto px-6 py-6 flex items-center justify-center gap-3 border-t border-slate-200 mt-auto">
-      <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path d="M3 20L12 4l9 16H3z"/><path d="M12 4v8"/>
-      </svg>
-      <span class="text-[9px] tracking-[0.35em] uppercase font-bold text-slate-400">Fidelity × Portfolio System</span>
-      <span class="text-orange-400 text-xs font-bold">×</span>
-      <span class="text-[9px] tracking-[0.2em] uppercase font-bold text-slate-400">index.astro</span>
-    </footer>
-
   </div>
+
+  <!-- 3 ── FOOTER ──────────────────────────────────────────────────────── -->
+  <SiteFooter
+    postCount={allPosts.length}
+    totalWords={totalWords}
+    tags={allTags}
+    startYear={2024}
+  />
+
 </BaseLayout>
-
-<script>
-  // --- Dynamic Image Synthesis Logic ---
-  const apiKey = ""; 
-  const triggerBtn = document.getElementById('generate-trigger');
-  const avatarTrigger = document.getElementById('profilePicContainer');
-  const wallLoader = document.getElementById('wallpaper-loader');
-  const avatarLoader = document.getElementById('avatar-loader');
-
-  async function generateImage(prompt: string, elementId: string, loaderEl: HTMLElement | null) {
-    if (loaderEl) loaderEl.classList.remove('hidden');
-    
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict?key=${apiKey}`;
-    
-    const attemptFetch = async (retries = 0) => {
-      try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            instances: [{ prompt }],
-            parameters: { sampleCount: 1 }
-          })
-        });
-
-        if (!response.ok) throw new Error('API Error');
-
-        const data = await response.json();
-        if (data.predictions?.[0]) {
-          const imgEl = document.getElementById(elementId) as HTMLImageElement;
-          if (imgEl) {
-            imgEl.src = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
-          }
-        }
-      } catch (e) {
-        if (retries < 5) {
-          const delay = Math.pow(2, retries) * 1000;
-          setTimeout(() => attemptFetch(retries + 1), delay);
-        } else {
-          console.error("Synthesis failed after 5 retries.");
-        }
-      } finally {
-        if (loaderEl) loaderEl.classList.add('hidden');
-      }
-    };
-
-    await attemptFetch();
-  }
-
-  if (triggerBtn) {
-    triggerBtn.addEventListener('click', () => {
-      const vibes = [
-        "Cinematic anime scenery of a futuristic floating city at sunset, highly detailed, Makoto Shinkai style, vivid colors",
-        "Peaceful anime Ghibli meadow, gentle breeze, lush green grass, bright blue sky with fluffy clouds, studio quality",
-        "Cyberpunk alleyway with neon signs glowing in rain puddles, dark atmospheric anime illustration, 8k resolution",
-        "Ethereal sci-fi landscape, giant glowing moon, crystalline structures, deep blues and purples, anime concept art"
-      ];
-      const randomVibe = vibes[Math.floor(Math.random() * vibes.length)];
-      generateImage(randomVibe, 'heroWallpaper', wallLoader);
-    });
-  }
-
-  if (avatarTrigger) {
-    avatarTrigger.addEventListener('click', () => {
-      generateImage("High-end anime style profile picture, male designer character with teal highlights, techwear aesthetic, clean white background, pixiv style illustration", "profilePic", avatarLoader);
-    });
-  }
-</script>

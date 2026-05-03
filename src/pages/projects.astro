@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Navigation from '../components/Navigation.astro';
+import SiteFooter from '../components/SiteFooter.astro';
 import { getCollection } from 'astro:content';
  
 const pageData = await getCollection('pageData');
@@ -11,7 +12,8 @@ const { Content } = await projectsPage.render();
 ---
 <BaseLayout title="Projects | Personal Workspace">
   <Navigation />
-  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
+  <main class="max-w-[1100px] mx-auto px-6 pb-16 pt-6">
     <Content />
   </main>
+  <SiteFooter />
 </BaseLayout>

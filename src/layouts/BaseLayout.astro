@@ -19,27 +19,6 @@ const { title = "Portfolio // Fidelity System" } = Astro.props;
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 
-  <!-- ✅ FIXED: tailwind.config MUST be defined BEFORE the CDN script loads,
-       otherwise Tailwind initialises without your custom tokens and ignores this block entirely. -->
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#00D1FF',
-            'primary-soft': 'rgba(0, 209, 255, 0.1)',
-          },
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-          }
-        }
-      }
-    }
-  </script>
-
-  <!-- Tailwind CDN — loads AFTER the config object is defined above -->
-  <script src="https://cdn.tailwindcss.com"></script>
 
   <style>
     :root {
