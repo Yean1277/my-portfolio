@@ -1,537 +1,1061 @@
-# DESIGN.md — MY Portfolio Design System
+# DESIGN.md — Yean Ter Portfolio Home Page
 
-> **维护指南** · 本文件是整个 portfolio 站点的单一设计真相来源（Single Source of Truth）。  
-> 修改任何颜色、间距、组件规范前，请先更新此文件，再同步到代码。
+> *所有奇迹的始发点 · Where All Miracles Begin*
 
----
-
-## 目录
-
-1. [设计哲学](#1-设计哲学)
-2. [色彩系统](#2-色彩系统)
-3. [排版系统](#3-排版系统)
-4. [间距与圆角](#4-间距与圆角)
-5. [阴影系统](#5-阴影系统)
-6. [渐变边框模式](#6-渐变边框模式)
-7. [动效规范](#7-动效规范)
-8. [组件目录](#8-组件目录)
-   - [Navigation.astro](#navigationastro)
-   - [SidebarProfile.astro](#sidebarprofileastro)
-   - [MusicPlayer.astro](#musicplayerastro)
-   - [HeroBanner.astro](#herobannerastro)
-   - [ProjectCollections.astro](#projectcollectionsastro)
-9. [徽章 & 标签规范](#9-徽章--标签规范)
-10. [页面布局](#10-页面布局)
-11. [新增组件 Checklist](#11-新增组件-checklist)
+A single source of truth for everything UI/UX on the home page. If you change a token or a behaviour, update this file. If you add a new component, add a section.
 
 ---
 
-## 1. 设计哲学
+## Table of contents
 
-| 原则 | 说明 |
-|------|------|
-| **Anime × Tech** | 将 anime.astro 的收藏卡片美学延伸到整个站点，青绿 + 橙色双主题 |
-| **白卡 + 浅灰底** | 所有卡片白底，页面背景统一 `#f1f5f9`，形成层次感 |
-| **边框即装饰** | 用渐变边框环（gradient ring wrapper）替代纯色 `border`，是本系统最标志性的视觉语言 |
-| **徽章叙事** | 每个模块都应有序列号徽章（`PRJ-001`、`HRO-001`）和分类标签，强化 archive 氛围 |
-| **光晕点缀** | 背景固定位置的 teal/橙 `blur-3xl` 光晕，提升空间深度，但保持克制 |
-
----
-
-## 2. 色彩系统
-
-### 主色板
-
-| Token | 值 | 用途 |
-|-------|----|------|
-| `--color-teal` | `#39c5bb` | 主强调色：链接激活、按钮、徽章、边框环、脉冲点 |
-| `--color-teal-dark` | `#2ba8a0` | teal 渐变终止色、hover 深化 |
-| `--color-orange` | `#FF9500` | 补充强调：次级按钮、徽章、分类标签 |
-| `--color-orange-alt` | `#FFA500` | 橙色渐变变体 |
-
-### 背景色板
-
-| Token | 值 | 用途 |
-|-------|----|------|
-| `--bg-page` | `#f1f5f9` | 页面根背景（与 `anime.astro` 完全一致） |
-| `--bg-card` | `#ffffff` | 所有卡片背景 |
-| `--bg-muted` | `#f8fafc` | 卡片内嵌区块（poster 区域、状态栏） |
-| `--bg-dark` | `#0f172a` | 深色元素（vinyl、Hero 叠加层底色） |
-
-### 文字色板
-
-| Token | Tailwind | 用途 |
-|-------|----------|------|
-| `--text-heading` | `text-slate-900` | 标题 |
-| `--text-body` | `text-slate-600` / `text-slate-700` | 正文 |
-| `--text-muted` | `text-slate-400` | 辅助文字、标签、时间戳 |
-| `--text-teal` | `text-[#39c5bb]` | teal 高亮文字 |
-| `--text-orange` | `text-orange-500` | 橙色高亮文字 |
-
-### 透明度使用规范
-
-```
-teal 背景叠加：  /5  /10  /20  /30  /40  /60  /80  /90
-orange 背景叠加：/10  /20  /30  /50  /80  /90
-白色叠加（毛玻璃）：/10  /20（backdrop-blur-sm 配合使用）
-```
+1. [Design philosophy](#1-design-philosophy)
+2. [Design tokens](#2-design-tokens)
+3. [Typography](#3-typography)
+4. [Spacing, radius, shadow](#4-spacing-radius-shadow)
+5. [Page structure & layout](#5-page-structure--layout)
+6. [Component reference](#6-component-reference)
+7. [Interaction & motion](#7-interaction--motion)
+8. [Responsive behaviour](#8-responsive-behaviour)
+9. [Accessibility](#9-accessibility)
+10. [File map](#10-file-map)
+11. [Open items & gotchas](#11-open-items--gotchas)
 
 ---
 
-## 3. 排版系统
+## 1. Design philosophy
 
-### 字体
+The home page is a personal portfolio with three jobs, in order of priority:
 
-```
-主字体：Plus Jakarta Sans
-引入：https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap
-```
+1. **Greet the visitor warmly.** A full-bleed cinematic hero sets a mood — neon, late-night, a little nostalgic — and tells you who lives here in two centred lines.
+2. **Show what's been made and what's being made.** A scannable list of recent posts in the main column; a profile card in the sidebar that says "this is me, this is what I'm building right now."
+3. **Stay ambient.** A floating music player in the corner so the soundtrack follows you down the page. A live local clock in the sidebar so the page feels inhabited.
 
-在 `BaseLayout.astro` 的 `<head>` 中引入，全局生效。  
-代码区域（序列号、目录路径）使用系统 `font-mono`。
+Visual language: **Plus Jakarta Sans + JetBrains Mono**, white surfaces, soft shadows, generous radius, single-accent teal (`#39c5bb`) with a warm orange sidekick (`#f59e0b`) used sparingly for "new" / "featured" moments. Everything else is slate-gray.
 
-### 字阶规范
-
-| 用途 | Tailwind class | 说明 |
-|------|----------------|------|
-| 页面大标题 | `text-4xl md:text-5xl font-extrabold` | Hero 主标题 |
-| 区块标题 | `text-2xl font-black tracking-tight` | Collections 标题、Profile 名称 |
-| 卡片标题 | `text-xl font-black tracking-tight` | 项目卡片 |
-| 小卡片标题 | `text-[11px] font-black` | anime 卡片标题 |
-| 分区标签 | `text-[9px] font-black uppercase tracking-[0.2em~0.35em]` | 所有 section 小标签 |
-| 正文 | `text-sm` / `text-[13px] font-medium` | 描述文字 |
-| 辅助 | `text-[10px] text-slate-400` | 副标题、时间戳 |
+The page should feel **calm, not busy**. No gradients on every surface. No motion for motion's sake. Movement is reserved for things that are alive: the vinyl spinning, the LIVE pulse, the EQ bars in the playlist.
 
 ---
 
-## 4. 间距与圆角
+## 2. Design tokens
 
-### 圆角层级
+### Colour
 
-| 层级 | 值 | 使用场景 |
-|------|----|----------|
-| `rounded-[34px]` | 渐变边框环外层（+2px 补偿） | 所有卡片的 gradient ring wrapper |
-| `rounded-[32px]` | 大卡片（Profile、ProjectCard、Hero）| 主视觉卡片 |
-| `rounded-[24px]` | 中卡片（MusicPlayer、状态栏）| 次要卡片 |
-| `rounded-[20px]` | anime 收藏卡片卡体 | anime.astro 专用 |
-| `rounded-[16px]` | anime 卡片内嵌图片区域 | anime.astro 专用 |
-| `rounded-full` | 头像、标签 pill、按钮、脉冲点 | |
-| `rounded-lg` | 序列号徽章、分类徽章 | |
-| `rounded-md` | 小徽章（CV:01、HRO-001）| |
+#### Brand
+| Token            | Hex        | Usage                                                       |
+|------------------|------------|-------------------------------------------------------------|
+| `teal`           | `#39c5bb`  | Primary brand. CTAs, active states, links, accent dots.     |
+| `teal-deep`      | `#2ba8a0`  | Hover state for `teal`. Gradient pair.                      |
+| `teal-soft`      | `rgba(57,197,187,0.10)` | Tinted backgrounds (category pills, hover).    |
+| `teal-ring`      | `rgba(57,197,187,0.30)` | Subtle borders around teal-tinted surfaces.    |
 
-### Padding 规范
+#### Accents
+| Token            | Hex        | Usage                                                       |
+|------------------|------------|-------------------------------------------------------------|
+| `orange`         | `#f59e0b`  | "Anime" category, "New" badge, secondary accents.           |
+| `orange-deep`    | `#d97706`  | Text on orange-tinted backgrounds.                          |
+| `orange-soft`    | `rgba(245,158,11,0.10)` | Anime category pill bg, code-square bg.       |
+| `purple`         | `#8b5cf6`  | "Journal" category accent.                                  |
+| `purple-deep`    | `#7c3aed`  | Text on purple-tinted backgrounds.                          |
+| `slate-accent`   | `#475569`  | "Dev" category accent (neutral).                            |
 
-```
-大卡片内边距：  p-8  (32px)
-中卡片内边距：  p-5  (20px)
-小徽章内边距：  px-2.5 py-1  /  px-2 py-0.5
-导航内边距：    px-6 pt-10
-页面内边距：    px-6 pb-24 pt-6
-```
+#### Surfaces & ink
+| Token            | Hex        | Usage                                                       |
+|------------------|------------|-------------------------------------------------------------|
+| `bg-page`        | `#f1f5f9`  | The main page background (the gray strip behind cards).     |
+| `bg-surface`     | `#ffffff`  | Cards, the footer, the music player pill.                   |
+| `bg-muted`       | `#f8fafc`  | Inset blocks (e.g. "Currently building" bar).               |
+| `border-default` | `#e2e8f0`  | All card borders.                                           |
+| `border-soft`    | `#f1f5f9`  | Hairline dividers inside cards.                             |
+| `ink-900`        | `#0f172a`  | Headings, primary text.                                     |
+| `ink-700`        | `#334155`  | Body text on light surfaces.                                |
+| `ink-500`        | `#64748b`  | Secondary body, navigation links.                           |
+| `ink-400`        | `#94a3b8`  | Excerpts, labels.                                           |
+| `ink-300`        | `#cbd5e1`  | Disabled, captions, monospace metadata.                     |
+| `ink-100`        | `#e2e8f0`  | Decorative dots, very low contrast text.                    |
 
----
-
-## 5. 阴影系统
-
+#### Hero scrim
+The hero uses a custom four-stop gradient over the wallpaper for legibility:
 ```css
-/* 卡片默认阴影（subtle，避免过重） */
-shadow-[0_8px_30px_rgb(0,0,0,0.04)]
-
-/* 卡片 teal 调阴影（带品牌色） */
-shadow-[0_8px_40px_rgba(57,197,187,0.08)]
-
-/* Hero teal 光晕阴影 */
-shadow-[0_20px_60px_rgba(57,197,187,0.15)]
-
-/* 主按钮 teal 发光 */
-shadow-[0_4px_20px_rgba(57,197,187,0.4)]
-hover:shadow-[0_4px_28px_rgba(57,197,187,0.6)]
-
-/* Navigation Contact 按钮 hover */
-hover:shadow-[0_4px_20px_rgba(57,197,187,0.3)]
-
-/* vinyl 中心点发光 */
-shadow-[0_0_8px_rgba(57,197,187,0.8)]
+linear-gradient(to bottom,
+  rgba(0,0,0,0.08)  0%,
+  rgba(0,0,0,0.18) 35%,
+  rgba(0,0,0,0.55) 70%,
+  rgba(0,0,0,0.85) 100%);
 ```
+
+### Category colour map
+
+The `Recent Posts` card system uses one row per category. **Always source colours from this table** — don't hand-pick new shades.
+
+| Category | Accent   | Pill bg                | Pill text  | Code box bg            | Code-box text | Code |
+|----------|----------|------------------------|------------|------------------------|---------------|------|
+| Anime    | `#f59e0b`| `rgba(245,158,11,0.10)`| `#d97706`  | `rgba(245,158,11,0.08)`| `#d97706`     | `AN` |
+| Design   | `#39c5bb`| `rgba(57,197,187,0.10)`| `#2ba8a0`  | `rgba(57,197,187,0.08)`| `#2ba8a0`     | `DE` |
+| Dev      | `#475569`| `rgba(71,85,105,0.10)` | `#334155`  | `rgba(71,85,105,0.06)` | `#475569`     | `DE` |
+| Journal  | `#8b5cf6`| `rgba(139,92,246,0.10)`| `#7c3aed`  | `rgba(139,92,246,0.08)`| `#7c3aed`     | `JO` |
+| (fallback)| `#475569`| `rgba(71,85,105,0.10)`| `#334155`  | `rgba(71,85,105,0.06)` | `#475569`     | `PO` |
+
+> **Note:** Anime and Dev share the `DE` two-letter code by accident. If they ever appear next to each other and read ambiguously, change `Dev` → `DV`. The map lives in `RecentPosts.astro`.
 
 ---
 
-## 6. 渐变边框模式
+## 3. Typography
 
-这是本系统的**核心视觉语言**，所有主要卡片都应使用此模式。
+### Font families
+- **Plus Jakarta Sans** (400 / 500 / 600 / 700 / 800 / 900) — everything UI.
+- **JetBrains Mono** (500) — clocks, dates, file paths (`index.astro`), serial-style metadata, anywhere we want the "code-y" feel.
 
-### 标准实现
+Both are loaded once in `BaseLayout.astro` from Google Fonts.
 
-```astro
-<!-- 外层 relative wrapper -->
-<div class="relative">
-  <!-- 渐变环：-inset-[2px] 确保刚好包住圆角卡片 -->
-  <div class="absolute -inset-[2px] rounded-[34px] bg-gradient-to-br from-[#39c5bb]/40 to-orange-300/30 -z-10"></div>
-  
-  <!-- 实际卡片 -->
-  <div class="bg-white rounded-[32px] p-8 ...">
-    ...内容...
-  </div>
-</div>
-```
+### Scale
 
-### 变体
+| Use                                    | Size                       | Weight | Tracking      |
+|----------------------------------------|----------------------------|--------|---------------|
+| Hero title (`Yean Ter`)                | `clamp(2.6rem, 6.5vw, 4.5rem)` | 900   | tight         |
+| Hero greeting line                     | 13px                       | 500    | wide          |
+| Hero tagline                           | `clamp(0.85rem, 1.6vw, 1rem)` | 500    | wide          |
+| Hero CTA                               | 13px                       | 700    | normal        |
+| Section divider label (e.g. SITE STATS)| 10px                       | 900    | `0.22em`      |
+| Big stat number                        | `clamp(1.85rem, 3.5vw, 2.4rem)` | 900   | tabular nums  |
+| Card title (post)                      | 14px                       | 900    | tight         |
+| Card excerpt                           | 12px                       | 500    | normal        |
+| Profile name                           | 18px                       | 900    | tight         |
+| Profile tagline                        | 12px                       | 500    | normal        |
+| Sidebar section label                  | 9px                        | 900    | `0.20em`      |
+| LocalTime clock                        | 18px JetBrains Mono        | 900    | `0.04em`      |
+| Footer columns header (PAGES, TAGS)    | 10px                       | 900    | `0.18em`      |
+| Tag pill                               | 10px                       | 700    | normal        |
+| Category pill                          | 10px                       | 900    | `0.12em` upper |
+| Hashtag (`#UI`)                        | 10px JetBrains Mono        | 400    | normal        |
+| Date metadata                          | 10px JetBrains Mono        | 400    | normal        |
 
-| 变体 | gradient class | 使用场景 |
-|------|----------------|----------|
-| 默认 teal→橙 | `from-[#39c5bb]/40 to-orange-300/30` | SidebarProfile、MusicPlayer |
-| 强调 teal→橙（premium） | `from-[#39c5bb]/50 to-orange-300/40` | 偶数 ProjectCard |
-| 强调 橙→teal | `from-orange-400/50 to-[#39c5bb]/30` | 奇数 ProjectCard |
-| Hero 边框 | `from-[#39c5bb]/60 via-orange-400/40 to-[#39c5bb]/30` | HeroBanner |
+### Casing
 
-### 注意
-- 外层 `rounded-[34px]` = 内层卡片圆角 `32px` + 2px 边框宽度
-- 必须在外层添加 `-z-10`，否则会遮住卡片内容
-- 对于 `position: absolute` 的内层元素，确保它们 `z-index` > 0
+- **UPPERCASE + wide tracking** is reserved for category pills, section labels, and stat captions. Never put body text in uppercase.
+- **Headings** use sentence case: `My Top 5 Anime This Season`, not `My Top 5 Anime this Season`.
+- **Buttons** use Title Case: `Browse Work`, `View all posts`.
 
 ---
 
-## 7. 动效规范
+## 4. Spacing, radius, shadow
 
-### 悬停动效
+### Spacing rhythm
 
+Tailwind defaults (`gap-1` = 4px, `gap-2` = 8px, etc.). Most layouts use `gap-3` (12px), `gap-4` (16px), `gap-5` (20px), `gap-8` (32px). Vertical rhythm in the sidebar is `space-y-5` (20px).
+
+Page max width: **1100px** (`max-w-[1100px]`). This is non-negotiable — every inner container respects it. Outer regions (hero, stats, footer) bleed full-width but their inner content reins back to 1100.
+
+Page horizontal padding: **24px** (`px-6`) at all breakpoints.
+
+### Border radius
+
+| Surface             | Radius       |
+|---------------------|--------------|
+| Pill (CTA, tag, badge, music player pill) | `9999px` |
+| Card (post, profile, music drawer, stats) | `16px` (`rounded-2xl`) |
+| Inset block (currently building, code square)| `12px` (`rounded-xl`) |
+| Small badge (LIVE, category pill)         | `8px` (`rounded-md` / `rounded-lg`) |
+| Hover/focus ring                          | matches host  |
+
+### Shadow
+
+There are exactly **four** shadow levels. Don't invent more.
+
+| Level        | Value                                                       | Used on                          |
+|--------------|-------------------------------------------------------------|----------------------------------|
+| `shadow-card`| `0 4px 20px rgba(15,23,42,0.04)`                            | Default white cards (idle).      |
+| `shadow-card-hover`| `0 6px 24px rgba(15,23,42,0.06)` or `rgba(57,197,187,0.08)` | Cards on hover.                  |
+| `shadow-cta` | `0 4px 24px rgba(57,197,187,0.45)`                          | Primary teal CTA (Browse Work).  |
+| `shadow-float` | `0 8px 28px rgba(15,23,42,0.18)` (with optional pulsing ring) | Floating music player disc.   |
+
+CTA hover boosts to `0 6px 28px rgba(57,197,187,0.6)`. Music player playing-state adds a pulsing teal ring via animation (see [§7](#7-interaction--motion)).
+
+---
+
+## 5. Page structure & layout
+
+### Vertical flow
+
+```
+┌─────────────────────────────────────────────────┐
+│  Hero (100vh, full-bleed)                       │
+│  ├── Navigation (overlay, transitions on scroll)│
+│  ├── LIVE badge (top-left)                      │
+│  ├── Dismiss X (top-center, decorative)         │
+│  ├── Title block (centered, lower-third)        │
+│  │   ├── Greeting line                          │
+│  │   ├── Title — "Yean Ter"                     │
+│  │   ├── Tagline                                │
+│  │   └── Two CTAs                               │
+│  └── Slide nav (bottom-center: ‹ • • ‹•› • • ›) │
+├─────────────────────────────────────────────────┤
+│  Main grid (max-w-1100, on bg-page)             │
+│  ┌──────── 4 ────────┬──────── 8 ──────────┐    │
+│  │ LocalTime         │ RecentPosts         │    │
+│  │ SidebarProfile    │ (8 cards stacked)   │    │
+│  │                   │ View all posts →    │    │
+│  └───────────────────┴─────────────────────┘    │
+├─────────────────────────────────────────────────┤
+│  SiteStats (full-bleed, on bg-page)             │
+│  • SITE STATS divider                           │
+│  • 4 white cards: Posts · Words · Tags · Days   │
+├─────────────────────────────────────────────────┤
+│  SiteFooter (full-bleed, white)                 │
+│  ┌──────────┬──────────┬──────────────────┐     │
+│  │ Brand    │ Pages    │ Tags             │     │
+│  └──────────┴──────────┴──────────────────┘     │
+│  Bottom bar: © · 所有奇迹的始发点                │
+└─────────────────────────────────────────────────┘
+
+Floating overlay (always on top, persistent):
+  • Music Player (bottom-left, fixed)
+```
+
+### Grid
+
+- Hero, SiteStats, SiteFooter are **full-bleed sections**. Their direct child re-applies `max-w-[1100px] mx-auto px-6`.
+- Main content uses a 12-column CSS grid: `grid grid-cols-1 lg:grid-cols-12 gap-8`.
+  - Sidebar: `lg:col-span-4`
+  - Main:    `lg:col-span-8`
+- Below `lg` (1024px), the grid collapses to a single column. Sidebar stacks above main.
+
+### Z-index map
+
+| Layer              | Z-index | Element                                        |
+|--------------------|---------|------------------------------------------------|
+| Floating player    | `40`    | `MusicPlayer` (`#floating-player`)             |
+| Navigation         | `50`    | `Navigation` header                            |
+| Hero overlays      | `20`    | LIVE badge, dismiss X, slide nav               |
+| Hero centre block  | `10`    | Title group, scroll hint                       |
+| Page bg accents    | `-10`   | The fixed teal blur orb                        |
+
+> **Important:** The Navigation (`z-50`) sits **above** the floating music player (`z-40`) on purpose — the nav must always be reachable. If you move things around, preserve this order.
+
+---
+
+## 6. Component reference
+
+### 6.1 BaseLayout (`layouts/BaseLayout.astro`)
+
+The HTML shell. Mounts fonts, applies the Plus Jakarta Sans body, sets `bg-page` (currently `#F8FAFC` — should be normalised to `#f1f5f9` to match the rest of the system).
+
+Contains two global animations referenced by other components:
+- `.vinyl-record` — 4s linear infinite spin, paused by default, runs when `.playing` is added. *Used by the older sidebar music player; the floating player uses its own scoped `.fp-vinyl-spin` and does not depend on this.*
+- `.loading-shimmer` — the wallpaper loader stripe. Currently only used by `HeroBanner.astro` (not on the home page).
+
+### 6.2 Navigation (`Navigation.astro`)
+
+Sticky-or-floating header, max-width 1100, height 64px.
+
+**Modes**
+- `heroOverlay={false}` (default) — sticky from page load, frosted-glass white background.
+- `heroOverlay={true}` — starts `position: absolute` and **fully transparent** so it floats over the hero image; transitions to frosted-glass and switches to `position: sticky` once the user has scrolled more than 60px.
+
+**Links** — `Home / Projects / Anime / Resume / About`. Each has:
+- Active state: teal text, bold, with a 3×2px teal underline pill below.
+- Hover state: text darkens to `slate-900` on a frosted background, or to white on the hero overlay.
+
+**CTA** — single `Contact` pill on the right (`slate-900` bg, white text). Mobile: hidden behind the hamburger.
+
+**Mobile menu** — 3-line hamburger animates to ✕. Drawer reveals via `max-height` transition. Auto-closes on outside click and on Astro view transitions.
+
+> **Bug fixed in this revision:** the scroll handler used to query `[data-hero-link]` but the attribute was never set on the link elements, so the link colour didn't actually flip on scroll. The attribute is now applied conditionally (only when `heroOverlay=true`).
+
+### 6.3 HeroSection (`HeroSection.astro`)
+
+Full-viewport (`min-height: 100vh`) cinematic hero.
+
+**Props**
+| Prop          | Type                       | Default                              | Notes                                  |
+|---------------|----------------------------|--------------------------------------|----------------------------------------|
+| `title`       | string                     | required                             | Renders as the big centered H1.        |
+| `tagline`     | string                     | —                                    | Bilingual subtitle line.               |
+| `greeting`    | string                     | —                                    | Small line above title (with emoji ok).|
+| `wallpapers`  | `{src, alt}[]`             | —                                    | Slideshow mode if length > 1.          |
+| `wallpaper`   | string                     | unsplash placeholder                 | Single-image fallback.                 |
+| `liveLabel`   | string                     | `'LIVE'`                             | Top-left badge text.                   |
+| `primaryCta`  | `{label, href}`            | `{Browse Work, /projects}`           | Teal solid pill.                       |
+| `secondaryCta`| `{label, href, badge?}`    | `{Anime Labs, /anime, badge:'New'}`  | Dark glass pill with optional badge.   |
+
+**Anatomy (top to bottom)**
+1. **Wallpaper layer** — stack of `<img>` elements, all `object-cover`, fading via `opacity` on slide change.
+2. **Scrim** — see [§2](#2-design-tokens). Pointer-events disabled.
+3. **LIVE badge** — top-left at `top-20 left-6` (80px / 24px), teal-80 bg, white pulsing dot.
+4. **Dismiss X** — `top-[68px]`, centered horizontally. Decorative; clicking fades it out. Treat as a **playful** affordance, not load-bearing UX.
+5. **Navigation slot** — `<slot name="nav" />`. Parent injects `<Navigation heroOverlay />`.
+6. **Centre text block** — `bottom: 24%`, centred. Contains greeting + title + tagline + CTA row.
+7. **Slide nav** — `bottom: 80px`, centred, frosted dark pill: prev chevron · dot · dot · pill · dot · dot · next chevron. Active dot is wider (`w-5`).
+8. **Scroll hint** — `bottom-3`, centred. A 1px × 24px white vertical line that pulses scaleY. Fades out once `window.scrollY > 40`.
+
+**Slideshow timing** — auto-advance every **6 seconds**. User interaction with prev/next/dots resets the cadence.
+
+### 6.4 LocalTime (`LocalTime.astro`)
+
+Small white card. Sits at the **top of the sidebar**, above the profile.
+
+**Layout** — left: 40×40 teal-tinted ring with a clock-face SVG. Right: three lines stacked.
+- Top line: `LOCAL TIME · CHINA` (9px, 900, slate-400, `tracking-[0.18em]`).
+- Middle line: `02:33:54` (18px, 900, slate-900, JetBrains Mono, tabular-nums, `letter-spacing: 0.04em`).
+- Bottom line: `Mon, May 4` (10px, 500, slate-400, tabular-nums).
+
+**Behaviour** — uses `Intl.DateTimeFormat` with `timeZone: 'Asia/Shanghai'`. Recomputes every 1000ms via `setInterval`. Format is **24-hour** (`hour12: false`), so this clock reads `02:33:54` not `2:33:54 AM`.
+
+**Props** — `label` (default `LOCAL TIME · CHINA`) and `timezone` (default `Asia/Shanghai`). Both are configurable; if you change to e.g. `Asia/Tokyo`, also update the label.
+
+### 6.5 SidebarProfile (`SidebarProfile.astro`)
+
+White card, no gradient ring (cleaner than the previous revision).
+
+**Anatomy (top to bottom)**
+1. Section label — teal dot + `PROFILE`.
+2. Avatar (56×56, gradient teal fill with initials fallback) + name + tagline. Online dot in the corner of the avatar, animated pulse.
+3. Tags — wrap row of 10px uppercase pills. Teal for skills, orange for hobbies, slate for "neutral" tech. Map lives in the component.
+4. **Currently building** strip — slate-50 inset rectangle, teal pulsing dot, two stacked lines (label + status).
+5. Hairline divider.
+6. **Directory / Pages** — five mock-file links (`index.astro`, `projects.astro`, …) each with a coloured dot prefix. Hover turns the link teal.
+
+The whole card has a soft hover that boosts the shadow tint from neutral to a faint teal.
+
+### 6.6 RecentPosts (`RecentPosts.astro`)
+
+The main content column. **No top divider** in this revision — the list begins immediately.
+
+**Card anatomy** (one row per post)
+```
+┌──┬─────────────────────────────────────────────────────────┐
+│  │ [CATEGORY]  #tag  #tag                       date     │  │
+│ ▌│ Title (one line, line-clamp-1)                          │
+│  │ Excerpt over up to two lines, slate-400.                │
+└──┴─────────────────────────────────────────────────────────┘
+                                           ↑ 78×78 code square
+```
+
+- **Left accent bar** — 4px wide, full card height, coloured per category. Animates to 6px (`w-1.5`) on hover.
+- **Meta row** — category pill (uppercase, tinted), then `#tags` in JetBrains Mono slate-300, then date pushed to the right (`ml-auto`, also slate-300 mono).
+- **Title** — 14px, weight 900. Turns teal on row hover.
+- **Excerpt** — 12px, slate-400, two-line clamp.
+- **Right code square** — 78×78 rounded `rounded-xl`, tinted with the category's `boxBg`, displays the two-letter `code` (e.g. `AN`) at 13px / 900 / 0.55 opacity. Scales 1.05 on hover. If the post has a `heroImage`, that replaces the code.
+
+**View all** — centred link below the list with a subtle right arrow.
+
+**Demo data** — when the posts collection is empty, the component renders 8 demo cards covering all four categories so the layout never collapses.
+
+### 6.7 SiteStats (`SiteStats.astro`)
+
+Full-bleed strip on `bg-page`.
+
+- Centred section label `SITE STATS` flanked by a teal-fading hairline on each side.
+- Four white cards in a 1-column → 2-column → 4-column responsive grid (`grid-cols-2 sm:grid-cols-4`), `gap-4`. Each card has its own border + soft shadow.
+- Inside each card: big number (`clamp(1.85rem, 3.5vw, 2.4rem)`, weight 900, tabular-nums) above a 10px uppercase caption.
+- Empty values render as `—` so the layout never collapses.
+
+### 6.8 SiteFooter (`SiteFooter.astro`)
+
+White, `border-t` only (no internal stat bar — `SiteStats` does that now).
+
+- **Three columns** in a 1 → 3 grid:
+  1. **Brand** — gradient `PORTFOLIO` wordmark, bilingual tagline, GitHub + X social pills, version pill with a pulsing teal dot.
+  2. **Pages** — 5 vertical nav links with a tiny dot prefix.
+  3. **Tags** — flex-wrap of pill-shaped tags. If the live `tags` prop is empty, falls back to a fixed demo list rendered as non-link `<span>`s (so they don't 404).
+- **Bottom bar** — `mt-10 pt-5 border-t`. Left: `© <year> <ownerName> · Built with Astro`. Right: `所有奇迹的始发点` (very low contrast).
+
+### 6.9 MusicPlayer (`MusicPlayer.astro`) — floating
+
+Position-fixed at `bottom-6 left-6` (`bottom-4 left-4` on mobile). `z-40`. Persistent across scroll.
+
+**Three states**
+| State          | Class on `#floating-player`     | Visual                                                  |
+|----------------|---------------------------------|---------------------------------------------------------|
+| `collapsed`    | (no extra class)                | 56×56 black vinyl disc with glowing teal core.          |
+| `expanded`     | `.expanded`                     | 320px white pill: small disc + track info + 5 controls. |
+| `playlist-open`| `.expanded.playlist-open`       | Drawer (320×280max) slides up from above the pill.      |
+
+**Initial reveal** — the entire container has `opacity: 0; transform: translateY(20px); pointer-events: none`. Once `window.scrollY > 200`, it fades in and slides up via the `.visible` class. So the player **never appears over the hero CTAs**.
+
+**Interactions**
+- **Disc click** (collapsed) → expand. If audio hasn't started, also kicks off track 0.
+- **Vinyl click** (inside pill) → toggle play/pause.
+- **Teal play button** → toggle play/pause.
+- **Prev / Next** → switch tracks; preserves play state (skipping while playing keeps it playing).
+- **List button** (☰) → toggle playlist drawer; goes teal when open.
+- **Close** (✕) → collapse back to disc.
+- **Click outside the player** → closes the drawer but **keeps the pill expanded** (less aggressive).
+- **Auto-collapse** — if the player is paused **and** the user hasn't moused over for 8 seconds, it collapses itself. Playing audio cancels the timer indefinitely.
+
+**Visual feedback**
+- Disc spins (4s linear) only when `.playing` is on it.
+- A pulsing teal halo (`@keyframes fpPulse`) rings the disc while playing — `box-shadow: 0 0 0 8px rgba(57,197,187,0)` expanding outward over 2s.
+- The currently playing track in the drawer shows three dancing EQ bars in place of its number.
+
+**Empty state** — if `playlist` is empty, the player still renders but as a static dim disc with `cursor: default` and a tooltip "No tracks loaded." No script wires up.
+
+**Audio engine** — single hidden `<audio id="audioEngine" preload="metadata">` shared across the player. The ID is preserved from the previous revision so any external integrations (analytics, Media Session API) keep working.
+
+---
+
+## 7. Interaction & motion
+
+### Easing & duration
+
+- **Default ease** for all hover transitions: `ease` or `cubic-bezier(0.4, 0, 0.2, 1)` (Tailwind's default).
+- **Default duration**: 200ms for state changes, 300ms for layout-y things (nav backdrop), 400ms for reveals (player slide-up uses `cubic-bezier(0.16, 1, 0.3, 1)` for a softer landing).
+- **Long autoplay loops** (slideshow, vinyl spin): linear so they don't read as breathing.
+
+### Hover-level micro-interactions
+
+| Surface                      | Hover effect                                         |
+|------------------------------|------------------------------------------------------|
+| Post card                    | `translate-y(-2px)` + shadow lift                    |
+| Profile / LocalTime card     | Shadow tint shifts neutral → teal                    |
+| Primary CTA (`Browse Work`)  | `translate-y(-2px)` + brighter shadow                |
+| Secondary CTA (`Anime Labs`) | `translate-y(-2px)` + bg darkens                     |
+| Music disc (collapsed)       | `scale(1.05)` + teal border ring intensifies         |
+| Music disc (with overlay)    | A blurred dark veil fades in revealing play icon     |
+| Code square in post card     | `scale(1.05)`                                        |
+| Nav link (non-active)        | bg `slate-100/80`, text darkens to `slate-900`       |
+
+### Looping animations
+
+| Animation         | Duration | Where                                 |
+|-------------------|----------|---------------------------------------|
+| `vinyl-spin`      | 4s linear| Music disc (only while playing)       |
+| `fpPulse`         | 2s ease  | Music disc halo (only while playing)  |
+| `fpEq`            | 0.8s alt | EQ bars in the playlist drawer        |
+| `scrollPulse`     | 2s ease  | Hero scroll-hint vertical line        |
+| `pulse` (Tailwind)| ~2s      | LIVE badge dot, online dot, focus dots|
+
+### Slideshow & ticker timings
+
+- Hero wallpaper auto-advance: **6000ms**.
+- Hero ticker (when used) auto-advance: **4000ms**. *(Not used on the home page in this revision — see [§11](#11-open-items--gotchas).)*
+
+---
+
+## 8. Responsive behaviour
+
+| Breakpoint     | Behaviour                                                                      |
+|----------------|--------------------------------------------------------------------------------|
+| `< 480px`      | Music player tightens to `bottom-4 left-4`. Pill width = `100vw - 32px`.       |
+| `< 640px (sm)` | SiteStats drops to 2 columns. SiteFooter columns stack. Stats numbers scale via `clamp`. |
+| `< 768px (md)` | Navigation desktop links collapse into the hamburger menu. CTA `Contact` hides on small screens. |
+| `< 1024px (lg)`| Main grid collapses 12-col → 1-col. Sidebar stacks above main content.         |
+
+Hero text uses fluid `clamp()` on font size, so it scales smoothly without breakpoint jumps. Padding stays a flat 24px horizontally at every size.
+
+---
+
+## 9. Accessibility
+
+### Done
+- Every icon-only button has an `aria-label`. Examples: "Previous slide", "Toggle menu", "Toggle playlist", "Collapse player".
+- The dismiss X in the hero is `<button>` not `<div>` despite being decorative.
+- Hero scrim is marked `aria-hidden="true"`.
+- Avatar fallback initials are wrapped in an element whose visible text is the initials and whose `<img>` (when present) carries `alt={profile.name}`.
+- `<header role="banner">` is implicit via `<header>` semantic. Mobile menu sets `aria-expanded` as it opens.
+- Online status dot has `aria-label="Online"`.
+- Focus is preserved on all interactive surfaces (no `outline: none` without a replacement).
+
+### To watch
+- The **floating music player covers ~80×80px** in the bottom-left corner. Users zooming in or with low-vision setups may want it gone — consider a visually-hidden "skip to main content" link or a setting to disable it.
+- Auto-collapse on the player happens after **8s of no interaction**. If you have keyboard-only users tab-focused on the pill, the timer will still fire. Consider pausing the timer while focus is inside the pill.
+- Hero auto-advance has **no pause-on-focus** affordance for screen readers. If accessibility is a priority, add a pause control or kill the autoplay on `prefers-reduced-motion`.
+- No `prefers-reduced-motion` queries currently. Add `@media (prefers-reduced-motion: reduce)` to disable: vinyl spin, halo pulse, EQ bars, scroll hint, slideshow autoplay, ticker autoplay.
+
+### Colour contrast spot-checks
+All passing AA on white (4.5:1):
+- `ink-900` (`#0f172a`) — 18.7:1 ✅
+- `ink-700` (`#334155`) — 11.5:1 ✅
+- `ink-500` (`#64748b`) — 5.7:1 ✅
+- Teal `#39c5bb` on white — 2.5:1 ❌ (used only for **bold ≥14px** or **large numbers** which lifts the requirement to 3:1, still below). Use `teal-deep` `#2ba8a0` (3.0:1) for body-sized text, which most components already do.
+
+---
+
+## 10. File map
+
+```
+src/
+├── pages/
+│   └── index.astro              # Home page entry (Section 5 layout)
+├── layouts/
+│   └── BaseLayout.astro         # HTML shell, fonts, global animations
+├── components/
+│   ├── Navigation.astro         # §6.2
+│   ├── HeroSection.astro        # §6.3
+│   ├── LocalTime.astro          # §6.4 (NEW)
+│   ├── SidebarProfile.astro     # §6.5
+│   ├── RecentPosts.astro        # §6.6
+│   ├── SiteStats.astro          # §6.7
+│   ├── SiteFooter.astro         # §6.8
+│   └── MusicPlayer.astro        # §6.9 (refactored to floating)
+└── data/
+    └── playlist.ts              # Music tracks (consumed by MusicPlayer)
+```
+
+**Unused on the home page** (kept around in case other pages need them):
+- `HeroBanner.astro` — older inline hero card style.
+- `HeroTicker.astro` — frosted-glass post ticker. Designed to slot into HeroSection's `ticker` slot. Removed from home in this revision.
+- `ProjectCollections.astro` — 2-column project card grid.
+
+---
+
+## 11. Open items & gotchas
+
+1. **`BaseLayout` brand colour mismatch.** `:root --color-primary` is `#00D1FF` but the rest of the system uses `#39c5bb`. Either kill that variable or normalise to teal. Currently nothing on the home page reads from `--color-primary`, so the inconsistency is invisible — but it'll bite if you ever build something that does.
+
+2. **`bg-page` mismatch.** `BaseLayout` sets `--color-bg-main: #F8FAFC` while the home page uses `bg-[#f1f5f9]` directly. They're close (`#F8FAFC` = `slate-50`, `#f1f5f9` = `slate-100`) but not the same. Pick one and roll it out.
+
+3. **Hero wallpapers are Unsplash placeholders.** The exact "CENTRAL CINEMA" image from the prototype is not in the array — swap in your own asset when ready.
+
+4. **Dismiss X is decorative.** It currently fades itself out on click. If you want it to dismiss something meaningful (a notification banner, a beta flag), wire it up. Otherwise consider deleting it — non-functional UI ages badly.
+
+5. **Music player + nav z-index ordering.** Nav is `z-50`, player is `z-40`. The player is always **below** the nav. If you ever add a modal that needs to cover both, use `z-60`+.
+
+6. **Auto-collapse timer ignores keyboard focus.** See [§9](#9-accessibility).
+
+7. **No `prefers-reduced-motion` handling.** Vinyl will spin, hero will autoplay, EQ bars will dance regardless of OS setting. This is the easiest accessibility win to ship next.
+
+8. **Anime + Dev share `DE` two-letter code.** See note under [§2](#2-design-tokens).
+
+9. **Local time defaults to `Asia/Shanghai`.** If you're not in China, change the prop on the home page. The component is generic — `<LocalTime label="LOCAL TIME · MALAYSIA" timezone="Asia/Kuala_Lumpur" />` works fine.
+
+10. **`HeroTicker` is no longer rendered on home.** It still exists as a component and HeroSection still has a `<slot name="ticker" />`. If you want it back, just pass it through:
+    ```astro
+    <HeroSection ...>
+      <Navigation slot="nav" heroOverlay />
+      <HeroTicker slot="ticker" posts={recent} />
+    </HeroSection>
+    ```
+
+---
+
+*Last updated: 2026-05-04. Update this file when behaviour or tokens change.*# DESIGN.md — Yean Ter Portfolio Home Page
+
+> *所有奇迹的始发点 · Where All Miracles Begin*
+
+A single source of truth for everything UI/UX on the home page. If you change a token or a behaviour, update this file. If you add a new component, add a section.
+
+---
+
+## Table of contents
+
+1. [Design philosophy](#1-design-philosophy)
+2. [Design tokens](#2-design-tokens)
+3. [Typography](#3-typography)
+4. [Spacing, radius, shadow](#4-spacing-radius-shadow)
+5. [Page structure & layout](#5-page-structure--layout)
+6. [Component reference](#6-component-reference)
+7. [Interaction & motion](#7-interaction--motion)
+8. [Responsive behaviour](#8-responsive-behaviour)
+9. [Accessibility](#9-accessibility)
+10. [File map](#10-file-map)
+11. [Open items & gotchas](#11-open-items--gotchas)
+
+---
+
+## 1. Design philosophy
+
+The home page is a personal portfolio with three jobs, in order of priority:
+
+1. **Greet the visitor warmly.** A full-bleed cinematic hero sets a mood — neon, late-night, a little nostalgic — and tells you who lives here in two centred lines.
+2. **Show what's been made and what's being made.** A scannable list of recent posts in the main column; a profile card in the sidebar that says "this is me, this is what I'm building right now."
+3. **Stay ambient.** A floating music player in the corner so the soundtrack follows you down the page. A live local clock in the sidebar so the page feels inhabited.
+
+Visual language: **Plus Jakarta Sans + JetBrains Mono**, white surfaces, soft shadows, generous radius, single-accent teal (`#39c5bb`) with a warm orange sidekick (`#f59e0b`) used sparingly for "new" / "featured" moments. Everything else is slate-gray.
+
+The page should feel **calm, not busy**. No gradients on every surface. No motion for motion's sake. Movement is reserved for things that are alive: the vinyl spinning, the LIVE pulse, the EQ bars in the playlist.
+
+---
+
+## 2. Design tokens
+
+### Colour
+
+#### Brand
+| Token            | Hex        | Usage                                                       |
+|------------------|------------|-------------------------------------------------------------|
+| `teal`           | `#39c5bb`  | Primary brand. CTAs, active states, links, accent dots.     |
+| `teal-deep`      | `#2ba8a0`  | Hover state for `teal`. Gradient pair.                      |
+| `teal-soft`      | `rgba(57,197,187,0.10)` | Tinted backgrounds (category pills, hover).    |
+| `teal-ring`      | `rgba(57,197,187,0.30)` | Subtle borders around teal-tinted surfaces.    |
+
+#### Accents
+| Token            | Hex        | Usage                                                       |
+|------------------|------------|-------------------------------------------------------------|
+| `orange`         | `#f59e0b`  | "Anime" category, "New" badge, secondary accents.           |
+| `orange-deep`    | `#d97706`  | Text on orange-tinted backgrounds.                          |
+| `orange-soft`    | `rgba(245,158,11,0.10)` | Anime category pill bg, code-square bg.       |
+| `purple`         | `#8b5cf6`  | "Journal" category accent.                                  |
+| `purple-deep`    | `#7c3aed`  | Text on purple-tinted backgrounds.                          |
+| `slate-accent`   | `#475569`  | "Dev" category accent (neutral).                            |
+
+#### Surfaces & ink
+| Token            | Hex        | Usage                                                       |
+|------------------|------------|-------------------------------------------------------------|
+| `bg-page`        | `#f1f5f9`  | The main page background (the gray strip behind cards).     |
+| `bg-surface`     | `#ffffff`  | Cards, the footer, the music player pill.                   |
+| `bg-muted`       | `#f8fafc`  | Inset blocks (e.g. "Currently building" bar).               |
+| `border-default` | `#e2e8f0`  | All card borders.                                           |
+| `border-soft`    | `#f1f5f9`  | Hairline dividers inside cards.                             |
+| `ink-900`        | `#0f172a`  | Headings, primary text.                                     |
+| `ink-700`        | `#334155`  | Body text on light surfaces.                                |
+| `ink-500`        | `#64748b`  | Secondary body, navigation links.                           |
+| `ink-400`        | `#94a3b8`  | Excerpts, labels.                                           |
+| `ink-300`        | `#cbd5e1`  | Disabled, captions, monospace metadata.                     |
+| `ink-100`        | `#e2e8f0`  | Decorative dots, very low contrast text.                    |
+
+#### Hero scrim
+The hero uses a custom four-stop gradient over the wallpaper for legibility:
 ```css
-/* 卡片上浮（标准） */
-hover:-translate-y-1.5 transition-transform
-
-/* 轻微上浮（MusicPlayer 等小组件） */
-hover:-translate-y-1 transition-transform
-
-/* 图片 zoom-in */
-group-hover:scale-110 transition-transform duration-700
-
-/* Hero 图片轻微 zoom */
-group-hover:scale-[1.02] transition-transform duration-700
+linear-gradient(to bottom,
+  rgba(0,0,0,0.08)  0%,
+  rgba(0,0,0,0.18) 35%,
+  rgba(0,0,0,0.55) 70%,
+  rgba(0,0,0,0.85) 100%);
 ```
 
-### Shimmer 光效覆盖层
+### Category colour map
 
-每个带 `group` 的卡片在悬停时应叠加光效：
+The `Recent Posts` card system uses one row per category. **Always source colours from this table** — don't hand-pick new shades.
 
-```astro
-<!-- 放在卡片末尾，pointer-events-none -->
-<div class="pointer-events-none absolute inset-0 rounded-[32px] 
-            bg-gradient-to-br from-white/0 via-orange-100/20 to-[#39c5bb]/10 
-            opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-</div>
-```
+| Category | Accent   | Pill bg                | Pill text  | Code box bg            | Code-box text | Code |
+|----------|----------|------------------------|------------|------------------------|---------------|------|
+| Anime    | `#f59e0b`| `rgba(245,158,11,0.10)`| `#d97706`  | `rgba(245,158,11,0.08)`| `#d97706`     | `AN` |
+| Design   | `#39c5bb`| `rgba(57,197,187,0.10)`| `#2ba8a0`  | `rgba(57,197,187,0.08)`| `#2ba8a0`     | `DE` |
+| Dev      | `#475569`| `rgba(71,85,105,0.10)` | `#334155`  | `rgba(71,85,105,0.06)` | `#475569`     | `DE` |
+| Journal  | `#8b5cf6`| `rgba(139,92,246,0.10)`| `#7c3aed`  | `rgba(139,92,246,0.08)`| `#7c3aed`     | `JO` |
+| (fallback)| `#475569`| `rgba(71,85,105,0.10)`| `#334155`  | `rgba(71,85,105,0.06)` | `#475569`     | `PO` |
 
-### 脉冲动效
-
-```css
-/* 在线状态点、系统状态指示灯 */
-animate-pulse
-
-/* anime.astro premium 卡片边框 */
-@keyframes pulse-border {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.6; }
-}
-.premium-ring { animation: pulse-border 2s ease-in-out infinite; }
-```
-
-### 过渡时长规范
-
-```
-颜色/透明度过渡：  duration-200（快）/ duration-300（默认）/ duration-500（慢，shimmer）
-transform 过渡：   duration-200（按钮）/ duration-300（卡片）/ duration-700（图片 zoom）
-```
+> **Note:** Anime and Dev share the `DE` two-letter code by accident. If they ever appear next to each other and read ambiguously, change `Dev` → `DV`. The map lives in `RecentPosts.astro`.
 
 ---
 
-## 8. 组件目录
+## 3. Typography
+
+### Font families
+- **Plus Jakarta Sans** (400 / 500 / 600 / 700 / 800 / 900) — everything UI.
+- **JetBrains Mono** (500) — clocks, dates, file paths (`index.astro`), serial-style metadata, anywhere we want the "code-y" feel.
+
+Both are loaded once in `BaseLayout.astro` from Google Fonts.
+
+### Scale
+
+| Use                                    | Size                       | Weight | Tracking      |
+|----------------------------------------|----------------------------|--------|---------------|
+| Hero title (`Yean Ter`)                | `clamp(2.6rem, 6.5vw, 4.5rem)` | 900   | tight         |
+| Hero greeting line                     | 13px                       | 500    | wide          |
+| Hero tagline                           | `clamp(0.85rem, 1.6vw, 1rem)` | 500    | wide          |
+| Hero CTA                               | 13px                       | 700    | normal        |
+| Section divider label (e.g. SITE STATS)| 10px                       | 900    | `0.22em`      |
+| Big stat number                        | `clamp(1.85rem, 3.5vw, 2.4rem)` | 900   | tabular nums  |
+| Card title (post)                      | 14px                       | 900    | tight         |
+| Card excerpt                           | 12px                       | 500    | normal        |
+| Profile name                           | 18px                       | 900    | tight         |
+| Profile tagline                        | 12px                       | 500    | normal        |
+| Sidebar section label                  | 9px                        | 900    | `0.20em`      |
+| LocalTime clock                        | 18px JetBrains Mono        | 900    | `0.04em`      |
+| Footer columns header (PAGES, TAGS)    | 10px                       | 900    | `0.18em`      |
+| Tag pill                               | 10px                       | 700    | normal        |
+| Category pill                          | 10px                       | 900    | `0.12em` upper |
+| Hashtag (`#UI`)                        | 10px JetBrains Mono        | 400    | normal        |
+| Date metadata                          | 10px JetBrains Mono        | 400    | normal        |
+
+### Casing
+
+- **UPPERCASE + wide tracking** is reserved for category pills, section labels, and stat captions. Never put body text in uppercase.
+- **Headings** use sentence case: `My Top 5 Anime This Season`, not `My Top 5 Anime this Season`.
+- **Buttons** use Title Case: `Browse Work`, `View all posts`.
 
 ---
 
-### `Navigation.astro`
+## 4. Spacing, radius, shadow
 
-**位置**：`src/components/Navigation.astro`  
-**职责**：全局顶部导航栏
+### Spacing rhythm
 
-#### Props
-无（静态组件）
+Tailwind defaults (`gap-1` = 4px, `gap-2` = 8px, etc.). Most layouts use `gap-3` (12px), `gap-4` (16px), `gap-5` (20px), `gap-8` (32px). Vertical rhythm in the sidebar is `space-y-5` (20px).
 
-#### 关键样式
-```
-Logo：          bg-gradient-to-r from-[#39c5bb] to-[#2ba8a0] bg-clip-text text-transparent
-激活链接：      text-[#39c5bb] + 下方 w-3 h-[2px] bg-[#39c5bb] 指示线
-Anime Labs 徽章：bg-orange-100 text-orange-500（"New" pill）
-版本标签：      白色 pill + teal 脉冲点 + border-slate-200
-Contact 按钮：  bg-slate-900 hover:shadow-[...teal glow]
-```
+Page max width: **1100px** (`max-w-[1100px]`). This is non-negotiable — every inner container respects it. Outer regions (hero, stats, footer) bleed full-width but their inner content reins back to 1100.
 
-#### 修改指南
-- **新增导航项**：复制现有 `<a>` 标签，激活页添加 flex-col + 下划线 div
-- **更换 Logo 文字**：直接修改 `FIDELITY.` 文字内容
-- **更换版本号**：修改 `Astro_Sys_v1.0`
+Page horizontal padding: **24px** (`px-6`) at all breakpoints.
 
----
+### Border radius
 
-### `SidebarProfile.astro`
+| Surface             | Radius       |
+|---------------------|--------------|
+| Pill (CTA, tag, badge, music player pill) | `9999px` |
+| Card (post, profile, music drawer, stats) | `16px` (`rounded-2xl`) |
+| Inset block (currently building, code square)| `12px` (`rounded-xl`) |
+| Small badge (LIVE, category pill)         | `8px` (`rounded-md` / `rounded-lg`) |
+| Hover/focus ring                          | matches host  |
 
-**位置**：`src/components/SidebarProfile.astro`  
-**职责**：左侧个人档案卡
+### Shadow
 
-#### Props
-```typescript
-profile: {
-  name: string;
-  tagline: string;
-  tags: string[];        // 渲染为彩色 pill 标签
-  currentFocus: string;  // 渲染为状态行
-  avatarFallback: string; // 头像 URL
-}
-```
+There are exactly **four** shadow levels. Don't invent more.
 
-#### 标签颜色映射
-在组件内的 `tagColors` 对象中维护：
+| Level        | Value                                                       | Used on                          |
+|--------------|-------------------------------------------------------------|----------------------------------|
+| `shadow-card`| `0 4px 20px rgba(15,23,42,0.04)`                            | Default white cards (idle).      |
+| `shadow-card-hover`| `0 6px 24px rgba(15,23,42,0.06)` or `rgba(57,197,187,0.08)` | Cards on hover.                  |
+| `shadow-cta` | `0 4px 24px rgba(57,197,187,0.45)`                          | Primary teal CTA (Browse Work).  |
+| `shadow-float` | `0 8px 28px rgba(15,23,42,0.18)` (with optional pulsing ring) | Floating music player disc.   |
 
-```typescript
-const tagColors: Record<string, [bgClass, textClass, borderClass]> = {
-  "UI/UX":   ["bg-[#39c5bb]/10", "text-[#2ba8a0]", "border-[#39c5bb]/30"],
-  "Astro":   ["bg-orange-50",    "text-orange-500", "border-orange-200"],
-  "Next.js": ["bg-slate-100",    "text-slate-600",  "border-slate-200"],
-  "Otaku":   ["bg-orange-50",    "text-orange-500", "border-orange-200"],
-  // 新增 tag 在此添加
-};
-```
-
-#### 目录链接
-在 `Directory / Pages` 区块中手动维护，每个链接格式：
-
-```astro
-<a href="/路径" class="flex items-center gap-3 ... hover:text-[#39c5bb]">
-  <div class="w-2 h-2 rounded-full bg-[#39c5bb]"></div>
-  filename.astro
-</a>
-```
-
-颜色约定：`anime.astro` → teal，`projects.astro` → orange，其余 → slate-300
-
-#### 修改指南
-- **新增 tag**：在 `index.astro` 的 `profile.tags` 数组添加，并在 `tagColors` 中注册颜色
-- **新增目录项**：在 Directory 区块 copy 一行，调整 href 和 dot 颜色
-- **更换头像**：修改 `profile.avatarFallback`，或保留点击生成功能
+CTA hover boosts to `0 6px 28px rgba(57,197,187,0.6)`. Music player playing-state adds a pulsing teal ring via animation (see [§7](#7-interaction--motion)).
 
 ---
 
-### `MusicPlayer.astro`
+## 5. Page structure & layout
 
-**位置**：`src/components/MusicPlayer.astro`  
-**职责**：侧边栏音乐播放器（纯 UI，无实际音频）
+### Vertical flow
 
-#### Props
-```typescript
-playlist: Array<{
-  id: number;
-  title: string;
-  artist: string;
-  durationStr: string;  // 显示用，如 "3:58"
-  durationSec: number;  // 预留，暂未使用
-}>
+```
+┌─────────────────────────────────────────────────┐
+│  Hero (100vh, full-bleed)                       │
+│  ├── Navigation (overlay, transitions on scroll)│
+│  ├── LIVE badge (top-left)                      │
+│  ├── Dismiss X (top-center, decorative)         │
+│  ├── Title block (centered, lower-third)        │
+│  │   ├── Greeting line                          │
+│  │   ├── Title — "Yean Ter"                     │
+│  │   ├── Tagline                                │
+│  │   └── Two CTAs                               │
+│  └── Slide nav (bottom-center: ‹ • • ‹•› • • ›) │
+├─────────────────────────────────────────────────┤
+│  Main grid (max-w-1100, on bg-page)             │
+│  ┌──────── 4 ────────┬──────── 8 ──────────┐    │
+│  │ LocalTime         │ RecentPosts         │    │
+│  │ SidebarProfile    │ (8 cards stacked)   │    │
+│  │                   │ View all posts →    │    │
+│  └───────────────────┴─────────────────────┘    │
+├─────────────────────────────────────────────────┤
+│  SiteStats (full-bleed, on bg-page)             │
+│  • SITE STATS divider                           │
+│  • 4 white cards: Posts · Words · Tags · Days   │
+├─────────────────────────────────────────────────┤
+│  SiteFooter (full-bleed, white)                 │
+│  ┌──────────┬──────────┬──────────────────┐     │
+│  │ Brand    │ Pages    │ Tags             │     │
+│  └──────────┴──────────┴──────────────────┘     │
+│  Bottom bar: © · 所有奇迹的始发点                │
+└─────────────────────────────────────────────────┘
+
+Floating overlay (always on top, persistent):
+  • Music Player (bottom-left, fixed)
 ```
 
-#### 交互行为
-- **点击播放按钮**：切换 play/pause 图标，触发 `vinyl-record` playing 动画类
-- **点击 vinyl 圆盘**：切换至下一首曲目（循环）
+### Grid
 
-#### 修改指南
-- **修改歌单**：在 `index.astro` 的 `playlist` 数组中增删对象
-- **接入真实音频**：在 `<script>` 中实例化 `Audio` 对象，监听 `play/pause` 事件
-- **样式变更**：vinyl 背景色 `bg-slate-900`，中心点 `bg-[#39c5bb]`
+- Hero, SiteStats, SiteFooter are **full-bleed sections**. Their direct child re-applies `max-w-[1100px] mx-auto px-6`.
+- Main content uses a 12-column CSS grid: `grid grid-cols-1 lg:grid-cols-12 gap-8`.
+  - Sidebar: `lg:col-span-4`
+  - Main:    `lg:col-span-8`
+- Below `lg` (1024px), the grid collapses to a single column. Sidebar stacks above main.
+
+### Z-index map
+
+| Layer              | Z-index | Element                                        |
+|--------------------|---------|------------------------------------------------|
+| Floating player    | `40`    | `MusicPlayer` (`#floating-player`)             |
+| Navigation         | `50`    | `Navigation` header                            |
+| Hero overlays      | `20`    | LIVE badge, dismiss X, slide nav               |
+| Hero centre block  | `10`    | Title group, scroll hint                       |
+| Page bg accents    | `-10`   | The fixed teal blur orb                        |
+
+> **Important:** The Navigation (`z-50`) sits **above** the floating music player (`z-40`) on purpose — the nav must always be reachable. If you move things around, preserve this order.
 
 ---
 
-### `HeroBanner.astro`
+## 6. Component reference
 
-**位置**：`src/components/HeroBanner.astro`  
-**职责**：主内容区顶部英雄横幅，支持 AI 图片生成替换背景
+### 6.1 BaseLayout (`layouts/BaseLayout.astro`)
 
-#### Props
-无（由 `index.astro` 的 script 通过 DOM ID 控制）
+The HTML shell. Mounts fonts, applies the Plus Jakarta Sans body, sets `bg-page` (currently `#F8FAFC` — should be normalised to `#f1f5f9` to match the rest of the system).
 
-#### 关键 DOM ID
-| ID | 用途 |
-|----|------|
-| `heroWallpaper` | 背景图 `<img>`，AI 生成后替换 `src` |
-| `wallpaper-loader` | loading shimmer 遮罩，生成时显示 |
-| `generate-trigger` | "Anime Labs" 按钮，点击触发 AI 生成 |
+Contains two global animations referenced by other components:
+- `.vinyl-record` — 4s linear infinite spin, paused by default, runs when `.playing` is added. *Used by the older sidebar music player; the floating player uses its own scoped `.fp-vinyl-spin` and does not depend on this.*
+- `.loading-shimmer` — the wallpaper loader stripe. Currently only used by `HeroBanner.astro` (not on the home page).
 
-#### 角落徽章
+### 6.2 Navigation (`Navigation.astro`)
+
+Sticky-or-floating header, max-width 1100, height 64px.
+
+**Modes**
+- `heroOverlay={false}` (default) — sticky from page load, frosted-glass white background.
+- `heroOverlay={true}` — starts `position: absolute` and **fully transparent** so it floats over the hero image; transitions to frosted-glass and switches to `position: sticky` once the user has scrolled more than 60px.
+
+**Links** — `Home / Projects / Anime / Resume / About`. Each has:
+- Active state: teal text, bold, with a 3×2px teal underline pill below.
+- Hover state: text darkens to `slate-900` on a frosted background, or to white on the hero overlay.
+
+**CTA** — single `Contact` pill on the right (`slate-900` bg, white text). Mobile: hidden behind the hamburger.
+
+**Mobile menu** — 3-line hamburger animates to ✕. Drawer reveals via `max-height` transition. Auto-closes on outside click and on Astro view transitions.
+
+> **Bug fixed in this revision:** the scroll handler used to query `[data-hero-link]` but the attribute was never set on the link elements, so the link colour didn't actually flip on scroll. The attribute is now applied conditionally (only when `heroOverlay=true`).
+
+### 6.3 HeroSection (`HeroSection.astro`)
+
+Full-viewport (`min-height: 100vh`) cinematic hero.
+
+**Props**
+| Prop          | Type                       | Default                              | Notes                                  |
+|---------------|----------------------------|--------------------------------------|----------------------------------------|
+| `title`       | string                     | required                             | Renders as the big centered H1.        |
+| `tagline`     | string                     | —                                    | Bilingual subtitle line.               |
+| `greeting`    | string                     | —                                    | Small line above title (with emoji ok).|
+| `wallpapers`  | `{src, alt}[]`             | —                                    | Slideshow mode if length > 1.          |
+| `wallpaper`   | string                     | unsplash placeholder                 | Single-image fallback.                 |
+| `liveLabel`   | string                     | `'LIVE'`                             | Top-left badge text.                   |
+| `primaryCta`  | `{label, href}`            | `{Browse Work, /projects}`           | Teal solid pill.                       |
+| `secondaryCta`| `{label, href, badge?}`    | `{Anime Labs, /anime, badge:'New'}`  | Dark glass pill with optional badge.   |
+
+**Anatomy (top to bottom)**
+1. **Wallpaper layer** — stack of `<img>` elements, all `object-cover`, fading via `opacity` on slide change.
+2. **Scrim** — see [§2](#2-design-tokens). Pointer-events disabled.
+3. **LIVE badge** — top-left at `top-20 left-6` (80px / 24px), teal-80 bg, white pulsing dot.
+4. **Dismiss X** — `top-[68px]`, centered horizontally. Decorative; clicking fades it out. Treat as a **playful** affordance, not load-bearing UX.
+5. **Navigation slot** — `<slot name="nav" />`. Parent injects `<Navigation heroOverlay />`.
+6. **Centre text block** — `bottom: 24%`, centred. Contains greeting + title + tagline + CTA row.
+7. **Slide nav** — `bottom: 80px`, centred, frosted dark pill: prev chevron · dot · dot · pill · dot · dot · next chevron. Active dot is wider (`w-5`).
+8. **Scroll hint** — `bottom-3`, centred. A 1px × 24px white vertical line that pulses scaleY. Fades out once `window.scrollY > 40`.
+
+**Slideshow timing** — auto-advance every **6 seconds**. User interaction with prev/next/dots resets the cadence.
+
+### 6.4 LocalTime (`LocalTime.astro`)
+
+Small white card. Sits at the **top of the sidebar**, above the profile.
+
+**Layout** — left: 40×40 teal-tinted ring with a clock-face SVG. Right: three lines stacked.
+- Top line: `LOCAL TIME · CHINA` (9px, 900, slate-400, `tracking-[0.18em]`).
+- Middle line: `02:33:54` (18px, 900, slate-900, JetBrains Mono, tabular-nums, `letter-spacing: 0.04em`).
+- Bottom line: `Mon, May 4` (10px, 500, slate-400, tabular-nums).
+
+**Behaviour** — uses `Intl.DateTimeFormat` with `timeZone: 'Asia/Shanghai'`. Recomputes every 1000ms via `setInterval`. Format is **24-hour** (`hour12: false`), so this clock reads `02:33:54` not `2:33:54 AM`.
+
+**Props** — `label` (default `LOCAL TIME · CHINA`) and `timezone` (default `Asia/Shanghai`). Both are configurable; if you change to e.g. `Asia/Tokyo`, also update the label.
+
+### 6.5 SidebarProfile (`SidebarProfile.astro`)
+
+White card, no gradient ring (cleaner than the previous revision).
+
+**Anatomy (top to bottom)**
+1. Section label — teal dot + `PROFILE`.
+2. Avatar (56×56, gradient teal fill with initials fallback) + name + tagline. Online dot in the corner of the avatar, animated pulse.
+3. Tags — wrap row of 10px uppercase pills. Teal for skills, orange for hobbies, slate for "neutral" tech. Map lives in the component.
+4. **Currently building** strip — slate-50 inset rectangle, teal pulsing dot, two stacked lines (label + status).
+5. Hairline divider.
+6. **Directory / Pages** — five mock-file links (`index.astro`, `projects.astro`, …) each with a coloured dot prefix. Hover turns the link teal.
+
+The whole card has a soft hover that boosts the shadow tint from neutral to a faint teal.
+
+### 6.6 RecentPosts (`RecentPosts.astro`)
+
+The main content column. **No top divider** in this revision — the list begins immediately.
+
+**Card anatomy** (one row per post)
 ```
-左上：  LIVE  → bg-[#39c5bb]/80（teal）
-右上：  HRO-001 → bg-orange-500/80（orange）
+┌──┬─────────────────────────────────────────────────────────┐
+│  │ [CATEGORY]  #tag  #tag                       date     │  │
+│ ▌│ Title (one line, line-clamp-1)                          │
+│  │ Excerpt over up to two lines, slate-400.                │
+└──┴─────────────────────────────────────────────────────────┘
+                                           ↑ 78×78 code square
 ```
-修改右上角序列号时直接改 `HRO-001` 文字。
 
-#### 修改指南
-- **替换默认背景图**：修改 `<img>` 的 `src` 属性（Unsplash URL）
-- **修改标题文字**：找到 `Crafting Digital` 和 `<span class="text-[#39c5bb]">Experiences</span>`
-- **修改副标题**：找到 `Astro-powered precision...` 段落
-- **修改 CTA 按钮文字**：找到 `Browse Work` / `Anime Labs`
-- **更换 AI 生成 prompts**：在 `index.astro` 的 `vibes` 数组中修改
+- **Left accent bar** — 4px wide, full card height, coloured per category. Animates to 6px (`w-1.5`) on hover.
+- **Meta row** — category pill (uppercase, tinted), then `#tags` in JetBrains Mono slate-300, then date pushed to the right (`ml-auto`, also slate-300 mono).
+- **Title** — 14px, weight 900. Turns teal on row hover.
+- **Excerpt** — 12px, slate-400, two-line clamp.
+- **Right code square** — 78×78 rounded `rounded-xl`, tinted with the category's `boxBg`, displays the two-letter `code` (e.g. `AN`) at 13px / 900 / 0.55 opacity. Scales 1.05 on hover. If the post has a `heroImage`, that replaces the code.
+
+**View all** — centred link below the list with a subtle right arrow.
+
+**Demo data** — when the posts collection is empty, the component renders 8 demo cards covering all four categories so the layout never collapses.
+
+### 6.7 SiteStats (`SiteStats.astro`)
+
+Full-bleed strip on `bg-page`.
+
+- Centred section label `SITE STATS` flanked by a teal-fading hairline on each side.
+- Four white cards in a 1-column → 2-column → 4-column responsive grid (`grid-cols-2 sm:grid-cols-4`), `gap-4`. Each card has its own border + soft shadow.
+- Inside each card: big number (`clamp(1.85rem, 3.5vw, 2.4rem)`, weight 900, tabular-nums) above a 10px uppercase caption.
+- Empty values render as `—` so the layout never collapses.
+
+### 6.8 SiteFooter (`SiteFooter.astro`)
+
+White, `border-t` only (no internal stat bar — `SiteStats` does that now).
+
+- **Three columns** in a 1 → 3 grid:
+  1. **Brand** — gradient `PORTFOLIO` wordmark, bilingual tagline, GitHub + X social pills, version pill with a pulsing teal dot.
+  2. **Pages** — 5 vertical nav links with a tiny dot prefix.
+  3. **Tags** — flex-wrap of pill-shaped tags. If the live `tags` prop is empty, falls back to a fixed demo list rendered as non-link `<span>`s (so they don't 404).
+- **Bottom bar** — `mt-10 pt-5 border-t`. Left: `© <year> <ownerName> · Built with Astro`. Right: `所有奇迹的始发点` (very low contrast).
+
+### 6.9 MusicPlayer (`MusicPlayer.astro`) — floating
+
+Position-fixed at `bottom-6 left-6` (`bottom-4 left-4` on mobile). `z-40`. Persistent across scroll.
+
+**Three states**
+| State          | Class on `#floating-player`     | Visual                                                  |
+|----------------|---------------------------------|---------------------------------------------------------|
+| `collapsed`    | (no extra class)                | 56×56 black vinyl disc with glowing teal core.          |
+| `expanded`     | `.expanded`                     | 320px white pill: small disc + track info + 5 controls. |
+| `playlist-open`| `.expanded.playlist-open`       | Drawer (320×280max) slides up from above the pill.      |
+
+**Initial reveal** — the entire container has `opacity: 0; transform: translateY(20px); pointer-events: none`. Once `window.scrollY > 200`, it fades in and slides up via the `.visible` class. So the player **never appears over the hero CTAs**.
+
+**Interactions**
+- **Disc click** (collapsed) → expand. If audio hasn't started, also kicks off track 0.
+- **Vinyl click** (inside pill) → toggle play/pause.
+- **Teal play button** → toggle play/pause.
+- **Prev / Next** → switch tracks; preserves play state (skipping while playing keeps it playing).
+- **List button** (☰) → toggle playlist drawer; goes teal when open.
+- **Close** (✕) → collapse back to disc.
+- **Click outside the player** → closes the drawer but **keeps the pill expanded** (less aggressive).
+- **Auto-collapse** — if the player is paused **and** the user hasn't moused over for 8 seconds, it collapses itself. Playing audio cancels the timer indefinitely.
+
+**Visual feedback**
+- Disc spins (4s linear) only when `.playing` is on it.
+- A pulsing teal halo (`@keyframes fpPulse`) rings the disc while playing — `box-shadow: 0 0 0 8px rgba(57,197,187,0)` expanding outward over 2s.
+- The currently playing track in the drawer shows three dancing EQ bars in place of its number.
+
+**Empty state** — if `playlist` is empty, the player still renders but as a static dim disc with `cursor: default` and a tooltip "No tracks loaded." No script wires up.
+
+**Audio engine** — single hidden `<audio id="audioEngine" preload="metadata">` shared across the player. The ID is preserved from the previous revision so any external integrations (analytics, Media Session API) keep working.
 
 ---
 
-### `ProjectCollections.astro`
+## 7. Interaction & motion
 
-**位置**：`src/components/ProjectCollections.astro`  
-**职责**：最新项目卡片网格（2列），支持动态 posts 或静态 fallback
+### Easing & duration
 
-#### Props
-```typescript
-posts: any[]  // 来自 getCollection('posts')，空数组时显示 fallback 卡片
-```
+- **Default ease** for all hover transitions: `ease` or `cubic-bezier(0.4, 0, 0.2, 1)` (Tailwind's default).
+- **Default duration**: 200ms for state changes, 300ms for layout-y things (nav backdrop), 400ms for reveals (player slide-up uses `cubic-bezier(0.16, 1, 0.3, 1)` for a softer landing).
+- **Long autoplay loops** (slideshow, vinyl spin): linear so they don't read as breathing.
 
-#### 卡片色彩交替逻辑
-```typescript
-const cardAccents = [
-  // 偶数卡片 (i=0,2,...): teal 主
-  { ring: "from-[#39c5bb]/50 to-orange-300/30", badge: "bg-[#39c5bb]/80", ... },
-  // 奇数卡片 (i=1,3,...): orange 主
-  { ring: "from-orange-400/50 to-[#39c5bb]/30", badge: "bg-orange-500/80", ... },
-];
-// 取色：cardAccents[i % 2]
-```
+### Hover-level micro-interactions
 
-#### 序列号格式
-```typescript
-const toSerial = (i: number) => `PRJ-${String(i + 1).padStart(3, '0')}`;
-// 输出：PRJ-001, PRJ-002, ...
-```
+| Surface                      | Hover effect                                         |
+|------------------------------|------------------------------------------------------|
+| Post card                    | `translate-y(-2px)` + shadow lift                    |
+| Profile / LocalTime card     | Shadow tint shifts neutral → teal                    |
+| Primary CTA (`Browse Work`)  | `translate-y(-2px)` + brighter shadow                |
+| Secondary CTA (`Anime Labs`) | `translate-y(-2px)` + bg darkens                     |
+| Music disc (collapsed)       | `scale(1.05)` + teal border ring intensifies         |
+| Music disc (with overlay)    | A blurred dark veil fades in revealing play icon     |
+| Code square in post card     | `scale(1.05)`                                        |
+| Nav link (non-active)        | bg `slate-100/80`, text darkens to `slate-900`       |
 
-#### Fallback 卡片
-当 `posts.length === 0` 时显示静态示例卡片。修改静态标题：
+### Looping animations
 
-```typescript
-{ title: "Lumina Dashboard",  category: "Case Study",   idx: 0 },
-{ title: "Cyber-Neko UI",     category: "Experimental", idx: 1 },
-```
+| Animation         | Duration | Where                                 |
+|-------------------|----------|---------------------------------------|
+| `vinyl-spin`      | 4s linear| Music disc (only while playing)       |
+| `fpPulse`         | 2s ease  | Music disc halo (only while playing)  |
+| `fpEq`            | 0.8s alt | EQ bars in the playlist drawer        |
+| `scrollPulse`     | 2s ease  | Hero scroll-hint vertical line        |
+| `pulse` (Tailwind)| ~2s      | LIVE badge dot, online dot, focus dots|
 
-#### 修改指南
-- **更改显示数量**：`posts.slice(0, 2)` → 改 `2` 为目标数量，同时调整 grid cols
-- **新增卡片颜色变体**：在 `cardAccents` 数组添加第 3 个对象
-- **修改标题样式**：找到 `text-xl font-black` 的 `<h4>`
+### Slideshow & ticker timings
+
+- Hero wallpaper auto-advance: **6000ms**.
+- Hero ticker (when used) auto-advance: **4000ms**. *(Not used on the home page in this revision — see [§11](#11-open-items--gotchas).)*
 
 ---
 
-## 9. 徽章 & 标签规范
+## 8. Responsive behaviour
 
-### 序列号徽章（右上角 badge）
+| Breakpoint     | Behaviour                                                                      |
+|----------------|--------------------------------------------------------------------------------|
+| `< 480px`      | Music player tightens to `bottom-4 left-4`. Pill width = `100vw - 32px`.       |
+| `< 640px (sm)` | SiteStats drops to 2 columns. SiteFooter columns stack. Stats numbers scale via `clamp`. |
+| `< 768px (md)` | Navigation desktop links collapse into the hamburger menu. CTA `Contact` hides on small screens. |
+| `< 1024px (lg)`| Main grid collapses 12-col → 1-col. Sidebar stacks above main content.         |
 
-用于：HeroBanner、ProjectCard、anime 卡片
-
-```astro
-<!-- 橙色序列号 -->
-<div class="px-2.5 py-1 bg-orange-500/80 backdrop-blur-sm rounded-lg border border-white/20">
-  <span class="text-[9px] font-mono text-white font-bold">PRJ-001</span>
-</div>
-```
-
-命名规范：
-- Hero：`HRO-001`
-- 项目卡片：`PRJ-001`, `PRJ-002`...
-- Anime 卡片：`03-ANM-001`（anime.astro 专用格式）
-
-### 功能徽章（左上角 badge）
-
-用于：HeroBanner `LIVE`、anime 卡片 `CV:01`
-
-```astro
-<!-- teal 功能徽章 -->
-<div class="px-2.5 py-1 bg-[#39c5bb]/80 backdrop-blur-sm rounded-lg border border-white/20">
-  <span class="text-[9px] font-black text-white italic">LIVE</span>
-</div>
-```
-
-### 分类标签 pill（卡片内）
-
-```astro
-<!-- teal 系 -->
-<span class="bg-[#39c5bb]/10 text-[#2ba8a0] border-[#39c5bb]/30 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
-  UI/UX
-</span>
-
-<!-- orange 系 -->
-<span class="bg-orange-50 text-orange-500 border-orange-200 px-3.5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border">
-  Astro
-</span>
-```
-
-### Section 小标签（卡片内顶部）
-
-```astro
-<div class="flex items-center gap-1">
-  <!-- teal 小图标 -->
-  <svg class="w-2 h-2 text-[#39c5bb]" .../>
-  <span class="text-[9px] text-[#39c5bb] font-bold tracking-[0.2em] uppercase">
-    SECTION_LABEL
-  </span>
-</div>
-```
+Hero text uses fluid `clamp()` on font size, so it scales smoothly without breakpoint jumps. Padding stays a flat 24px horizontally at every size.
 
 ---
 
-## 10. 页面布局
+## 9. Accessibility
 
-### 根布局
+### Done
+- Every icon-only button has an `aria-label`. Examples: "Previous slide", "Toggle menu", "Toggle playlist", "Collapse player".
+- The dismiss X in the hero is `<button>` not `<div>` despite being decorative.
+- Hero scrim is marked `aria-hidden="true"`.
+- Avatar fallback initials are wrapped in an element whose visible text is the initials and whose `<img>` (when present) carries `alt={profile.name}`.
+- `<header role="banner">` is implicit via `<header>` semantic. Mobile menu sets `aria-expanded` as it opens.
+- Online status dot has `aria-label="Online"`.
+- Focus is preserved on all interactive surfaces (no `outline: none` without a replacement).
 
-```astro
-<!-- index.astro -->
-<div class="min-h-screen bg-[#f1f5f9] text-slate-800">
-  <!-- 固定背景光晕 -->
-  <div class="fixed top-0 left-1/4 w-96 h-96 bg-[#39c5bb]/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
-  <div class="fixed bottom-1/4 right-1/4 w-80 h-80 bg-orange-300/5 rounded-full blur-3xl pointer-events-none -z-10"></div>
-  
-  <Navigation />
-  
-  <main class="max-w-[1100px] mx-auto px-6 pb-24 pt-6">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      <aside class="lg:col-span-4 space-y-5"> ... </aside>
-      <section class="lg:col-span-8 space-y-8"> ... </section>
-    </div>
-  </main>
-</div>
-```
+### To watch
+- The **floating music player covers ~80×80px** in the bottom-left corner. Users zooming in or with low-vision setups may want it gone — consider a visually-hidden "skip to main content" link or a setting to disable it.
+- Auto-collapse on the player happens after **8s of no interaction**. If you have keyboard-only users tab-focused on the pill, the timer will still fire. Consider pausing the timer while focus is inside the pill.
+- Hero auto-advance has **no pause-on-focus** affordance for screen readers. If accessibility is a priority, add a pause control or kill the autoplay on `prefers-reduced-motion`.
+- No `prefers-reduced-motion` queries currently. Add `@media (prefers-reduced-motion: reduce)` to disable: vinyl spin, halo pulse, EQ bars, scroll hint, slideshow autoplay, ticker autoplay.
 
-### 网格比例
-```
-Sidebar  : Main = 4 : 8 (总 12 列)
-断点：lg (1024px) 以下堆叠为单列
-```
-
-### 最大宽度
-```
-页面容器：  max-w-[1100px]
-anime 页：  max-w-7xl (1280px)
-```
+### Colour contrast spot-checks
+All passing AA on white (4.5:1):
+- `ink-900` (`#0f172a`) — 18.7:1 ✅
+- `ink-700` (`#334155`) — 11.5:1 ✅
+- `ink-500` (`#64748b`) — 5.7:1 ✅
+- Teal `#39c5bb` on white — 2.5:1 ❌ (used only for **bold ≥14px** or **large numbers** which lifts the requirement to 3:1, still below). Use `teal-deep` `#2ba8a0` (3.0:1) for body-sized text, which most components already do.
 
 ---
 
-## 11. 新增组件 Checklist
-
-新建一个组件时，按此清单逐项确认：
+## 10. File map
 
 ```
-□ 背景色使用 bg-white（卡片）或 bg-[#f1f5f9]（嵌套区块）
-□ 圆角使用系统圆角层级（rounded-[32px] / [24px] / full）
-□ 主强调色使用 #39c5bb，次强调色使用 orange-500
-□ 标题字体添加 font-[Plus_Jakarta_Sans,sans-serif]
-□ 卡片使用渐变边框模式（gradient ring wrapper）
-□ 有 group 类时末尾添加 shimmer 光效覆盖层
-□ 悬停动效：hover:-translate-y-1.5 transition-transform
-□ 阴影使用系统阴影 token（不使用 Tailwind 默认 shadow-md 等）
-□ 序列号徽章（右上橙色）和功能徽章（左上 teal）按需添加
-□ Section 标签使用 text-[9px] font-black uppercase tracking-[0.2em] 格式
-□ 在此 DESIGN.md 的「组件目录」章节添加文档
+src/
+├── pages/
+│   └── index.astro              # Home page entry (Section 5 layout)
+├── layouts/
+│   └── BaseLayout.astro         # HTML shell, fonts, global animations
+├── components/
+│   ├── Navigation.astro         # §6.2
+│   ├── HeroSection.astro        # §6.3
+│   ├── LocalTime.astro          # §6.4 (NEW)
+│   ├── SidebarProfile.astro     # §6.5
+│   ├── RecentPosts.astro        # §6.6
+│   ├── SiteStats.astro          # §6.7
+│   ├── SiteFooter.astro         # §6.8
+│   └── MusicPlayer.astro        # §6.9 (refactored to floating)
+└── data/
+    └── playlist.ts              # Music tracks (consumed by MusicPlayer)
 ```
+
+**Unused on the home page** (kept around in case other pages need them):
+- `HeroBanner.astro` — older inline hero card style.
+- `HeroTicker.astro` — frosted-glass post ticker. Designed to slot into HeroSection's `ticker` slot. Removed from home in this revision.
+- `ProjectCollections.astro` — 2-column project card grid.
 
 ---
 
-*最后更新：与 anime.astro 色彩系统对齐后的第一个稳定版本*  
-*维护者：Fidelity Designer · `index.astro` system*
+## 11. Open items & gotchas
+
+1. **`BaseLayout` brand colour mismatch.** `:root --color-primary` is `#00D1FF` but the rest of the system uses `#39c5bb`. Either kill that variable or normalise to teal. Currently nothing on the home page reads from `--color-primary`, so the inconsistency is invisible — but it'll bite if you ever build something that does.
+
+2. **`bg-page` mismatch.** `BaseLayout` sets `--color-bg-main: #F8FAFC` while the home page uses `bg-[#f1f5f9]` directly. They're close (`#F8FAFC` = `slate-50`, `#f1f5f9` = `slate-100`) but not the same. Pick one and roll it out.
+
+3. **Hero wallpapers are Unsplash placeholders.** The exact "CENTRAL CINEMA" image from the prototype is not in the array — swap in your own asset when ready.
+
+4. **Dismiss X is decorative.** It currently fades itself out on click. If you want it to dismiss something meaningful (a notification banner, a beta flag), wire it up. Otherwise consider deleting it — non-functional UI ages badly.
+
+5. **Music player + nav z-index ordering.** Nav is `z-50`, player is `z-40`. The player is always **below** the nav. If you ever add a modal that needs to cover both, use `z-60`+.
+
+6. **Auto-collapse timer ignores keyboard focus.** See [§9](#9-accessibility).
+
+7. **No `prefers-reduced-motion` handling.** Vinyl will spin, hero will autoplay, EQ bars will dance regardless of OS setting. This is the easiest accessibility win to ship next.
+
+8. **Anime + Dev share `DE` two-letter code.** See note under [§2](#2-design-tokens).
+
+9. **Local time defaults to `Asia/Shanghai`.** If you're not in China, change the prop on the home page. The component is generic — `<LocalTime label="LOCAL TIME · MALAYSIA" timezone="Asia/Kuala_Lumpur" />` works fine.
+
+10. **`HeroTicker` is no longer rendered on home.** It still exists as a component and HeroSection still has a `<slot name="ticker" />`. If you want it back, just pass it through:
+    ```astro
+    <HeroSection ...>
+      <Navigation slot="nav" heroOverlay />
+      <HeroTicker slot="ticker" posts={recent} />
+    </HeroSection>
+    ```
+
+---
+
+*Last updated: 2026-05-04. Update this file when behaviour or tokens change.*
