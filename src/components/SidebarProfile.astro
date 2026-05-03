@@ -1,8 +1,8 @@
 ---
 /**
  * SidebarProfile.astro
- * Left sidebar profile card — gradient ring wrapper, avatar, tags, directory.
- * Matches DESIGN.md spec exactly.
+ * Left sidebar profile card — clean white card, soft border, no gradient ring.
+ * Matches the prototype's flatter, lighter aesthetic.
  *
  * Props:
  *   profile.name           — display name
@@ -28,113 +28,105 @@ const { profile } = Astro.props;
 
 // Tag colour map — extend here when adding new tags
 const tagColors: Record<string, [string, string, string]> = {
-  'UI/UX':    ['bg-[#39c5bb]/10', 'text-[#2ba8a0]',  'border-[#39c5bb]/30'],
-  'Astro':    ['bg-orange-50',    'text-orange-500',  'border-orange-200'],
-  'Next.js':  ['bg-slate-100',    'text-slate-600',   'border-slate-200'],
-  'Otaku':    ['bg-orange-50',    'text-orange-500',  'border-orange-200'],
-  'React':    ['bg-[#39c5bb]/10', 'text-[#2ba8a0]',  'border-[#39c5bb]/30'],
-  'TypeScript':['bg-slate-100',   'text-slate-600',   'border-slate-200'],
-  'Three.js': ['bg-slate-100',    'text-slate-600',   'border-slate-200'],
-  'Design':   ['bg-orange-50',    'text-orange-500',  'border-orange-200'],
+  'UI/UX':     ['bg-[#39c5bb]/10', 'text-[#2ba8a0]',  'border-[#39c5bb]/30'],
+  'Astro':     ['bg-orange-50',    'text-orange-500', 'border-orange-200'],
+  'Next.js':   ['bg-slate-100',    'text-slate-600',  'border-slate-200'],
+  'Otaku':     ['bg-orange-50',    'text-orange-500', 'border-orange-200'],
+  'React':     ['bg-[#39c5bb]/10', 'text-[#2ba8a0]',  'border-[#39c5bb]/30'],
+  'TypeScript':['bg-slate-100',    'text-slate-600',  'border-slate-200'],
+  'Three.js':  ['bg-slate-100',    'text-slate-600',  'border-slate-200'],
+  'Design':    ['bg-orange-50',    'text-orange-500', 'border-orange-200'],
 };
 
 const defaultTag: [string, string, string] = ['bg-slate-100', 'text-slate-500', 'border-slate-200'];
 
 const pages = [
-  { href: '/',         label: 'index.astro',    dot: 'bg-slate-300' },
+  { href: '/',         label: 'index.astro',    dot: 'bg-slate-300'  },
   { href: '/projects', label: 'projects.astro', dot: 'bg-orange-400' },
   { href: '/anime',    label: 'anime.astro',    dot: 'bg-[#39c5bb]'  },
-  { href: '/resume',   label: 'resume.astro',   dot: 'bg-slate-300' },
-  { href: '/about',    label: 'about.astro',    dot: 'bg-slate-300' },
+  { href: '/resume',   label: 'resume.astro',   dot: 'bg-slate-300'  },
+  { href: '/about',    label: 'about.astro',    dot: 'bg-slate-300'  },
 ];
 ---
 
-<!-- Gradient ring wrapper -->
-<div class="relative group hover:-translate-y-1.5 transition-transform duration-300">
-  <div class="absolute -inset-[2px] rounded-[34px] bg-gradient-to-br from-[#39c5bb]/40 to-orange-300/30 -z-10"></div>
+<!-- Clean white card — no gradient ring, just soft border + shadow -->
+<div
+  class="bg-white rounded-2xl border border-slate-100 px-7 py-7 shadow-[0_4px_24px_rgba(15,23,42,0.04)] hover:shadow-[0_6px_28px_rgba(57,197,187,0.08)] transition-shadow duration-300"
+  style="font-family:'Plus Jakarta Sans',sans-serif;"
+>
 
-  <div
-    class="bg-white rounded-[32px] p-8 shadow-[0_8px_40px_rgba(57,197,187,0.08)]"
-    style="font-family:'Plus Jakarta Sans',sans-serif;"
-  >
-
-    <!-- Top: section label -->
-    <div class="flex items-center gap-1.5 mb-5">
-      <svg class="w-2 h-2 text-[#39c5bb] shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
-        <circle cx="4" cy="4" r="4"/>
-      </svg>
-      <span class="text-[9px] text-[#39c5bb] font-black tracking-[0.2em] uppercase">Profile</span>
-    </div>
-
-    <!-- Avatar + name -->
-    <div class="flex items-center gap-4 mb-5">
-      <div class="relative shrink-0">
-        {profile.avatarFallback?.startsWith('/') || profile.avatarFallback?.startsWith('http') ? (
-          <img
-            src={profile.avatarFallback}
-            alt={profile.name}
-            class="w-16 h-16 rounded-full object-cover border-2 border-[#39c5bb]/30"
-          />
-        ) : (
-          <div
-            class="w-16 h-16 rounded-full flex items-center justify-center text-xl font-black text-white border-2 border-[#39c5bb]/30"
-            style="background: linear-gradient(135deg, #39c5bb, #2ba8a0);"
-          >
-            {profile.name.slice(0, 2).toUpperCase()}
-          </div>
-        )}
-        <!-- Online dot -->
-        <span class="absolute bottom-0.5 right-0.5 w-3 h-3 rounded-full bg-[#39c5bb] border-2 border-white animate-pulse" aria-label="Online"></span>
-      </div>
-
-      <div class="min-w-0">
-        <h2 class="text-slate-900 font-black text-xl tracking-tight leading-tight truncate">{profile.name}</h2>
-        <p class="text-slate-400 text-[12px] font-medium mt-0.5 truncate">{profile.tagline}</p>
-      </div>
-    </div>
-
-    <!-- Tags -->
-    <div class="flex flex-wrap gap-1.5 mb-5">
-      {profile.tags.map(tag => {
-        const [bg, text, border] = tagColors[tag] ?? defaultTag;
-        return (
-          <span class:list={['px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border', bg, text, border]}>
-            {tag}
-          </span>
-        );
-      })}
-    </div>
-
-    <!-- Current focus status bar -->
-    <div class="bg-[#f8fafc] rounded-2xl px-4 py-3 mb-5 flex items-start gap-2.5">
-      <span class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] mt-1.5 shrink-0 animate-pulse" aria-hidden="true"></span>
-      <div>
-        <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-0.5">Currently building</p>
-        <p class="text-[12px] font-medium text-slate-600 leading-snug">{profile.currentFocus}</p>
-      </div>
-    </div>
-
-    <!-- Divider -->
-    <div class="border-t border-slate-100 mb-4"></div>
-
-    <!-- Directory / Pages -->
-    <div class="mb-1">
-      <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3">Directory / Pages</p>
-      <nav class="space-y-1" aria-label="Site pages">
-        {pages.map(({ href, label, dot }) => (
-          <a
-            href={href}
-            class="flex items-center gap-3 px-3 py-2 rounded-xl text-[12px] font-medium text-slate-500 hover:text-[#39c5bb] hover:bg-[#39c5bb]/5 transition-all duration-200 group/link"
-          >
-            <div class:list={['w-2 h-2 rounded-full shrink-0 transition-colors duration-200 group-hover/link:bg-[#39c5bb]', dot]}></div>
-            <span class="font-mono">{label}</span>
-          </a>
-        ))}
-      </nav>
-    </div>
-
+  <!-- Top: section label -->
+  <div class="flex items-center gap-1.5 mb-5">
+    <svg class="w-2 h-2 text-[#39c5bb] shrink-0" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
+      <circle cx="4" cy="4" r="4"/>
+    </svg>
+    <span class="text-[9px] text-[#39c5bb] font-black tracking-[0.2em] uppercase">Profile</span>
   </div>
 
-  <!-- Shimmer hover overlay -->
-  <div class="pointer-events-none absolute inset-0 rounded-[32px] bg-gradient-to-br from-white/0 via-orange-100/20 to-[#39c5bb]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" aria-hidden="true"></div>
+  <!-- Avatar + name -->
+  <div class="flex items-center gap-4 mb-5">
+    <div class="relative shrink-0">
+      {profile.avatarFallback?.startsWith('/') || profile.avatarFallback?.startsWith('http') ? (
+        <img
+          src={profile.avatarFallback}
+          alt={profile.name}
+          class="w-14 h-14 rounded-full object-cover"
+        />
+      ) : (
+        <div
+          class="w-14 h-14 rounded-full flex items-center justify-center text-base font-black text-white"
+          style="background: linear-gradient(135deg, #39c5bb, #2ba8a0);"
+        >
+          {profile.name.slice(0, 2).toUpperCase()}
+        </div>
+      )}
+      <!-- Online dot -->
+      <span class="absolute bottom-0 right-0 w-3 h-3 rounded-full bg-[#39c5bb] border-2 border-white animate-pulse" aria-label="Online"></span>
+    </div>
+
+    <div class="min-w-0">
+      <h2 class="text-slate-900 font-black text-lg tracking-tight leading-tight">{profile.name}</h2>
+      <p class="text-slate-400 text-[12px] font-medium mt-0.5 leading-snug">{profile.tagline}</p>
+    </div>
+  </div>
+
+  <!-- Tags -->
+  <div class="flex flex-wrap gap-1.5 mb-5">
+    {profile.tags.map(tag => {
+      const [bg, text, border] = tagColors[tag] ?? defaultTag;
+      return (
+        <span class:list={['px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border', bg, text, border]}>
+          {tag}
+        </span>
+      );
+    })}
+  </div>
+
+  <!-- Current focus status bar -->
+  <div class="bg-slate-50 rounded-xl px-4 py-3 mb-5 flex items-start gap-2.5 border border-slate-100">
+    <span class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] mt-1.5 shrink-0 animate-pulse" aria-hidden="true"></span>
+    <div class="min-w-0">
+      <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-0.5">Currently building</p>
+      <p class="text-[12px] font-medium text-slate-600 leading-snug">{profile.currentFocus}</p>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="border-t border-slate-100 mb-4"></div>
+
+  <!-- Directory / Pages -->
+  <div>
+    <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3">Directory / Pages</p>
+    <nav class="space-y-1" aria-label="Site pages">
+      {pages.map(({ href, label, dot }) => (
+        <a
+          href={href}
+          class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-[12px] font-medium text-slate-500 hover:text-[#39c5bb] hover:bg-[#39c5bb]/5 transition-all duration-200 group/link"
+        >
+          <div class:list={['w-2 h-2 rounded-full shrink-0 transition-colors duration-200', dot]}></div>
+          <span class="font-mono">{label}</span>
+        </a>
+      ))}
+    </nav>
+  </div>
 </div>
