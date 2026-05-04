@@ -29,8 +29,8 @@ const { heroOverlay = false } = Astro.props;
   id="site-nav"
   data-hero={heroOverlay ? 'true' : 'false'}
   class:list={[
-    'left-0 right-0 top-0 z-50 transition-all duration-300',
-    heroOverlay ? 'absolute' : 'sticky',
+    'left-0 right-0 top-0 z-50 transition-all duration-500',
+    heroOverlay ? 'fixed' : 'sticky',
   ]}
 >
   <!-- Frosted glass backdrop — hidden in hero mode until scrolled -->
@@ -159,16 +159,22 @@ const { heroOverlay = false } = Astro.props;
   const lines       = menuToggle.querySelectorAll<HTMLElement>('.hamburger-line');
   const isHeroMode  = header.dataset.hero === 'true';
 
-  // ── SCROLL: hero overlay → frosted glass transition ──────────────────────
+  // ── SCROLL: hero overlay → frosted glass + hide-on-scroll-down ──────────
   if (isHeroMode) {
     const heroLinks = header.querySelectorAll<HTMLElement>('[data-hero-link]');
+    let lastY = 0;
 
     const onScroll = () => {
-      const scrolled = window.scrollY > 60;
+      const y = window.scrollY;
+      const scrolled = y > 60;
 
-      // Switch positioning strategy
-      header.classList.toggle('absolute', !scrolled);
-      header.classList.toggle('sticky',   scrolled);
+      // Hide when scrolling down past hero, reveal when scrolling up
+      if (y > lastY && y > 120) {
+        header.style.transform = 'translateY(-110%)';
+      } else {
+        header.style.transform = 'translateY(0)';
+      }
+      lastY = y;
 
       // Fade in the frosted glass backdrop
       backdrop.classList.toggle('bg-white/80',         scrolled);

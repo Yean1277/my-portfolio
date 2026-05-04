@@ -4,7 +4,6 @@ import Navigation from '../components/Navigation.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { getCollection } from 'astro:content';
 
-// ── Data ──────────────────────────────────────────────────────────────────────
 const pageData = await getCollection('pageData');
 const animePage = pageData.find((p: any) => p.slug === 'anime' || p.id === 'anime');
 
@@ -17,148 +16,193 @@ const baseAnimeData: {
 
 const entries = baseAnimeData.map((item, i) => ({
   ...item,
-  poster:       item.poster ?? '',
-  isPremium:    item.isPremium ?? false,
-  serialNumber: `03-ANM-${String(i + 1).padStart(3, '0')}`,
+  poster:    item.poster ?? '',
+  isPremium: item.isPremium ?? false,
+  index:     i,
 }));
 
 const total = entries.length;
 ---
 
-<BaseLayout>
+<BaseLayout title="Anime — Yean Ter">
+  <Navigation />
 
-  <Navigation/>
-  <div class="min-h-screen bg-[#f7f6f2] p-8" style="color:#24231f;">
+  <!-- ── PAGE HERO ──────────────────────────────────────────────────────────── -->
+  <section class="relative bg-[#24231f] overflow-hidden">
+    <div class="absolute inset-0 pointer-events-none" aria-hidden="true">
+      <div class="absolute -top-32 -right-32 w-[560px] h-[560px] rounded-full blur-[120px]"
+           style="background:rgba(57,197,187,0.07);"></div>
+      <div class="absolute -bottom-16 -left-16 w-80 h-80 rounded-full blur-[80px]"
+           style="background:rgba(240,117,53,0.06);"></div>
+      <div class="absolute inset-0 opacity-[0.025]"
+           style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px;"></div>
+    </div>
 
-    <!-- ── Card grid ───────────────────────────────────────────────────────── -->
-    <main class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8 justify-items-center">
-      {entries.map((anime) => (
-        <div class="card-outer relative group w-[220px] h-[308px]">
+    <div class="relative max-w-7xl mx-auto px-6 pt-20 pb-16">
+      <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8">
 
-          <!-- Gradient border ring -->
-          <div class:list={[
-            "absolute -inset-[3px] rounded-[24px] transition-all duration-500 pointer-events-none",
-            anime.isPremium
-              ? "premium-ring bg-gradient-to-br from-[#F07535] via-[#39c5bb] to-[#F07535]"
-              : "bg-gradient-to-br from-[#39c5bb]/40 to-[#F07535]/30",
-          ]}></div>
+        <div>
+          <p class="text-[#39c5bb] text-[11px] font-semibold tracking-[0.35em] uppercase mb-4">
+            Personal Archive
+          </p>
+          <h1 class="text-[72px] md:text-[100px] font-black leading-none tracking-tight text-white mb-5">
+            アニメ
+          </h1>
+          <p class="text-white/40 text-[15px] max-w-sm leading-relaxed">
+            Titles that left a mark — stories I still think about long after the credits roll.
+          </p>
+        </div>
 
-          <!-- Flip wrapper -->
-          <div class="flip-inner w-full h-full relative [transform-style:preserve-3d] cursor-pointer">
+        <div class="flex items-end gap-12 pb-1">
+          <div>
+            <p class="text-[52px] font-black leading-none text-white">{total}</p>
+            <p class="text-white/30 text-[11px] tracking-[0.25em] uppercase mt-1">Titles</p>
+          </div>
+        </div>
+      </div>
 
-            <!-- ── FRONT FACE ─────────────────────────────────────────────── -->
-            <div class="face-front absolute inset-0 bg-white rounded-[20px] p-[5px] flex flex-col shadow-xl overflow-hidden border border-[#ece9e0] [backface-visibility:hidden]">
-              <div class="relative flex-1 rounded-[16px] overflow-hidden flex flex-col bg-[#f7f6f2]">
+      <div class="mt-14 h-px bg-gradient-to-r from-[#39c5bb]/60 via-[#F07535]/25 to-transparent"></div>
+    </div>
+  </section>
 
-                <!-- Poster -->
-                <div class="relative flex-1 overflow-hidden">
-                  <img
-                    src={anime.poster || `https://picsum.photos/seed/${encodeURIComponent(anime.title)}/600/840`}
-                    alt={anime.title}
-                    class="poster-img w-full h-full object-cover object-top"
-                    loading="lazy"
-                    decoding="async"
-                    onerror={`this.src='https://picsum.photos/seed/${encodeURIComponent(anime.title)}/600/840'`}
-                  />
-                  <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-white via-white/20 to-transparent"></div>
-                </div>
+  <!-- ── CARD GRID ───────────────────────────────────────────────────────────── -->
+  <section class="bg-[#f7f6f2] min-h-screen">
+    <div class="max-w-7xl mx-auto px-6 py-14">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center">
 
-                <!-- Title area -->
-                <div class="px-3 py-3 bg-white">
-                  <h3 class="text-[11px] font-medium line-clamp-2 leading-tight tracking-tight" style="color:#24231f;">
+        {entries.map((anime) => (
+          <div class="card-outer relative group" style={`--i:${anime.index}`}>
+
+            <div class:list={[
+              "absolute -inset-[2px] rounded-[22px] transition-all duration-500 pointer-events-none",
+              anime.isPremium
+                ? "premium-ring bg-gradient-to-br from-[#F07535] via-[#39c5bb] to-[#F07535]"
+                : "opacity-0 group-hover:opacity-100 bg-gradient-to-br from-[#39c5bb]/60 to-[#F07535]/40",
+            ]}></div>
+
+            <div class="flip-inner w-full h-full relative [transform-style:preserve-3d] cursor-pointer">
+
+              <div class="face-front absolute inset-0 rounded-[20px] shadow-lg overflow-hidden [backface-visibility:hidden]">
+
+                <img
+                  src={anime.poster || `https://picsum.photos/seed/${encodeURIComponent(anime.title)}/400/560`}
+                  alt={anime.title}
+                  class="poster-img w-full h-full object-cover object-top"
+                  loading="lazy"
+                  decoding="async"
+                  onerror={`this.src='https://picsum.photos/seed/${encodeURIComponent(anime.title)}/400/560'`}
+                />
+
+                <div class="absolute inset-x-0 bottom-0 pt-14 pb-4 px-3
+                            bg-gradient-to-t from-black/85 via-black/40 to-transparent">
+                  <h3 class="text-white text-[11px] font-semibold leading-tight line-clamp-2">
                     {anime.title}
                   </h3>
                 </div>
 
-              </div>
+                <div class="flip-hint absolute top-2.5 right-2.5 w-6 h-6 rounded-full
+                            bg-black/50 backdrop-blur-sm flex items-center justify-center
+                            opacity-0 transition-opacity duration-300 pointer-events-none">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white"
+                       fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                  </svg>
+                </div>
 
-              <!-- Flip hint icon (top-right, appears on hover) -->
-              <div class="flip-hint absolute top-2 right-2 w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 transition-opacity duration-300 pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
-              </div>
-
-              <!-- Hover shimmer -->
-              <div class="front-shimmer pointer-events-none absolute inset-0 rounded-[20px] bg-gradient-to-br from-white/0 via-[#F5B3C8]/10 to-[#39c5bb]/10 opacity-0 transition-opacity duration-500"></div>
-            </div>
-
-            <!-- ── BACK FACE ──────────────────────────────────────────────── -->
-            <div class="absolute inset-0 rounded-[20px] overflow-hidden [backface-visibility:hidden] [transform:rotateY(180deg)] border shadow-xl flex flex-col" style="background:#24231f;border-color:rgba(58,56,51,0.5);">
-
-              <!-- Teal + orange accent bar -->
-              <div class="h-1 w-full bg-gradient-to-r from-[#39c5bb] to-[#F07535] flex-shrink-0"></div>
-
-              <!-- Quote body -->
-              <div class="flex-1 flex flex-col justify-center px-5 py-4 relative overflow-hidden">
-                <!-- Decorative large open-quote -->
-                <div class="absolute top-0 left-3 text-[80px] leading-none text-[#39c5bb]/10 font-serif select-none pointer-events-none">"</div>
-
-                {anime.quote ? (
-                  <p class="relative z-10 text-white/90 text-[11px] italic leading-relaxed text-center">
-                    {anime.quote}
-                  </p>
-                ) : (
-                  <p class="relative z-10 text-[10px] italic text-center" style="color:#787670;">No quote yet...</p>
+                {anime.isPremium && (
+                  <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-[#F07535] to-[#39c5bb] px-2 py-0.5 rounded-full">
+                    <span class="text-white text-[8px] font-bold tracking-wider uppercase">★ Pick</span>
+                  </div>
                 )}
               </div>
 
-              <!-- Character + title footer -->
-              <div class="px-4 pb-4 flex flex-col gap-1.5">
-                <div class="border-t pt-2 flex flex-col gap-1" style="border-color:#3a3833;">
-                  <p class="text-[9px] text-center line-clamp-2 leading-tight" style="color:#787670;">{anime.title}</p>
-                  <p class="text-[8px] text-center tracking-[0.2em] uppercase" style="color:#5c5a55;">tap to flip back</p>
+              <div class="absolute inset-0 rounded-[20px] overflow-hidden shadow-xl flex flex-col
+                          [backface-visibility:hidden] [transform:rotateY(180deg)]"
+                   style="background:#1a1917;">
+
+                <div class="h-1 w-full bg-gradient-to-r from-[#39c5bb] to-[#F07535] flex-shrink-0"></div>
+
+                <div class="flex-1 flex flex-col justify-center items-center px-5 py-6 relative overflow-hidden">
+                  <div class="absolute -top-3 left-1 text-[110px] leading-none font-serif
+                               select-none pointer-events-none text-[#39c5bb]/8">"</div>
+                  <div class="absolute -bottom-8 right-1 text-[110px] leading-none font-serif
+                               select-none pointer-events-none text-[#F07535]/8 rotate-180">"</div>
+
+                  {anime.quote ? (
+                    <p class="relative z-10 text-white/80 text-[11px] italic leading-relaxed text-center">
+                      {anime.quote}
+                    </p>
+                  ) : (
+                    <p class="relative z-10 text-white/25 text-[10px] italic text-center">
+                      No quote yet...
+                    </p>
+                  )}
+                </div>
+
+                <div class="px-4 pb-5">
+                  <div class="border-t pt-3 flex flex-col gap-2" style="border-color:rgba(255,255,255,0.06);">
+                    <p class="text-[9px] text-white/35 text-center leading-snug line-clamp-2">
+                      {anime.title}
+                    </p>
+                    <div class="flex items-center justify-center gap-2">
+                      <div class="w-4 h-px bg-[#39c5bb]/40 rounded-full"></div>
+                      <p class="text-[8px] text-white/20 tracking-[0.2em] uppercase">tap to flip</p>
+                      <div class="w-4 h-px bg-[#39c5bb]/40 rounded-full"></div>
+                    </div>
+                  </div>
                 </div>
               </div>
-
             </div>
           </div>
-        </div>
-      ))}
-    </main>
+        ))}
 
-  </div>
+      </div>
+    </div>
+  </section>
+
   <SiteFooter />
 </BaseLayout>
 
 <style>
   @keyframes pulse-border {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.6; }
+    50%       { opacity: 0.5; }
   }
-  .premium-ring { animation: pulse-border 2s ease-in-out infinite; }
+  .premium-ring { animation: pulse-border 2.5s ease-in-out infinite; }
 
-  /* ── Flip card ────────────────────────────────────────────────────────────── */
-  .card-outer { perspective: 1000px; }
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0)   scale(1);    }
+  }
+
+  .card-outer {
+    perspective: 1000px;
+    width:  200px;
+    height: 280px;
+    animation: card-in 0.45s ease both;
+    animation-delay: calc(var(--i) * 75ms);
+  }
 
   .flip-inner {
     transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Hover lift — suppressed when flipped */
   .card-outer:hover .flip-inner:not(.flipped) {
-    transform: translateY(-8px);
+    transform: translateY(-7px) scale(1.03);
   }
 
-  /* Flip state */
   .flip-inner.flipped {
     transform: rotateY(180deg);
   }
 
-  /* Image scale — front face only, hover only */
   .poster-img {
     transition: transform 0.7s ease;
   }
   .card-outer:hover .flip-inner:not(.flipped) .poster-img {
-    transform: scale(1.1);
+    transform: scale(1.07);
   }
 
-  /* Shimmer — front face only */
-  .card-outer:hover .flip-inner:not(.flipped) .front-shimmer {
-    opacity: 1;
-  }
-
-  /* Flip hint icon */
   .card-outer:hover .flip-inner:not(.flipped) .flip-hint {
     opacity: 1;
   }
