@@ -85,18 +85,6 @@ const slides: WallpaperItem[] = wallpapers?.length
     aria-hidden="true"
   ></div>
 
-  <!-- ── CIRCULAR CLOSE / DISMISS BUTTON (decorative) ─────────────── -->
-  <button
-    id="hero-dismiss"
-    type="button"
-    aria-label="Dismiss"
-    class="absolute top-[68px] left-1/2 -translate-x-1/2 z-20 w-9 h-9 rounded-full flex items-center justify-center bg-slate-900/55 backdrop-blur-md border border-white/10 text-white/80 hover:text-white hover:bg-slate-900/75 transition-all duration-200"
-  >
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-      <path d="M3 3L11 11M11 3L3 11" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-    </svg>
-  </button>
-
   <!-- ── SLOT: Navigation floats here (injected by parent) ────────── -->
   <slot name="nav" />
 
