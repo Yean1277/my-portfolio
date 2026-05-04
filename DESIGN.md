@@ -14,6 +14,8 @@ Clean, calm, personal. The site has three jobs in order:
 2. **Show the work.** A scannable list of projects below the fold — no clutter.
 3. **Stay ambient.** A floating music player follows you down the page.
 
+Hover states whisper. Motion arrives, never bounces. The page steps out of the way of the work.
+
 No sidebar. No status pills, category badges, or tags anywhere in the UI. No images inside project cards. Three accent colors only — all sourced from anime characters.
 
 ---
@@ -35,16 +37,19 @@ All three are registered in `tailwind.config.mjs`. Full Tailwind modifier syntax
 
 Do not introduce any additional accent hues.
 
-### Neutral surfaces
+### Neutral surfaces (warm scale)
 
-| Usage | Value |
-|---|---|
-| Page background | `#f1f5f9` (slate-100) |
-| Card / surface | `#ffffff` |
-| Card border | `#f1f5f9` (slate-100) |
-| Body text | `#0f172a` (slate-900) |
-| Muted text | `#94a3b8` (slate-400) |
-| Mono / metadata | `#cbd5e1` (slate-300) |
+| Usage | Value | Notes |
+|---|---|---|
+| Page background | `#f7f6f2` | Warm off-white. Replaces slate-100. |
+| Card / surface | `#ffffff` | Pure white still works against warm bg. |
+| Card border | `#ece9e0` | Soft warm grey, replaces slate-100. |
+| Heading text | `#24231f` | Warm near-black. Use only for h1–h4. |
+| Body text | `#3a3833` | Warm dark grey. Replaces slate-900 for body. |
+| Muted text | `#787670` | Warm grey. Replaces slate-400. |
+| Mono / metadata | `#a8a69f` | Warm light grey. Replaces slate-300. |
+
+The neutrals are warm, not cool. Slate (`#0f172a`, `#94a3b8`, etc.) is banned from any text or surface — it pulls the page toward "tech dashboard" and away from "personal site." Accent colors are unchanged; they're already saturated enough to pop against warm neutrals.
 
 ### Category accent map (RecentPosts / ProjectCollections)
 
@@ -52,24 +57,56 @@ Do not introduce any additional accent hues.
 |---|---|
 | Anime | yuru `#F07535` |
 | Design | miku `#39c5bb` |
-| Dev | slate `#475569` |
+| Dev | warm grey `#5c5a55` |
 | Journal | kato `#F5B3C8` |
 
 ---
 
 ## 3. Typography
 
-| Role | Font | Size | Weight |
+| Role | Font | Source | Weight |
 |---|---|---|---|
-| All UI / body | Plus Jakarta Sans | varies | 400–900 |
-| Code / mono | JetBrains Mono | varies | 500 |
+| All UI / body | Inter | Google Fonts | 400–600 |
+| Headings | Inter | Google Fonts | **500 only** |
+| Code / mono | JetBrains Mono | Google Fonts | 500 |
 
-Both fonts load once from `BaseLayout.astro` via Google Fonts.
+Both fonts load once from `BaseLayout.astro`. Plus Jakarta Sans is removed.
 
-Casing rules:
+### Why Inter
+
+Inter is humanist, screen-tuned, and reads softer than geometric sans like Plus Jakarta Sans. It carries less branded/marketing energy and more *personal letter* energy — which matches the site's intent.
+
+### Heading rule
+
+**Headings stay at weight 500 (medium). Never 600, 700, or 900.** Bold headings on warm backgrounds read as shouting. Medium-weight headings have presence without aggression. Borrowed directly from Yohaku's invariant on this point — it's the single biggest factor in whether type feels "hard" or "calm."
+
+### Global type settings
+
+```css
+html {
+  letter-spacing: 0.01em;   /* tiny breathing margin */
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+  color: #3a3833;
+}
+
+h1, h2, h3, h4 {
+  font-weight: 500;
+  line-height: 1.2;
+  color: #24231f;
+}
+```
+
+### Casing rules
+
 - **UPPERCASE + wide tracking** — section labels only (`PROJECTS`, `SITE STATS`).
 - Headings — sentence case.
 - Buttons — Title Case (`Browse Work`, `View all`).
+- Dates and annotations — italic Inter, muted-text color. Treat them as marginal notes, not data fields. Mono is reserved for code, stats numbers, and metadata where precision matters more than warmth.
 
 ---
 
@@ -92,15 +129,34 @@ Casing rules:
 
 | Level | Value | Used on |
 |---|---|---|
-| Card idle | `0 4px 20px rgba(15,23,42,0.04)` | Default white cards |
-| Card hover | `0 6px 24px rgba(15,23,42,0.06)` | Cards on hover |
+| Card idle | `0 4px 20px rgba(36,35,31,0.04)` | Default white cards |
+| Card hover | `0 6px 24px rgba(36,35,31,0.06)` | Cards on hover |
 | Miku hover | `0 6px 24px rgba(57,197,187,0.08)` | Miku-tinted card hover |
-| CTA | `0 4px 24px rgba(57,197,187,0.45)` | Primary teal button |
-| CTA hover | `0 6px 28px rgba(57,197,187,0.6)` | Primary teal button hover |
+| CTA | `0 4px 24px rgba(57,197,187,0.25)` | Primary teal button |
+| CTA hover | `0 6px 28px rgba(57,197,187,0.4)` | Primary teal button hover |
+
+Shadows use warm near-black (`rgba(36,35,31,…)`) instead of slate. Always soft and low-opacity. The CTA leads, but it doesn't shout — the gap between idle card shadow and CTA shadow should feel like emphasis, not alarm.
 
 ---
 
-## 5. Page structure
+## 5. Motion
+
+One easing curve, three durations. Motion arrives — it doesn't bounce, slide, or pop.
+
+| Token | Value | Used for |
+|---|---|---|
+| Easing | `cubic-bezier(0.22, 1, 0.36, 1)` | All transitions |
+| Quick | `150ms` | Hover, focus, color shifts |
+| Standard | `300ms` | Card lift, drawer open, accent fade |
+| Cinematic | `600ms` | Hero entrance, slide change, page-load reveal |
+
+**First-visit rule.** The hero slideshow auto-advances every 6s on first visit only (set a `sessionStorage` flag). On return visits, the current slide holds static — the cinematic entrance is a greeting, not a loop. Apply the same logic to any future intro animation.
+
+**Hover principle.** Every hover says *"I noticed you,"* not *"look here!"* Color deepens, shadows soften upward, opacity nudges. Nothing leaps.
+
+---
+
+## 6. Page structure
 
 ### Home (`/`)
 
@@ -109,7 +165,7 @@ Hero (100vh, full-bleed)
   └── Navigation (overlay → sticky on scroll)
   └── LIVE badge, title, tagline, two CTAs, slide nav
 
-Main (bg-[#f1f5f9], max-w-1100)
+Main (bg-[#f7f6f2], max-w-1100)
   └── ProjectCollections — stacked cards, full width
 
 SiteStats (full-bleed)
@@ -136,16 +192,16 @@ MDX content page. Navigation + footer only.
 
 ---
 
-## 6. Component reference
+## 7. Component reference
 
 ### Navigation
 Sticky frosted-glass bar (64px tall, max-w-1100). In `heroOverlay` mode starts transparent and transitions on scroll past 60px. Links: Home · Projects · Anime · About. Right: Contact pill.
 
 ### HeroSection
-Full-viewport wallpaper slideshow (6s auto-advance). Centered title + tagline + two CTAs. Primary CTA is miku solid; secondary is dark glass with a kato-colored "New" badge.
+Full-viewport wallpaper slideshow. Centered title + tagline + two CTAs. Primary CTA is miku solid; secondary is dark glass with a kato-colored "New" badge. First-visit auto-advance every 6s; return visits hold static (see §5).
 
 ### ProjectCollections
-Stacked card list. Each card: 4px left accent bar (cycles miku → yuru → kato → slate), date, title, excerpt. No images, no badges. "View all" link leads to `/projects`.
+Stacked card list. Each card: 4px left accent bar (cycles miku → yuru → kato → warm-grey), italic date, title, excerpt. No images, no badges. "View all" link leads to `/projects`. The left bar is the card's "starting point" — a small nod to *始发点*.
 
 ### RecentPosts
 Same card style. Left accent bar color is category-driven (see §2 category map). Used by demo data; not rendered on any live page currently.
@@ -160,24 +216,27 @@ Two columns: Brand + Pages. No tag cloud. Bottom bar has copyright and Chinese t
 Fixed `bottom-6 left-6`, `z-40`. Three states: collapsed disc → expanded pill → playlist drawer. Appears after scrolling 200px (never covers hero CTAs). Uses miku green throughout.
 
 ### Anime cards
-220×308px flip cards. Front: poster image + title text. Back: dark slate with quote. Premium ring: yuru→miku animated gradient. Standard ring: miku/yuru soft gradient. Shimmer on hover: kato/miku gradient.
+220×308px flip cards. Front: poster image + title text. Back: warm dark `#24231f` with quote. Premium ring: yuru→miku animated gradient. Standard ring: miku/yuru soft gradient. Shimmer on hover: kato/miku gradient.
 
 ---
 
-## 7. Rules (enforce these)
+## 8. Rules (enforce these)
 
 - No sidebar, no LocalTime widget.
 - No images inside project or post cards.
 - No status pills, category badges, or tag labels anywhere in the UI.
 - No "coming soon" copy.
 - Three accent colors only: miku, yuru, kato. No new accent hues.
+- No slate / cool greys anywhere. Neutrals are warm.
+- Headings stay at weight 500. Never bold.
+- One easing curve. One motion vocabulary. Animations arrive, never bounce.
 - Shadows always soft and low-opacity — never harsh.
 - All card corners: `rounded-2xl` or `rounded-3xl`. No sharp edges on cards.
 - Pages: Home · Projects · Anime · About. No resume page.
 
 ---
 
-## 8. File map
+## 9. File map
 
 ```
 src/
@@ -191,15 +250,10 @@ src/
 └── components/
     ├── Navigation.astro
     ├── HeroSection.astro
-    ├── ProjectCollections.astro   # Used on home page
-    ├── RecentPosts.astro          # Not rendered on any live page currently
+    ├── ProjectCollections.astro
     ├── SiteStats.astro
     ├── SiteFooter.astro
-    ├── MusicPlayer.astro
-    ├── SidebarProfile.astro       # Unused (sidebar removed)
-    ├── LocalTime.astro            # Unused (sidebar removed)
-    ├── HeroBanner.astro           # Unused (older hero style)
-    └── HeroTicker.astro           # Unused (removed from home)
+    └── MusicPlayer.astro
 
 tailwind.config.mjs    # miku / yuru / kato color tokens defined here
 ```
