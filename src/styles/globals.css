@@ -4,24 +4,35 @@
 
 @layer base {
   :root {
-    /* Fidelity Design System 2.0 Colors */
-    --color-primary: #00D1FF;
-    --color-primary-soft: rgba(0, 209, 255, 0.1);
-    --color-bg-main: #F8FAFC;
-    --color-bg-card: #ffffff;
-    --color-text-primary: #111827;
-    --color-text-secondary: #4B5563;
-    --color-text-muted: #9CA3AF;
-    --color-border: #F1F5F9;
+    --color-primary: #39c5bb;
+    --color-primary-soft: rgba(57, 197, 187, 0.1);
+    --color-bg-main: #f7f6f2;
+  }
+
+  html {
+    letter-spacing: 0.01em;
   }
 
   body {
     background: var(--color-bg-main);
-    color: var(--color-text-primary);
-    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    color: #3a3833;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    font-weight: 500;
+    line-height: 1.2;
+    color: #24231f;
+  }
+
+  ::selection {
+    background-color: var(--color-primary-soft);
+    color: var(--color-primary);
   }
 }
 
@@ -58,19 +69,15 @@
     to { background-position: -200% 0; }
   }
 
-  /* ── Layout Utilities ── */
   .glass-card {
-    /* Option A (Standard CSS): Most stable for PostCSS 
-       Option B (@apply): Use @apply bg-white/80 if your PostCSS is up to date
-    */
     background-color: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(24px); 
-    -webkit-backdrop-filter: blur(24px); /* Required for Safari */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(255, 255, 255, 0.2);
   }
 
   .shadow-fidelity {
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 8px 30px rgba(36, 35, 31, 0.03);
   }
 }
 
@@ -84,7 +91,7 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E2E8F0;
+  background: #ece9e0;
   border-radius: 10px;
 }
 

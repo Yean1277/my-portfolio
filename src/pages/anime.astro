@@ -28,7 +28,7 @@ const total = entries.length;
 <BaseLayout>
 
   <Navigation/>
-  <div class="min-h-screen bg-[#f1f5f9] text-slate-800 p-8">
+  <div class="min-h-screen bg-[#f7f6f2] p-8" style="color:#24231f;">
 
     <!-- ── Card grid ───────────────────────────────────────────────────────── -->
     <main class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-8 justify-items-center">
@@ -47,8 +47,8 @@ const total = entries.length;
           <div class="flip-inner w-full h-full relative [transform-style:preserve-3d] cursor-pointer">
 
             <!-- ── FRONT FACE ─────────────────────────────────────────────── -->
-            <div class="face-front absolute inset-0 bg-white rounded-[20px] p-[5px] flex flex-col shadow-xl overflow-hidden border border-slate-200 [backface-visibility:hidden]">
-              <div class="relative flex-1 rounded-[16px] overflow-hidden flex flex-col bg-[#f8fafc]">
+            <div class="face-front absolute inset-0 bg-white rounded-[20px] p-[5px] flex flex-col shadow-xl overflow-hidden border border-[#ece9e0] [backface-visibility:hidden]">
+              <div class="relative flex-1 rounded-[16px] overflow-hidden flex flex-col bg-[#f7f6f2]">
 
                 <!-- Poster -->
                 <div class="relative flex-1 overflow-hidden">
@@ -65,7 +65,7 @@ const total = entries.length;
 
                 <!-- Title area -->
                 <div class="px-3 py-3 bg-white">
-                  <h3 class="text-[11px] font-black text-slate-800 line-clamp-2 leading-tight tracking-tight">
+                  <h3 class="text-[11px] font-medium line-clamp-2 leading-tight tracking-tight" style="color:#24231f;">
                     {anime.title}
                   </h3>
                 </div>
@@ -84,7 +84,7 @@ const total = entries.length;
             </div>
 
             <!-- ── BACK FACE ──────────────────────────────────────────────── -->
-            <div class="absolute inset-0 rounded-[20px] overflow-hidden [backface-visibility:hidden] [transform:rotateY(180deg)] bg-slate-900 border border-slate-700/50 shadow-xl flex flex-col">
+            <div class="absolute inset-0 rounded-[20px] overflow-hidden [backface-visibility:hidden] [transform:rotateY(180deg)] border shadow-xl flex flex-col" style="background:#24231f;border-color:rgba(58,56,51,0.5);">
 
               <!-- Teal + orange accent bar -->
               <div class="h-1 w-full bg-gradient-to-r from-[#39c5bb] to-[#F07535] flex-shrink-0"></div>
@@ -99,15 +99,15 @@ const total = entries.length;
                     {anime.quote}
                   </p>
                 ) : (
-                  <p class="relative z-10 text-slate-500 text-[10px] italic text-center">No quote yet...</p>
+                  <p class="relative z-10 text-[10px] italic text-center" style="color:#787670;">No quote yet...</p>
                 )}
               </div>
 
               <!-- Character + title footer -->
               <div class="px-4 pb-4 flex flex-col gap-1.5">
-                <div class="border-t border-slate-700 pt-2 flex flex-col gap-1">
-                  <p class="text-slate-400 text-[9px] text-center line-clamp-2 leading-tight">{anime.title}</p>
-                  <p class="text-slate-600 text-[8px] text-center tracking-[0.2em] uppercase">tap to flip back</p>
+                <div class="border-t pt-2 flex flex-col gap-1" style="border-color:#3a3833;">
+                  <p class="text-[9px] text-center line-clamp-2 leading-tight" style="color:#787670;">{anime.title}</p>
+                  <p class="text-[8px] text-center tracking-[0.2em] uppercase" style="color:#5c5a55;">tap to flip back</p>
                 </div>
               </div>
 

@@ -69,7 +69,7 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
         <video
           src={slide.src}
           class:list={[
-            'absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700',
+            'absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-[600ms] ease-site',
             i === 0 ? 'opacity-100' : 'opacity-0',
           ]}
           data-slide={i}
@@ -83,7 +83,7 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
           src={slide.src}
           alt={slide.alt ?? title}
           class:list={[
-            'absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700',
+            'absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-[600ms] ease-site',
             i === 0 ? 'opacity-100' : 'opacity-0',
           ]}
           data-slide={i}
@@ -120,7 +120,7 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
     <!-- Main title -->
     <h1
       class="text-white font-black leading-[1.05] tracking-tight mb-3"
-      style="font-size: clamp(2.6rem, 6.5vw, 4.5rem); font-family: 'Plus Jakarta Sans', sans-serif; text-shadow: 0 2px 28px rgba(0,0,0,0.45);"
+      style="font-size: clamp(2.6rem, 6.5vw, 4.5rem); text-shadow: 0 2px 28px rgba(0,0,0,0.45);"
     >
       {title}
     </h1>
@@ -140,7 +140,7 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
       <!-- Primary: Browse Work (teal solid) -->
       <a
         href={primaryCta.href}
-        class="inline-flex items-center justify-center bg-[#39c5bb] hover:bg-[#2ba8a0] text-white font-bold text-[13px] px-7 py-3 rounded-full shadow-[0_4px_24px_rgba(57,197,187,0.45)] hover:shadow-[0_6px_28px_rgba(57,197,187,0.6)] hover:-translate-y-0.5 transition-all duration-200"
+        class="inline-flex items-center justify-center bg-[#39c5bb] hover:bg-[#2ba8a0] text-white font-medium text-[13px] px-7 py-3 rounded-full shadow-[0_4px_24px_rgba(57,197,187,0.25)] hover:shadow-[0_6px_28px_rgba(57,197,187,0.4)] hover:-translate-y-0.5 transition-all duration-150 ease-site"
       >
         {primaryCta.label}
       </a>
@@ -148,7 +148,7 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
       <!-- Secondary: Anime Labs (dark glass with badge) -->
       <a
         href={secondaryCta.href}
-        class="inline-flex items-center gap-2 bg-slate-900/70 backdrop-blur-md text-white font-bold text-[13px] px-7 py-3 rounded-full border border-white/15 hover:bg-slate-900/85 hover:-translate-y-0.5 transition-all duration-200"
+        class="inline-flex items-center gap-2 bg-[#24231f]/70 backdrop-blur-md text-white font-medium text-[13px] px-7 py-3 rounded-full border border-white/15 hover:bg-[#24231f]/85 hover:-translate-y-0.5 transition-all duration-150 ease-site"
       >
         {secondaryCta.label}
         {secondaryCta.badge && (
@@ -167,7 +167,7 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
   {slides.length > 0 && (
     <div
       id="hero-dots"
-      class="absolute z-20 flex items-center gap-2 left-1/2 -translate-x-1/2 px-3 py-2 rounded-full bg-slate-900/45 backdrop-blur-md border border-white/10"
+      class="absolute z-20 flex items-center gap-2 left-1/2 -translate-x-1/2 px-3 py-2 rounded-full bg-[#24231f]/45 backdrop-blur-md border border-white/10"
       style="bottom: 80px;"
       aria-label="Slide indicators"
     >
@@ -270,8 +270,9 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
   prevBtn?.addEventListener('click', () => goTo(current - 1));
   nextBtn?.addEventListener('click', () => goTo(current + 1));
 
-  // Auto-advance if multiple slides
-  if (total > 1) {
+  // Auto-advance on first visit only
+  if (total > 1 && !sessionStorage.getItem('hero-visited')) {
+    sessionStorage.setItem('hero-visited', '1');
     setInterval(() => goTo(current + 1), 6000);
   }
 

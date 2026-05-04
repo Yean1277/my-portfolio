@@ -17,57 +17,9 @@ const { title = "Portfolio // Fidelity System" } = Astro.props;
   <!-- Design System Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
-
-
-  <style>
-    :root {
-      --color-primary: #00D1FF;
-      --color-primary-soft: rgba(0, 209, 255, 0.1);
-      --color-bg-main: #F8FAFC;
-    }
-
-    body {
-      background-color: var(--color-bg-main);
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    ::selection {
-      background-color: var(--color-primary-soft);
-      color: var(--color-primary);
-    }
-
-    /* ── Vinyl Record Spin Animation ── */
-    .vinyl-record {
-      animation: spin 4s linear infinite;
-      animation-play-state: paused;
-    }
-    .vinyl-record.playing {
-      animation-play-state: running;
-    }
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
-    /* ── Loading Shimmer ── */
-    .loading-shimmer {
-      background: linear-gradient(
-        90deg,
-        transparent 25%,
-        rgba(255, 255, 255, 0.4) 50%,
-        transparent 75%
-      );
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite linear;
-    }
-    @keyframes shimmer {
-      from { background-position: 200% 0; }
-      to   { background-position: -200% 0; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
 </head>
-<body class="antialiased text-gray-900 min-h-full">
+<body class="antialiased min-h-full">
   <slot />
 </body>
 </html>

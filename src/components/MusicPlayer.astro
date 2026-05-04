@@ -42,13 +42,13 @@ const serialized = JSON.stringify(
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: linear-gradient(135deg, #24231f 0%, #3a3833 100%);
     border: 3px solid rgba(57, 197, 187, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 8px 28px rgba(15, 23, 42, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4);
+    box-shadow: 0 8px 28px rgba(36, 35, 31, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4);
     transition: box-shadow 0.3s ease, border-color 0.2s ease, transform 0.2s ease;
     position: relative;
   }
@@ -69,7 +69,7 @@ const serialized = JSON.stringify(
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(36, 35, 31, 0.6);
     backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
@@ -85,8 +85,8 @@ const serialized = JSON.stringify(
     animation: fpPulse 2s ease-in-out infinite;
   }
   @keyframes fpPulse {
-    0%, 100% { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4); }
-    50%      { box-shadow: 0 8px 28px rgba(15, 23, 42, 0.18), 0 0 0 8px rgba(57, 197, 187, 0); }
+    0%, 100% { box-shadow: 0 8px 28px rgba(36, 35, 31, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4); }
+    50%      { box-shadow: 0 8px 28px rgba(36, 35, 31, 0.18), 0 0 0 8px rgba(57, 197, 187, 0); }
   }
 
   /* Vinyl spin */
@@ -108,13 +108,13 @@ const serialized = JSON.stringify(
     align-items: center;
     gap: 12px;
     background: #fff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #ece9e0;
     border-radius: 999px;
     padding: 8px 12px 8px 8px;
-    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.14);
+    box-shadow: 0 12px 36px rgba(36, 35, 31, 0.14);
     min-width: 320px;
     max-width: calc(100vw - 48px);
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     position: relative;
   }
   #floating-player.expanded .fp-pill { display: flex; }
@@ -139,7 +139,7 @@ const serialized = JSON.stringify(
   .fp-title {
     font-size: 12px;
     font-weight: 700;
-    color: #0f172a;
+    color: #24231f;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -147,7 +147,7 @@ const serialized = JSON.stringify(
   }
   .fp-artist {
     font-size: 10px;
-    color: #94a3b8;
+    color: #787670;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -167,7 +167,7 @@ const serialized = JSON.stringify(
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #64748b;
+    color: #787670;
     background: transparent;
     border: none;
     cursor: pointer;
@@ -185,7 +185,7 @@ const serialized = JSON.stringify(
   .fp-ctrl.fp-play:hover { background: #2ba8a0; }
 
   .fp-ctrl.fp-close {
-    color: #cbd5e1;
+    color: #a8a69f;
     margin-left: 4px;
   }
   .fp-ctrl.fp-close:hover { color: #ef4444; background: rgba(239, 68, 68, 0.08); }
@@ -200,9 +200,9 @@ const serialized = JSON.stringify(
     width: 320px;
     max-width: calc(100vw - 48px);
     background: #fff;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #ece9e0;
     border-radius: 18px;
-    box-shadow: 0 12px 36px rgba(15, 23, 42, 0.14);
+    box-shadow: 0 12px 36px rgba(36, 35, 31, 0.14);
     padding: 12px;
     transform-origin: bottom left;
     transform: scale(0.95) translateY(8px);
@@ -223,22 +223,22 @@ const serialized = JSON.stringify(
     align-items: center;
     justify-content: space-between;
     padding: 0 4px 8px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #ece9e0;
     margin-bottom: 6px;
     flex-shrink: 0;
   }
   .fp-drawer-title {
     font-size: 9px;
     font-weight: 900;
-    color: #94a3b8;
+    color: #787670;
     text-transform: uppercase;
     letter-spacing: 0.18em;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
   .fp-drawer-count {
     font-size: 9px;
     font-family: 'JetBrains Mono', monospace;
-    color: #cbd5e1;
+    color: #a8a69f;
   }
   .fp-list {
     overflow-y: auto;
@@ -264,7 +264,7 @@ const serialized = JSON.stringify(
     text-align: left;
     width: 100%;
     transition: background 0.15s;
-    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
   }
   :global(.fp-track:hover) { background: rgba(57, 197, 187, 0.07); }
   :global(.fp-track.active) { background: rgba(57, 197, 187, 0.12); }
@@ -272,7 +272,7 @@ const serialized = JSON.stringify(
   :global(.fp-track-num) {
     font-size: 9px;
     font-family: 'JetBrains Mono', monospace;
-    color: #cbd5e1;
+    color: #a8a69f;
     width: 14px;
     text-align: right;
     flex-shrink: 0;
@@ -313,7 +313,7 @@ const serialized = JSON.stringify(
   :global(.fp-track-title) {
     font-size: 11px;
     font-weight: 600;
-    color: #1e293b;
+    color: #24231f;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -321,7 +321,7 @@ const serialized = JSON.stringify(
   :global(.fp-track.active .fp-track-title) { color: #39c5bb; }
   :global(.fp-track-artist) {
     font-size: 9px;
-    color: #94a3b8;
+    color: #787670;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -329,7 +329,7 @@ const serialized = JSON.stringify(
   :global(.fp-track-dur) {
     font-size: 9px;
     font-family: 'JetBrains Mono', monospace;
-    color: #cbd5e1;
+    color: #a8a69f;
     flex-shrink: 0;
   }
   :global(.fp-track.active .fp-track-dur) { color: #39c5bb; }
@@ -355,7 +355,7 @@ const serialized = JSON.stringify(
   {playlist.length === 0 ? (
     <!-- Empty state: a static dim disc that does nothing -->
     <div class="fp-disc fp-disc-standalone" title="No tracks loaded" aria-label="Music player (empty)">
-      <span class="fp-disc-core" style="background:#cbd5e1;box-shadow:none;"></span>
+      <span class="fp-disc-core" style="background:#a8a69f;box-shadow:none;"></span>
     </div>
   ) : (
     <>

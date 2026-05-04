@@ -5,7 +5,7 @@ interface Props {
 
 const { posts } = Astro.props;
 
-const accentColors = ['#39c5bb', '#F07535', '#F5B3C8', '#475569'];
+const accentColors = ['#39c5bb', '#F07535', '#F5B3C8', '#5c5a55'];
 
 const displayPosts = posts.length > 0
   ? posts.slice(0, 4).map((p, i) => ({
@@ -23,7 +23,7 @@ const displayPosts = posts.length > 0
     ];
 ---
 
-<section style="font-family:'Plus Jakarta Sans',sans-serif;" aria-label="Projects">
+<section aria-label="Projects">
 
   <!-- Section header -->
   <div class="flex items-center justify-between mb-5">
@@ -31,11 +31,11 @@ const displayPosts = posts.length > 0
       <svg class="w-2 h-2 text-[#39c5bb]" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
         <circle cx="4" cy="4" r="4"/>
       </svg>
-      <span class="text-[9px] text-[#39c5bb] font-black tracking-[0.2em] uppercase">Projects</span>
+      <span class="text-[9px] text-[#39c5bb] font-semibold tracking-[0.2em] uppercase">Projects</span>
     </div>
     <a
       href="/projects"
-      class="text-[11px] font-bold text-slate-400 hover:text-[#39c5bb] transition-colors flex items-center gap-1"
+      class="text-[11px] font-medium text-[#787670] hover:text-[#39c5bb] transition-colors flex items-center gap-1"
     >
       View all
       <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
@@ -51,30 +51,30 @@ const displayPosts = posts.length > 0
       return (
         <a
           href={post.href}
-          class="group flex items-stretch bg-white rounded-2xl border border-slate-100 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(15,23,42,0.06)]"
+          class="group flex items-stretch bg-white rounded-2xl border border-[#ece9e0] overflow-hidden transition-all duration-300 ease-site hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(36,35,31,0.06)]"
         >
           <!-- Left accent bar -->
           <div
-            class="w-[4px] shrink-0 transition-all duration-300 group-hover:w-1.5"
+            class="w-[4px] shrink-0 transition-all duration-300 ease-site group-hover:w-1.5"
             style={`background:${accent};`}
           ></div>
 
           <div class="flex-1 px-5 py-4 min-w-0">
 
             <!-- Date -->
-            <p class="text-[10px] font-mono text-slate-300 tabular-nums mb-1.5">{post.date}</p>
+            <p class="text-[11px] italic mb-1.5" style="color:#787670;">{post.date}</p>
 
             <!-- Title -->
             <h3
-              class="text-[14px] font-black leading-snug tracking-tight line-clamp-1 transition-colors duration-200 group-hover:text-[#39c5bb]"
-              style="color:#0f172a;"
+              class="text-[14px] font-medium leading-snug tracking-tight line-clamp-1 transition-colors duration-150 ease-site group-hover:text-[#39c5bb]"
+              style="color:#24231f;"
             >
               {post.title}
             </h3>
 
             <!-- Excerpt -->
             {post.excerpt && (
-              <p class="text-[12px] font-medium leading-relaxed mt-1 line-clamp-2" style="color:#94a3b8;">
+              <p class="text-[12px] leading-relaxed mt-1 line-clamp-2" style="color:#787670;">
                 {post.excerpt}
               </p>
             )}
