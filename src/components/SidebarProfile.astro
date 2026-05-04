@@ -99,32 +99,4 @@ const pages = [
       );
     })}
   </div>
-
-  <!-- Current focus status bar -->
-  <div class="bg-slate-50 rounded-xl px-4 py-3 mb-5 flex items-start gap-2.5 border border-slate-100">
-    <span class="w-1.5 h-1.5 rounded-full bg-[#39c5bb] mt-1.5 shrink-0 animate-pulse" aria-hidden="true"></span>
-    <div class="min-w-0">
-      <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-0.5">Currently building</p>
-      <p class="text-[12px] font-medium text-slate-600 leading-snug">{profile.currentFocus}</p>
-    </div>
-  </div>
-
-  <!-- Divider -->
-  <div class="border-t border-slate-100 mb-4"></div>
-
-  <!-- Directory / Pages -->
-  <div>
-    <p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3">Directory / Pages</p>
-    <nav class="space-y-1" aria-label="Site pages">
-      {pages.map(({ href, label, dot }) => (
-        <a
-          href={href}
-          class="flex items-center gap-3 px-3 py-1.5 rounded-lg text-[12px] font-medium text-slate-500 hover:text-[#39c5bb] hover:bg-[#39c5bb]/5 transition-all duration-200 group/link"
-        >
-          <div class:list={['w-2 h-2 rounded-full shrink-0 transition-colors duration-200', dot]}></div>
-          <span class="font-mono">{label}</span>
-        </a>
-      ))}
-    </nav>
-  </div>
 </div>
