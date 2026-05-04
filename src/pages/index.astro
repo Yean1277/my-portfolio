@@ -1,20 +1,4 @@
 ---
-/**
- * src/pages/index.astro
- *
- * Layout (May 2026 prototype):
- *  1. HeroSection (100vh, full-bleed)
- *      • Navigation slotted in (overlay mode)
- *      • Centered title + tagline + two CTAs (Browse Work / Anime Labs)
- *      • Bottom-center slide nav
- *  2. 12-col grid on a light gray bg
- *      col-4 sidebar: LocalTime + SidebarProfile
- *      col-8 main:    RecentPosts (no top divider)
- *  3. SiteStats  (full-bleed — 4 white cards on the gray strip)
- *  4. SiteFooter (full-bleed — brand + pages + tags + bottom bar)
- *  5. MusicPlayer (floating, fixed bottom-left, persistent across scroll)
- */
-
 import { getCollection } from 'astro:content';
 
 import BaseLayout      from '../layouts/BaseLayout.astro';
