@@ -173,13 +173,6 @@ declare module 'astro:content' {
   collection: "pageData";
   data: InferEntrySchema<"pageData">
 } & { render(): Render[".mdx"] };
-"resume.mdx": {
-	id: "resume.mdx";
-  slug: "resume";
-  body: string;
-  collection: "pageData";
-  data: InferEntrySchema<"pageData">
-} & { render(): Render[".mdx"] };
 };
 "posts": {
 "building-a-static-cms-with-git.md": {
