@@ -52,6 +52,8 @@ const {
 const slides: WallpaperItem[] = wallpapers?.length
   ? wallpapers
   : [{ src: wallpaper, alt: title }];
+
+const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
 ---
 
 <section
@@ -63,17 +65,32 @@ const slides: WallpaperItem[] = wallpapers?.length
   <!-- ── WALLPAPER SLIDES ───────────────────────────────────────────── -->
   <div id="hero-slides" class="absolute inset-0">
     {slides.map((slide, i) => (
-      <img
-        src={slide.src}
-        alt={slide.alt ?? title}
-        class:list={[
-          'absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700',
-          i === 0 ? 'opacity-100' : 'opacity-0',
-        ]}
-        data-slide={i}
-        fetchpriority={i === 0 ? 'high' : 'low'}
-        loading={i === 0 ? 'eager' : 'lazy'}
-      />
+      isVideo(slide.src) ? (
+        <video
+          src={slide.src}
+          class:list={[
+            'absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700',
+            i === 0 ? 'opacity-100' : 'opacity-0',
+          ]}
+          data-slide={i}
+          autoplay
+          muted
+          loop
+          playsinline
+        />
+      ) : (
+        <img
+          src={slide.src}
+          alt={slide.alt ?? title}
+          class:list={[
+            'absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700',
+            i === 0 ? 'opacity-100' : 'opacity-0',
+          ]}
+          data-slide={i}
+          fetchpriority={i === 0 ? 'high' : 'low'}
+          loading={i === 0 ? 'eager' : 'lazy'}
+        />
+      )
     ))}
   </div>
 
@@ -135,7 +152,7 @@ const slides: WallpaperItem[] = wallpapers?.length
       >
         {secondaryCta.label}
         {secondaryCta.badge && (
-          <span class="text-[8px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-orange-500/90 text-white">
+          <span class="text-[8px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full bg-kato text-white">
             {secondaryCta.badge}
           </span>
         )}
