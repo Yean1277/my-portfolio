@@ -20,8 +20,6 @@ import { getCollection } from 'astro:content';
 import BaseLayout      from '../layouts/BaseLayout.astro';
 import Navigation      from '../components/Navigation.astro';
 import HeroSection     from '../components/HeroSection.astro';
-import LocalTime       from '../components/LocalTime.astro';
-import SidebarProfile  from '../components/SidebarProfile.astro';
 import MusicPlayer     from '../components/MusicPlayer.astro';
 import RecentPosts     from '../components/RecentPosts.astro';
 import SiteStats       from '../components/SiteStats.astro';
@@ -35,22 +33,11 @@ const sortedPosts = [...allPosts].sort(
 );
 
 // Stats derived values
-const allTags    = allPosts.flatMap(p => p.data.tags ?? []);
-const uniqueTags = [...new Set(allTags)];
 const totalWords = allPosts.reduce((n, p) => n + (p.data.wordCount ?? 500), 0);
 
 // Days online — counted from site launch
 const launchDate = new Date('2024-01-01');
 const daysOnline = Math.floor((Date.now() - launchDate.getTime()) / 86_400_000);
-
-// ── Profile config ────────────────────────────────────────────────────────────
-const profile = {
-  name:           'Yean Ter',
-  tagline:        'Frontend Developer · Anime Enjoyer',
-  tags:           ['UI/UX', 'Astro', 'Next.js', 'Otaku'],
-  currentFocus:   'Building portfolio with Astro + Three.js',
-  avatarFallback: 'YT',
-};
 
 // ── Hero wallpaper slideshow ─────────────────────────────────────────────────
 const heroWallpapers = [
@@ -87,20 +74,7 @@ const heroWallpapers = [
     ></div>
 
     <main class="max-w-[1100px] mx-auto px-6 pt-10 pb-16">
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-        <!-- Sidebar col-4: LocalTime + Profile (MusicPlayer is now floating) -->
-        <aside class="lg:col-span-4 space-y-5">
-          <LocalTime label="LOCAL TIME · CHINA" timezone="Asia/Shanghai" />
-          <SidebarProfile profile={profile} />
-        </aside>
-
-        <!-- Main col-8: Recent posts list -->
-        <section class="lg:col-span-8">
-          <RecentPosts posts={sortedPosts} maxItems={8} />
-        </section>
-
-      </div>
+      <RecentPosts posts={sortedPosts} maxItems={8} />
     </main>
   </div>
 
@@ -108,15 +82,12 @@ const heroWallpapers = [
   <SiteStats
     postCount={allPosts.length}
     totalWords={Math.round(totalWords / 1000)}
-    tagCount={uniqueTags.length}
+    tagCount={0}
     daysOnline={daysOnline}
   />
 
   <!-- 4 ── FOOTER ──────────────────────────────────────────────────────── -->
-  <SiteFooter
-    tags={uniqueTags}
-    ownerName="Yean Ter"
-  />
+  <SiteFooter ownerName="Yean Ter" />
 
   <!-- 5 ── FLOATING MUSIC PLAYER ───────────────────────────────────────── -->
   <!--
