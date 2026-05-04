@@ -25,25 +25,14 @@ import MusicPlayer     from '../components/MusicPlayer.astro';
 // Edit these strings — they're the only thing that needs to be true.
 const featured = {
   title:       'Yean Ter Portfolio',
-  status:      'v1.0 · LIVE',
   oneLiner:    'A personal portfolio built with Astro, Tailwind, and a healthy obsession with detail.',
   description: 'The site you\'re reading right now. Built from scratch as both a portfolio and a sandbox — every component (the floating music player, the cinematic hero, the per-category card system) was a chance to learn something new about Astro islands, design tokens, or motion.',
   liveHref:    'https://your-portfolio.example',
-  repoHref:    'https://github.com/yourname/portfolio',  // ← swap with your real repo
-  preview:     'https://images.unsplash.com/photo-1517077304055-6e89abbf09b0?w=1600&q=80',
-  // Small honest stats — adjust to reality
+  repoHref:    'https://github.com/yourname/portfolio',
   meta: [
     { label: 'Started',    value: 'Mar 2026' },
     { label: 'Components', value: '9' },
     { label: 'Stack',      value: 'Astro · TS' },
-  ],
-  // Tech stack pills (color-coded like the sidebar profile)
-  stack: [
-    { label: 'Astro',       tone: 'orange' },
-    { label: 'Tailwind',    tone: 'teal'   },
-    { label: 'TypeScript',  tone: 'slate'  },
-    { label: 'Three.js',    tone: 'slate'  },
-    { label: 'Plus Jakarta',tone: 'slate'  },
   ],
 };
 
@@ -96,12 +85,12 @@ const writeups = [
   },
 ];
 
-// Category style map — matches RecentPosts.astro for visual cohesion
-const catStyle: Record<string, { accent: string; pillBg: string; pillText: string; pillBorder: string; boxBg: string; boxText: string; code: string }> = {
-  Anime:   { accent: '#f59e0b', pillBg: 'rgba(245,158,11,0.10)',  pillText: '#d97706', pillBorder: 'rgba(245,158,11,0.30)', boxBg: 'rgba(245,158,11,0.08)',  boxText: '#d97706', code: 'AN' },
-  Design:  { accent: '#39c5bb', pillBg: 'rgba(57,197,187,0.10)',  pillText: '#2ba8a0', pillBorder: 'rgba(57,197,187,0.32)', boxBg: 'rgba(57,197,187,0.08)',  boxText: '#2ba8a0', code: 'DE' },
-  Dev:     { accent: '#475569', pillBg: 'rgba(71,85,105,0.10)',   pillText: '#334155', pillBorder: 'rgba(71,85,105,0.25)',  boxBg: 'rgba(71,85,105,0.06)',   boxText: '#475569', code: 'DV' },
-  Journal: { accent: '#8b5cf6', pillBg: 'rgba(139,92,246,0.10)',  pillText: '#7c3aed', pillBorder: 'rgba(139,92,246,0.30)', boxBg: 'rgba(139,92,246,0.08)',  boxText: '#7c3aed', code: 'JO' },
+// Category accent colours for writeup card left bars
+const catAccent: Record<string, string> = {
+  Anime:   '#f59e0b',
+  Design:  '#39c5bb',
+  Dev:     '#475569',
+  Journal: '#8b5cf6',
 };
 
 // ── Roadmap — Now / Next / Later ────────────────────────────────────────────
@@ -124,12 +113,6 @@ const roadmap = {
   ],
 };
 
-// Tone → tag pill style
-const tagToneClass: Record<string, string> = {
-  teal:   'bg-[#39c5bb]/10 text-[#2ba8a0] border-[#39c5bb]/30',
-  orange: 'bg-orange-50 text-orange-500 border-orange-200',
-  slate:  'bg-slate-100 text-slate-600 border-slate-200',
-};
 ---
 
 <BaseLayout title="Projects — Yean Ter">
@@ -186,34 +169,10 @@ const tagToneClass: Record<string, string> = {
 
       <!-- The project card -->
       <article
-        class="relative grid grid-cols-1 lg:grid-cols-12 gap-0 bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-[0_8px_40px_rgba(15,23,42,0.04)] hover:shadow-[0_12px_48px_rgba(57,197,187,0.10)] transition-shadow duration-500"
+        class="relative bg-white rounded-3xl border border-slate-100 overflow-hidden shadow-[0_8px_40px_rgba(15,23,42,0.04)] hover:shadow-[0_12px_48px_rgba(57,197,187,0.10)] transition-shadow duration-500"
       >
-
-        <!-- Left: Preview image -->
-        <div class="lg:col-span-7 relative bg-slate-900 overflow-hidden" style="min-height: 320px;">
-          <img
-            src={featured.preview}
-            alt={`${featured.title} preview`}
-            class="absolute inset-0 w-full h-full object-cover"
-            loading="lazy"
-          />
-          <!-- Soft scrim so the image doesn't fight the right column -->
-          <div class="absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-white/10 pointer-events-none lg:to-white/0"></div>
-
-          <!-- Status badge top-left -->
-          <div class="absolute top-4 left-4 flex items-center gap-1.5 px-2.5 py-1 bg-[#39c5bb]/85 backdrop-blur-sm rounded-lg border border-white/20">
-            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-            <span class="text-[9px] font-black text-white tracking-wide">{featured.status}</span>
-          </div>
-
-          <!-- Serial badge top-right -->
-          <div class="absolute top-4 right-4 px-2.5 py-1 bg-slate-900/70 backdrop-blur-sm rounded-lg border border-white/10">
-            <span class="text-[9px] font-mono text-white/90 font-bold">PRJ-001</span>
-          </div>
-        </div>
-
-        <!-- Right: Meta + CTA -->
-        <div class="lg:col-span-5 p-7 lg:p-9 flex flex-col">
+        <!-- Meta + CTA -->
+        <div class="p-7 lg:p-9 flex flex-col">
 
           <!-- Title -->
           <h2
@@ -233,15 +192,6 @@ const tagToneClass: Record<string, string> = {
           <p class="text-slate-600 text-[13px] font-medium leading-relaxed mb-6">
             {featured.description}
           </p>
-
-          <!-- Tech stack pills -->
-          <div class="flex flex-wrap gap-1.5 mb-6">
-            {featured.stack.map(s => (
-              <span class:list={['px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border', tagToneClass[s.tone] ?? tagToneClass.slate]}>
-                {s.label}
-              </span>
-            ))}
-          </div>
 
           <!-- Meta strip — small honest numbers -->
           <div class="grid grid-cols-3 gap-3 mb-6 pt-5 border-t border-slate-100">
@@ -349,7 +299,7 @@ const tagToneClass: Record<string, string> = {
       <!-- 2-col grid of writeup cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         {writeups.map(post => {
-          const cs = catStyle[post.category] ?? catStyle.Dev;
+          const accent = catAccent[post.category] ?? catAccent.Dev;
           return (
             <a
               href={post.href}
@@ -358,54 +308,26 @@ const tagToneClass: Record<string, string> = {
               <!-- Left accent bar -->
               <div
                 class="w-[4px] shrink-0 transition-all duration-300 group-hover:w-1.5"
-                style={`background:${cs.accent};`}
+                style={`background:${accent};`}
               ></div>
 
-              <div class="flex-1 flex items-center gap-4 px-5 py-4 min-w-0">
-                <div class="flex-1 min-w-0">
+              <div class="flex-1 px-5 py-4 min-w-0">
 
-                  <!-- Meta row -->
-                  <div class="flex items-center gap-2 mb-1.5 flex-wrap">
-                    <span
-                      class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-[0.12em] border"
-                      style={`background:${cs.pillBg};color:${cs.pillText};border-color:${cs.pillBorder};`}
-                    >
-                      {post.category}
-                    </span>
-                    {post.tags.map(tag => (
-                      <span class="text-[10px] font-mono text-slate-300">#{tag}</span>
-                    ))}
-                  </div>
+                <!-- Date -->
+                <p class="text-[10px] font-mono text-slate-300 tabular-nums mb-1.5">{post.date}</p>
 
-                  <!-- Title -->
-                  <h3
-                    class="text-[14px] font-black leading-snug tracking-tight line-clamp-1 transition-colors duration-200 group-hover:text-[#39c5bb]"
-                    style="color:#0f172a;"
-                  >
-                    {post.title}
-                  </h3>
-
-                  <!-- Excerpt -->
-                  <p class="text-[12px] font-medium leading-relaxed mt-1 line-clamp-2" style="color:#94a3b8;">
-                    {post.excerpt}
-                  </p>
-
-                  <!-- Date -->
-                  <p class="text-[10px] font-mono text-slate-300 tabular-nums mt-2">{post.date}</p>
-                </div>
-
-                <!-- Right code badge -->
-                <div
-                  class="shrink-0 w-[64px] h-[64px] rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105"
-                  style={`background:${cs.boxBg};`}
+                <!-- Title -->
+                <h3
+                  class="text-[14px] font-black leading-snug tracking-tight line-clamp-1 transition-colors duration-200 group-hover:text-[#39c5bb]"
+                  style="color:#0f172a;"
                 >
-                  <span
-                    class="text-[12px] font-black tracking-[0.12em]"
-                    style={`color:${cs.boxText};opacity:0.55;`}
-                  >
-                    {cs.code}
-                  </span>
-                </div>
+                  {post.title}
+                </h3>
+
+                <!-- Excerpt -->
+                <p class="text-[12px] font-medium leading-relaxed mt-1 line-clamp-2" style="color:#94a3b8;">
+                  {post.excerpt}
+                </p>
               </div>
             </a>
           );
