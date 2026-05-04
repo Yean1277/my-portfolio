@@ -39,8 +39,8 @@ const total = entries.length;
           <div class:list={[
             "absolute -inset-[3px] rounded-[24px] transition-all duration-500 pointer-events-none",
             anime.isPremium
-              ? "premium-ring bg-gradient-to-br from-orange-400 via-[#39c5bb] to-orange-400"
-              : "bg-gradient-to-br from-[#39c5bb]/40 to-orange-300/40",
+              ? "premium-ring bg-gradient-to-br from-[#F07535] via-[#39c5bb] to-[#F07535]"
+              : "bg-gradient-to-br from-[#39c5bb]/40 to-[#F07535]/30",
           ]}></div>
 
           <!-- Flip wrapper -->
@@ -80,14 +80,14 @@ const total = entries.length;
               </div>
 
               <!-- Hover shimmer -->
-              <div class="front-shimmer pointer-events-none absolute inset-0 rounded-[20px] bg-gradient-to-br from-white/0 via-orange-100/20 to-[#39c5bb]/10 opacity-0 transition-opacity duration-500"></div>
+              <div class="front-shimmer pointer-events-none absolute inset-0 rounded-[20px] bg-gradient-to-br from-white/0 via-[#F5B3C8]/10 to-[#39c5bb]/10 opacity-0 transition-opacity duration-500"></div>
             </div>
 
             <!-- ── BACK FACE ──────────────────────────────────────────────── -->
             <div class="absolute inset-0 rounded-[20px] overflow-hidden [backface-visibility:hidden] [transform:rotateY(180deg)] bg-slate-900 border border-slate-700/50 shadow-xl flex flex-col">
 
               <!-- Teal + orange accent bar -->
-              <div class="h-1 w-full bg-gradient-to-r from-[#39c5bb] to-orange-400 flex-shrink-0"></div>
+              <div class="h-1 w-full bg-gradient-to-r from-[#39c5bb] to-[#F07535] flex-shrink-0"></div>
 
               <!-- Quote body -->
               <div class="flex-1 flex flex-col justify-center px-5 py-4 relative overflow-hidden">

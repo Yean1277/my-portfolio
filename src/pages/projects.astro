@@ -87,7 +87,7 @@ const writeups = [
 
 // Category accent colours for writeup card left bars
 const catAccent: Record<string, string> = {
-  Anime:   '#f59e0b',
+  Anime:   '#F07535',
   Design:  '#39c5bb',
   Dev:     '#475569',
   Journal: '#8b5cf6',
@@ -365,16 +365,16 @@ const roadmap = {
           </ul>
         </div>
 
-        <!-- NEXT — orange accent -->
-        <div class="bg-white rounded-2xl border border-slate-100 p-6 hover:border-orange-200 transition-colors duration-200">
+        <!-- NEXT — yuru orange -->
+        <div class="bg-white rounded-2xl border border-slate-100 p-6 hover:border-yuru/30 transition-colors duration-200">
           <div class="flex items-center gap-2 mb-4">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange-400"></span>
-            <span class="text-[10px] font-black tracking-[0.2em] uppercase text-orange-500">Next</span>
+            <span class="w-1.5 h-1.5 rounded-full bg-yuru"></span>
+            <span class="text-[10px] font-black tracking-[0.2em] uppercase text-yuru">Next</span>
           </div>
           <ul class="space-y-2.5">
             {roadmap.next.map(item => (
               <li class="flex items-start gap-2.5 text-[13px] font-medium text-slate-700 leading-snug">
-                <span class="text-orange-400 mt-1 shrink-0">→</span>
+                <span class="text-yuru mt-1 shrink-0">→</span>
                 <span>{item}</span>
               </li>
             ))}

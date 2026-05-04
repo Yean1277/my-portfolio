@@ -20,20 +20,13 @@ import { getCollection } from 'astro:content';
 import BaseLayout      from '../layouts/BaseLayout.astro';
 import Navigation      from '../components/Navigation.astro';
 import HeroSection     from '../components/HeroSection.astro';
-import MusicPlayer     from '../components/MusicPlayer.astro';
-import RecentPosts     from '../components/RecentPosts.astro';
-import SiteStats       from '../components/SiteStats.astro';
+import MusicPlayer          from '../components/MusicPlayer.astro';
+import ProjectCollections   from '../components/ProjectCollections.astro';
+import SiteStats            from '../components/SiteStats.astro';
 import SiteFooter      from '../components/SiteFooter.astro';
 
 // ── Data ─────────────────────────────────────────────────────────────────────
 const allPosts = await getCollection('posts').catch(() => []);
-
-const sortedPosts = [...allPosts].sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
-
-// Stats derived values
-const totalWords = allPosts.reduce((n, p) => n + (p.data.wordCount ?? 500), 0);
 
 // Days online — counted from site launch
 const launchDate = new Date('2024-01-01');
@@ -41,7 +34,7 @@ const daysOnline = Math.floor((Date.now() - launchDate.getTime()) / 86_400_000);
 
 // ── Hero wallpaper slideshow ─────────────────────────────────────────────────
 const heroWallpapers = [
-  { src: '/images/wallpapers/wallpaper-1.jpg', alt: 'Wallpaper 1' },
+  { src: '/images/wallpapers/hatsune-miku-lantern-flower-moewalls-com.mp4', alt: 'Wallpaper 1' },
   { src: '/images/wallpapers/wallpaper-2.jpg', alt: 'Wallpaper 2' },
   { src: '/images/wallpapers/wallpaper-3.jpg', alt: 'Wallpaper 3' },
   { src: '/images/wallpapers/wallpaper-4.jpg', alt: 'Wallpaper 4' },
@@ -74,14 +67,14 @@ const heroWallpapers = [
     ></div>
 
     <main class="max-w-[1100px] mx-auto px-6 pt-10 pb-16">
-      <RecentPosts posts={sortedPosts} maxItems={8} />
+      <ProjectCollections posts={allPosts} />
     </main>
   </div>
 
   <!-- 3 ── SITE STATS ──────────────────────────────────────────────────── -->
   <SiteStats
     postCount={allPosts.length}
-    totalWords={Math.round(totalWords / 1000)}
+    totalWords={0}
     tagCount={0}
     daysOnline={daysOnline}
   />
