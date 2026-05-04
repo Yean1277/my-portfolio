@@ -91,18 +91,9 @@ const fallback = { accent: '#475569', pillBg: 'rgba(71,85,105,0.10)', pillText: 
 
             <div class="flex-1 min-w-0">
 
-              <!-- Meta row: category pill + #tags … (right) date -->
-              <div class="flex items-center gap-2.5 mb-1.5 flex-wrap">
-                <span
-                  class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-[0.12em] border"
-                  style={`background:${cs.pillBg};color:${cs.pillText};border-color:${cs.pillBorder};`}
-                >
-                  {post.category}
-                </span>
-                {post.tags.map(tag => (
-                  <span class="text-[10px] font-mono text-slate-300">#{tag}</span>
-                ))}
-                <span class="text-[10px] font-mono text-slate-300 ml-auto tabular-nums">
+              <!-- Date -->
+              <div class="flex items-center mb-1.5">
+                <span class="text-[10px] font-mono text-slate-300 tabular-nums">
                   {post.date}
                 </span>
               </div>
@@ -123,27 +114,6 @@ const fallback = { accent: '#475569', pillBg: 'rgba(71,85,105,0.10)', pillText: 
               )}
             </div>
 
-            <!-- Right-side tinted code badge -->
-            <div
-              class="shrink-0 w-[78px] h-[78px] rounded-xl flex items-center justify-center transition-transform duration-300 group-hover:scale-105 overflow-hidden"
-              style={`background:${cs.boxBg};`}
-            >
-              {post.image ? (
-                <img
-                  src={post.image}
-                  alt={post.title}
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <span
-                  class="text-[13px] font-black tracking-[0.12em]"
-                  style={`color:${cs.boxText};opacity:0.55;`}
-                >
-                  {cs.code}
-                </span>
-              )}
-            </div>
           </div>
         </a>
       );
