@@ -11,29 +11,17 @@
  */
 
 interface Props {
-  tags?:      string[];
   ownerName?: string;
 }
 
-const {
-  tags      = [],
-  ownerName = 'Yean Ter',
-} = Astro.props;
-
-const uniqueTags = [...new Set(tags)].slice(0, 24);
+const { ownerName = 'Yean Ter' } = Astro.props;
 
 const navLinks = [
   { href: '/',         label: 'Home'     },
   { href: '/projects', label: 'Projects' },
   { href: '/anime',    label: 'Anime'    },
-  { href: '/resume',   label: 'Resume'   },
   { href: '/about',    label: 'About'    },
 ];
-
-// Demo tags shown when no real posts exist yet
-const demoTags = ['Astro', 'ACGN', 'Anime', 'Design', 'Dev', 'Three.js', 'UI', 'Journal', 'Life', 'Next.js', 'WebGL', 'Honkai'];
-const tagsToShow = uniqueTags.length > 0 ? uniqueTags : demoTags;
-const tagsAreLive = uniqueTags.length > 0;
 ---
 
 <footer
@@ -43,7 +31,7 @@ const tagsAreLive = uniqueTags.length > 0;
 >
   <!-- Main footer body -->
   <div class="max-w-[1100px] mx-auto px-6 py-12">
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-10">
 
       <!-- Col 1: Brand -->
       <div>
@@ -109,26 +97,6 @@ const tagsAreLive = uniqueTags.length > 0;
         </nav>
       </div>
 
-      <!-- Col 3: Tag cloud -->
-      <div>
-        <p class="text-[10px] font-black uppercase tracking-[0.18em] mb-4" style="color:#cbd5e1;">Tags</p>
-        <div class="flex flex-wrap gap-1.5">
-          {tagsToShow.map(tag => (
-            tagsAreLive ? (
-              <a
-                href={`/tags/${tag}`}
-                class="px-2.5 py-1 rounded-full text-[10px] font-bold border border-slate-200 text-slate-500 transition-all duration-200 hover:border-[#39c5bb]/40 hover:text-[#39c5bb]"
-              >
-                {tag}
-              </a>
-            ) : (
-              <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border border-slate-200 text-slate-400">
-                {tag}
-              </span>
-            )
-          ))}
-        </div>
-      </div>
     </div>
 
     <!-- Bottom bar -->
