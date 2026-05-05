@@ -1,22 +1,22 @@
 # Portfolio
 
-Personal portfolio built with Astro, Tailwind CSS, and MDX — featuring an anime collection, music player, resume viewer, and blog posts.
+Personal portfolio built with Astro, Tailwind CSS, and MDX — featuring an anime collection, music player, and project showcase.
 
 ## Tech Stack
 
 - [Astro](https://astro.build) — static site framework
 - [Tailwind CSS](https://tailwindcss.com) — utility-first styling via `@astrojs/tailwind`
 - [MDX](https://mdxjs.com) — content authoring via `@astrojs/mdx`
+- [Three.js](https://threejs.org) + [Tween.js](https://github.com/tweenjs/tween.js) — 3D/animation
 - TypeScript
 
 ## Pages
 
 | Route | Description |
 |---|---|
-| `/` | Home — hero section, sidebar profile, music player, recent posts |
+| `/` | Home — hero slideshow, sidebar profile, music player, recent posts |
 | `/anime` | Anime collection — flip cards with quotes |
 | `/projects` | Projects listing |
-| `/resume` | Embedded PDF resume |
 | `/about` | About page |
 
 ## Getting Started
@@ -34,6 +34,7 @@ Open `http://localhost:4321` in your browser.
 npm run dev       # start dev server
 npm run build     # production build
 npm run preview   # preview production build
+npm run format    # format all files with Prettier
 ```
 
 ## Project Structure
@@ -42,7 +43,7 @@ npm run preview   # preview production build
 src/
 ├── components/       # Astro components (Navigation, MusicPlayer, HeroSection, ...)
 ├── content/
-│   ├── pageData/     # MDX files for page content (anime.mdx, projects.mdx, ...)
+│   ├── pageData/     # MDX files for page content (anime.mdx, about.mdx)
 │   └── posts/        # Blog post markdown files
 ├── data/
 │   └── playlist.ts   # Music player track list
@@ -52,8 +53,9 @@ src/
 └── styles/
     └── globals.css
 public/
-├── music/            # MP3 files for the music player
-└── resume.pdf        # Resume PDF
+├── images/
+│   └── wallpapers/   # Hero wallpaper images/videos
+└── music/            # MP3 files for the music player
 ```
 
 ## Adding Content
@@ -62,6 +64,7 @@ public/
 ```yaml
 - title: 'Anime Title'
   poster: 'https://...'
+  isPremium: true        # optional — adds star badge + gradient ring
   quote: 'A quote from the anime.'
 ```
 
@@ -75,11 +78,11 @@ public/
 ---
 title: 'Post Title'
 date: '2026-01-01'
-category: 'Dev'
+category: 'Projects'    # Projects | Anime | Notes | Design
 wordCount: 500
 description: 'Short description.'
 tags: ['Astro', 'Design']
 ---
 ```
 
-**Resume** — replace `public/resume.pdf` with your updated PDF.
+**Hero wallpaper** — drop an image or video into `public/images/wallpapers/` and add a `{src, alt}` entry to the `wallpapers` array in `src/pages/index.astro`.
