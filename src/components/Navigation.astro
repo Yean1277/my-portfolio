@@ -47,21 +47,19 @@ const { heroOverlay = false } = Astro.props;
   <nav class="relative max-w-[1100px] mx-auto flex justify-between items-center px-6 h-16">
 
     <!-- ── LOGO ── -->
-    <a
-      href="/"
-      class="text-[22px] font-black tracking-tight bg-gradient-to-r from-[#39c5bb] to-[#2ba8a0] bg-clip-text text-transparent shrink-0 hover:opacity-80 transition-opacity"
-    >
+    <a href="/" class="nav-logo text-[22px] font-black tracking-tight shrink-0">
       PORTFOLIO
     </a>
 
     <!-- ── DESKTOP LINKS ── -->
-    <div class="hidden md:flex items-center gap-1">
+    <div id="nav-links" class="hidden md:flex items-center gap-1 relative">
       {links.map(({ href, label }) => {
         const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
         return (
           <div class="flex flex-col items-center">
             <a
               href={href}
+              data-active={isActive ? 'true' : null}
               data-hero-link={heroOverlay ? 'true' : null}
               class:list={[
                 'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-medium transition-all duration-150 ease-site',
@@ -76,13 +74,15 @@ const { heroOverlay = false } = Astro.props;
             <!-- Active underline indicator -->
             <div
               class:list={[
-                'w-3 h-[2px] rounded-full mt-0.5 transition-all duration-150 ease-site',
+                'nav-link-bar w-3 h-[2px] rounded-full mt-0.5 transition-all duration-150 ease-site',
                 isActive ? 'bg-[#39c5bb]' : 'bg-transparent',
               ]}
             ></div>
           </div>
         );
       })}
+      <!-- Sliding hover pill (positioned by JS) -->
+      <div id="nav-indicator" aria-hidden="true"></div>
     </div>
 
     <!-- ── RIGHT: CONTACT + HAMBURGER ── -->
@@ -91,7 +91,7 @@ const { heroOverlay = false } = Astro.props;
       <!-- Contact CTA -->
       <a
         href="/about"
-        class="hidden md:inline-flex items-center bg-[#24231f] text-white px-5 py-2 rounded-full text-[13px] font-medium hover:scale-105 hover:shadow-[0_4px_20px_rgba(57,197,187,0.3)] transition-all duration-200"
+        class="hidden md:inline-flex items-center bg-[#F5B3C8] text-[#24231f] px-5 py-2 rounded-full text-[13px] font-medium hover:scale-105 hover:bg-[#E0899F] hover:text-white hover:shadow-[0_4px_20px_rgba(245,179,200,0.5)] transition-all duration-200"
       >
         Contact
       </a>
@@ -116,13 +116,14 @@ const { heroOverlay = false } = Astro.props;
     class="md:hidden overflow-hidden max-h-0 transition-all duration-300 ease-in-out"
   >
     <div class="bg-white/95 backdrop-blur-md border-t border-[#ece9e0] px-6 py-4 space-y-1">
-      {links.map(({ href, label }) => {
+      {links.map(({ href, label }, i) => {
         const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
         return (
           <a
             href={href}
+            style={`--i:${i}`}
             class:list={[
-              'flex items-center justify-between w-full px-4 py-3 rounded-2xl text-[14px] font-medium transition-all duration-200',
+              'mobile-link flex items-center justify-between w-full px-4 py-3 rounded-2xl text-[14px] font-medium transition-all duration-200',
               isActive
                 ? 'bg-[#39c5bb]/10 text-[#39c5bb] font-bold'
                 : 'text-[#787670] hover:bg-[#f7f6f2] hover:text-[#24231f]',
@@ -142,7 +143,8 @@ const { heroOverlay = false } = Astro.props;
       <div class="pt-3 pb-1">
         <a
           href="/about"
-          class="flex items-center justify-center w-full bg-[#24231f] text-white py-3 rounded-2xl text-[14px] font-medium hover:shadow-[0_4px_20px_rgba(57,197,187,0.3)] transition-all duration-200"
+          style="--i:4"
+          class="mobile-link flex items-center justify-center w-full bg-[#F5B3C8] text-[#24231f] py-3 rounded-2xl text-[14px] font-medium hover:bg-[#E0899F] hover:text-white hover:shadow-[0_4px_20px_rgba(245,179,200,0.5)] transition-all duration-200"
         >
           Contact
         </a>
@@ -185,6 +187,9 @@ const { heroOverlay = false } = Astro.props;
       backdrop.classList.toggle('backdrop-blur-none',  !scrolled);
       backdrop.classList.toggle('border-transparent',  !scrolled);
 
+      // Drive hamburger glass ↔ warm style
+      header.classList.toggle('hero-scrolled', scrolled);
+
       // Flip non-active link colors: white on hero → warm muted on frosted
       heroLinks.forEach(l => {
         l.classList.toggle('text-white/85', !scrolled);
@@ -202,7 +207,11 @@ const { heroOverlay = false } = Astro.props;
   const openMenu = () => {
     menuOpen = true;
     menuToggle.setAttribute('aria-expanded', 'true');
-    mobileMenu.style.maxHeight = mobileMenu.scrollHeight + 'px';
+    mobileMenu.style.maxHeight = 'none'; // reset so scrollHeight is accurate
+    const fullHeight = mobileMenu.scrollHeight;
+    mobileMenu.style.maxHeight = '0';
+    requestAnimationFrame(() => { mobileMenu.style.maxHeight = fullHeight + 'px'; });
+    mobileMenu.classList.add('open');
 
     // Animate to ✕
     lines[0].style.transform = 'translateY(6.5px) rotate(45deg)';
@@ -214,6 +223,7 @@ const { heroOverlay = false } = Astro.props;
     menuOpen = false;
     menuToggle.setAttribute('aria-expanded', 'false');
     mobileMenu.style.maxHeight = '0';
+    mobileMenu.classList.remove('open');
 
     // Animate back to ☰
     lines[0].style.transform = '';
@@ -232,4 +242,122 @@ const { heroOverlay = false } = Astro.props;
 
   // Close on route change (Astro view transitions)
   document.addEventListener('astro:page-load', closeMenu);
+
+  // ── SLIDING INDICATOR ───────────────────────────────────────────────────────
+  const navLinksEl  = document.getElementById('nav-links');
+  const indicatorEl = document.getElementById('nav-indicator') as HTMLElement | null;
+
+  if (navLinksEl && indicatorEl) {
+    const allLinkEls  = navLinksEl.querySelectorAll<HTMLElement>('a');
+    const activeLink  = navLinksEl.querySelector<HTMLElement>('[data-active]');
+
+    function placeIndicator(el: HTMLElement, instant = false) {
+      const cr = navLinksEl!.getBoundingClientRect();
+      const lr = el.getBoundingClientRect();
+      if (instant) indicatorEl!.style.transition = 'none';
+      indicatorEl!.style.left    = `${lr.left - cr.left}px`;
+      indicatorEl!.style.width   = `${lr.width}px`;
+      indicatorEl!.style.opacity = '1';
+      if (instant) requestAnimationFrame(() => { indicatorEl!.style.transition = ''; });
+    }
+
+    // Set initial position instantly (no slide-in on mount)
+    if (activeLink) placeIndicator(activeLink, true);
+    else indicatorEl.style.opacity = '0';
+
+    allLinkEls.forEach(link => {
+      link.addEventListener('mouseenter', () => placeIndicator(link));
+    });
+
+    navLinksEl.addEventListener('mouseleave', () => {
+      if (activeLink) placeIndicator(activeLink);
+      else indicatorEl.style.opacity = '0';
+    });
+  }
 </script>
+
+<style>
+  /* 1 ── Page load entrance */
+  @keyframes navSlideDown {
+    from { transform: translateY(-110%); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+  #site-nav {
+    animation: navSlideDown 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  }
+
+  /* 2 ── Sliding hover indicator */
+  #nav-indicator {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 32px;
+    background: rgba(57, 197, 187, 0.1);
+    border: 1px solid rgba(57, 197, 187, 0.18);
+    border-radius: 999px;
+    opacity: 0;
+    pointer-events: none;
+    transition: left   0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                width  0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.2s ease;
+  }
+
+  /* Hide static per-link bars — indicator handles active state visually */
+  .nav-link-bar { display: none; }
+
+  /* Hero mode — glass hamburger while nav is transparent */
+  #site-nav[data-hero="true"]:not(.hero-scrolled) #menu-toggle {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    transition: background 0.3s ease, border-color 0.3s ease;
+  }
+  #site-nav[data-hero="true"]:not(.hero-scrolled) .hamburger-line {
+    background: rgba(255, 255, 255, 0.9);
+  }
+  /* Restore warm style once frosted glass kicks in */
+  #site-nav[data-hero="true"].hero-scrolled #menu-toggle {
+    background: rgba(247, 246, 242, 0.8);
+    border: none;
+  }
+  #site-nav[data-hero="true"].hero-scrolled .hamburger-line {
+    background: #3a3833;
+  }
+
+  /* 3 ── Mobile link stagger */
+  .mobile-link {
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: opacity 0.2s ease, transform 0.2s ease,
+                background-color 0.2s ease, color 0.2s ease;
+    transition-delay: 0s;
+  }
+  #mobile-menu.open .mobile-link {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: calc(var(--i, 0) * 45ms + 40ms);
+  }
+  #mobile-menu:not(.open) .mobile-link {
+    transition-delay: 0s;
+  }
+
+  /* 4 ── Logo shimmer sweep on hover */
+  .nav-logo {
+    background: linear-gradient(
+      90deg,
+      #39c5bb 0%,
+      #2ba8a0 35%,
+      #a8f0ec 50%,
+      #2ba8a0 65%,
+      #39c5bb 100%
+    );
+    background-size: 250% auto;
+    background-position: 0% center;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    transition: background-position 0.7s ease;
+  }
+  .nav-logo:hover {
+    background-position: 100% center;
+  }
+</style>

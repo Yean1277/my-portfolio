@@ -18,6 +18,7 @@ export const playlist: Track[] = [
   { id: 2, title: "ray 超かぐや姫！", artist: "夏吉ゆうこ, 月見ヤチヨ", file: "ray-kaguyahime.mp3", durationStr: "2:29" },
   { id: 3, title: "Egao No Mahou", artist: "CHOCOBYTES", file: "Fairy Tail - Opening 5  Egao No Mahou.mp3", durationStr: "1:27" },
   { id: 4, title: "Kimiiro Signal", artist: "Luna Haruna", file: "Luna Haruna - Kimiiro Signal.mp3", durationStr: "4:42" },
+  { id: 5, title: "朧月（おぼろづき）", artist: "まふまふ（歌：初音ミク）", file: "初音ミク-朧月中文字幕.mp3", durationStr: "4:13" },
   // { id: 1, title: "Secret Base", artist: "AnoHana ED", file: "secret-base.mp3", durationStr: "5:12" },
   // { id: 2, title: "Suzume",      artist: "RADWIMPS",   file: "suzume.mp3",      durationStr: "3:58" },
   // { id: 3, title: "Idol",        artist: "YOASOBI",    file: "idol.mp3",        durationStr: "3:33" },

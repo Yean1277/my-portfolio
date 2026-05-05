@@ -68,7 +68,7 @@ const total = entries.length;
   <!-- ── CARD GRID ───────────────────────────────────────────────────────────── -->
   <section class="bg-[#f7f6f2] min-h-screen">
     <div class="max-w-7xl mx-auto px-6 py-14">
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 justify-items-center">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5 lg:gap-6">
 
         {entries.map((anime) => (
           <div class="card-outer relative group" style={`--i:${anime.index}`}>
@@ -100,17 +100,8 @@ const total = entries.length;
                   </h3>
                 </div>
 
-                <div class="flip-hint absolute top-2.5 right-2.5 w-6 h-6 rounded-full
-                            bg-black/50 backdrop-blur-sm flex items-center justify-center
-                            opacity-0 transition-opacity duration-300 pointer-events-none">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-white"
-                       fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                  </svg>
-                </div>
 
-                {anime.isPremium && (
+{anime.isPremium && (
                   <div class="absolute top-2.5 left-2.5 bg-gradient-to-r from-[#F07535] to-[#39c5bb] px-2 py-0.5 rounded-full">
                     <span class="text-white text-[8px] font-bold tracking-wider uppercase">★ Pick</span>
                   </div>
@@ -130,11 +121,11 @@ const total = entries.length;
                                select-none pointer-events-none text-[#F07535]/8 rotate-180">"</div>
 
                   {anime.quote ? (
-                    <p class="relative z-10 text-white/80 text-[11px] italic leading-relaxed text-center">
+                    <p class="card-quote relative z-10 text-white/80 text-[11px] italic leading-relaxed text-center">
                       {anime.quote}
                     </p>
                   ) : (
-                    <p class="relative z-10 text-white/25 text-[10px] italic text-center">
+                    <p class="card-quote relative z-10 text-white/25 text-[10px] italic text-center">
                       No quote yet...
                     </p>
                   )}
@@ -178,38 +169,93 @@ const total = entries.length;
 
   .card-outer {
     perspective: 1000px;
-    width:  200px;
-    height: 280px;
+    width: 100%;
+    aspect-ratio: 5 / 7;
     animation: card-in 0.45s ease both;
-    animation-delay: calc(var(--i) * 75ms);
+    animation-delay: min(calc(var(--i) * 75ms), 350ms);
   }
 
   .flip-inner {
-    transition: transform 0.65s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .card-outer:hover .flip-inner:not(.flipped) {
-    transform: translateY(-7px) scale(1.03);
+    transition: transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 16px rgba(36, 35, 31, 0.12);
   }
 
   .flip-inner.flipped {
     transform: rotateY(180deg);
   }
 
+  .card-quote {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+    transition-delay: 0s;
+  }
+  .flip-inner.flipped .card-quote {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.35s;
+  }
+
   .poster-img {
     transition: transform 0.7s ease;
   }
-  .card-outer:hover .flip-inner:not(.flipped) .poster-img {
-    transform: scale(1.07);
+
+  /* Hover effects only on devices that support true hover (not iOS sticky-hover) */
+  @media (hover: hover) and (pointer: fine) {
+    .card-outer:hover .flip-inner:not(.flipped) {
+      transform: translateY(-7px) scale(1.03);
+      box-shadow: 0 20px 48px rgba(36, 35, 31, 0.22), 0 0 0 1px rgba(57, 197, 187, 0.08);
+    }
+    .card-outer:hover .flip-inner:not(.flipped) .poster-img {
+      transform: scale(1.07);
+    }
   }
 
-  .card-outer:hover .flip-inner:not(.flipped) .flip-hint {
-    opacity: 1;
+  /* Touch tap feedback */
+  @media (hover: none) {
+    .card-outer:active .flip-inner:not(.flipped) {
+      transform: scale(0.96);
+      transition: transform 0.1s ease;
+    }
+  }
+
+  /* Fast transition during tilt tracking; spring curve kicks back in on mouseleave */
+  .flip-inner.tilting {
+    transition: transform 0.08s linear,
+                box-shadow 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 </style>
 
 <script>
-  document.querySelectorAll('.flip-inner').forEach(el => {
-    el.addEventListener('click', () => el.classList.toggle('flipped'));
+  const MAX_TILT  = 10;
+  const canHover  = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  document.querySelectorAll<HTMLElement>('.card-outer').forEach(card => {
+    const inner = card.querySelector<HTMLElement>('.flip-inner');
+    if (!inner) return;
+
+    if (canHover) {
+      card.addEventListener('mouseenter', () => inner.classList.add('tilting'));
+
+      card.addEventListener('mousemove', (e) => {
+        if (inner.classList.contains('flipped')) return;
+        const rect = card.getBoundingClientRect();
+        const dx = (e.clientX - (rect.left + rect.width  / 2)) / (rect.width  / 2);
+        const dy = (e.clientY - (rect.top  + rect.height / 2)) / (rect.height / 2);
+        inner.style.transform =
+          `translateY(-7px) scale(1.03) rotateX(${-dy * MAX_TILT}deg) rotateY(${dx * MAX_TILT}deg)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        inner.classList.remove('tilting');
+        inner.style.transform = '';
+      });
+    }
+
+    inner.addEventListener('click', () => {
+      inner.style.transform = '';
+      inner.classList.toggle('flipped');
+    });
   });
 </script>
