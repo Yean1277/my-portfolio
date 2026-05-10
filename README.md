@@ -4,11 +4,15 @@ Personal portfolio built with Astro, Tailwind CSS, and MDX — featuring an anim
 
 ## Tech Stack
 
-- [Astro](https://astro.build) — static site framework
-- [Tailwind CSS](https://tailwindcss.com) — utility-first styling via `@astrojs/tailwind`
-- [MDX](https://mdxjs.com) — content authoring via `@astrojs/mdx`
-- [Three.js](https://threejs.org) + [Tween.js](https://github.com/tweenjs/tween.js) — 3D/animation
-- TypeScript
+| Tool | Version | Role |
+|---|---|---|
+| [Astro](https://astro.build) | 4.16 | Static site framework |
+| [Tailwind CSS](https://tailwindcss.com) | 3.4 | Utility-first styling |
+| [MDX](https://mdxjs.com) | 3.0 | Content authoring |
+| [Three.js](https://threejs.org) | 0.183 | 3D rendering |
+| [Tween.js](https://github.com/tweenjs/tween.js) | 25.0 | Animation easing |
+| TypeScript | 5.0 | Type-safe scripting |
+| [Prettier](https://prettier.io) | 3.0 | Code formatting |
 
 ## Pages
 
