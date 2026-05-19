@@ -9,13 +9,125 @@ title: "About"
     <h1 class="mt-6 text-5xl font-medium" style="color:#24231f;">Hey, I'm Yean Ter</h1>
   </div>
 
+  <!-- Who am I -->
   <div class="rounded-[28px] border border-[#ece9e0] bg-white p-8 shadow-[0_4px_20px_rgba(36,35,31,0.04)] space-y-4">
     <h2 class="text-2xl font-medium" style="color:#24231f;">Who am I?</h2>
     <p class="leading-8" style="color:#3a3833;">
-      I'm a Junior Testing Engineer based in Malaysia.
+      I'm a Software Support Consultant and aspiring SDET based in Selangor, Malaysia. I hold a Bachelor of Software Engineering (Honours) from Tunku Abdul Rahman University of Management and Technology, and I've been working across QA, technical support, and security roles since 2021.
+    </p>
+    <p class="leading-8" style="color:#3a3833;">
+      Right now I'm at MySoft Corporation, helping SMB clients troubleshoot Accounting ERP systems — and experimenting with AI tooling on the side, like integrating DeepSeek LLM with MCP servers to speed up diagnostics. I'm also self-directing my way from manual QA toward full SDET, building a UI automation framework with Python, Playwright, and Pytest.
     </p>
   </div>
 
+  <!-- Experience -->
+  <div class="rounded-[28px] border border-[#ece9e0] bg-white p-8 shadow-[0_4px_20px_rgba(36,35,31,0.04)] space-y-6">
+    <h2 class="text-2xl font-medium" style="color:#24231f;">Experience</h2>
+
+    <div class="space-y-1">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p class="font-medium" style="color:#24231f;">Software Support Consultant</p>
+          <p class="text-sm" style="color:#787670;">MySoft Corporation · Cyberjaya</p>
+        </div>
+        <span class="text-xs rounded-full bg-[#f7f6f2] border border-[#ece9e0] px-3 py-1 whitespace-nowrap" style="color:#787670;">Apr 2025 – Present</span>
+      </div>
+      <p class="text-sm leading-7 pt-1" style="color:#3a3833;">
+        L1–L2 technical support for Accounting ERP. Incident triage, root cause analysis, client–server environment configuration, Crystal Reports customisation, and AI-assisted diagnostics via DeepSeek + MCP.
+      </p>
+    </div>
+
+    <div class="border-t border-[#ece9e0]"></div>
+
+    <div class="space-y-1">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p class="font-medium" style="color:#24231f;">Software QA Intern</p>
+          <p class="text-sm" style="color:#787670;">BASS Sdn Bhd · Kuala Lumpur</p>
+        </div>
+        <span class="text-xs rounded-full bg-[#f7f6f2] border border-[#ece9e0] px-3 py-1 whitespace-nowrap" style="color:#787670;">Feb 2024 – Aug 2024</span>
+      </div>
+      <p class="text-sm leading-7 pt-1" style="color:#3a3833;">
+        Manual functional testing on vessel management software. Designed test cases, tracked defects in a bug management system, and supported regression testing during system updates.
+      </p>
+    </div>
+
+    <div class="border-t border-[#ece9e0]"></div>
+
+    <div class="space-y-1">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p class="font-medium" style="color:#24231f;">Security Analyst Intern</p>
+          <p class="text-sm" style="color:#787670;">NetAssist (M) Sdn Bhd · Kuala Lumpur</p>
+        </div>
+        <span class="text-xs rounded-full bg-[#f7f6f2] border border-[#ece9e0] px-3 py-1 whitespace-nowrap" style="color:#787670;">Oct 2021 – Jan 2022</span>
+      </div>
+      <p class="text-sm leading-7 pt-1" style="color:#3a3833;">
+        24/7 L1 SOC monitoring via SIEM and IDS platforms, log analysis, threat escalation, and IP address registry management.
+      </p>
+    </div>
+  </div>
+
+  <!-- Skills -->
+  <div class="rounded-[28px] border border-[#ece9e0] bg-white p-8 shadow-[0_4px_20px_rgba(36,35,31,0.04)] space-y-5">
+    <h2 class="text-2xl font-medium" style="color:#24231f;">Skills</h2>
+
+    <div class="space-y-4">
+      <div>
+        <p class="text-xs uppercase tracking-widest mb-2" style="color:#787670;">Testing & QA</p>
+        <div class="flex flex-wrap gap-2">
+          {["Manual Testing", "Functional Testing", "Regression Testing", "Test Case Design", "Playwright", "Pytest", "Allure Reports"].map(s => (
+            <span class="text-xs rounded-full bg-[#f0fafa] border border-[#c5ecea] px-3 py-1" style="color:#2ba8a0;">{s}</span>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-widest mb-2" style="color:#787670;">Programming</p>
+        <div class="flex flex-wrap gap-2">
+          {["Python", "MySQL", "HTML", "CSS"].map(s => (
+            <span class="text-xs rounded-full bg-[#f7f6f2] border border-[#ece9e0] px-3 py-1" style="color:#3a3833;">{s}</span>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-widest mb-2" style="color:#787670;">Tools & Platforms</p>
+        <div class="flex flex-wrap gap-2">
+          {["Git", "GitHub", "Postman", "Crystal Reports", "Trello", "Microsoft Office", "WinMTR"].map(s => (
+            <span class="text-xs rounded-full bg-[#f7f6f2] border border-[#ece9e0] px-3 py-1" style="color:#3a3833;">{s}</span>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-widest mb-2" style="color:#787670;">AI Tools</p>
+        <div class="flex flex-wrap gap-2">
+          {["Claude Code", "ChatGPT", "Gemini", "DeepSeek", "MCP", "NotebookLM", "Stitch"].map(s => (
+            <span class="text-xs rounded-full bg-[#f7f6f2] border border-[#ece9e0] px-3 py-1" style="color:#3a3833;">{s}</span>
+          ))}
+        </div>
+      </div>
+      <div>
+        <p class="text-xs uppercase tracking-widest mb-2" style="color:#787670;">Languages & Certs</p>
+        <div class="flex flex-wrap gap-2">
+          {["Chinese", "English", "Malay", "Japanese (JLPT N4)", "CCNAv7"].map(s => (
+            <span class="text-xs rounded-full bg-[#f7f6f2] border border-[#ece9e0] px-3 py-1" style="color:#3a3833;">{s}</span>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Education -->
+  <div class="rounded-[28px] border border-[#ece9e0] bg-white p-8 shadow-[0_4px_20px_rgba(36,35,31,0.04)] space-y-4">
+    <h2 class="text-2xl font-medium" style="color:#24231f;">Education</h2>
+    <div>
+      <p class="font-medium" style="color:#24231f;">Tunku Abdul Rahman University of Management and Technology</p>
+      <p class="text-sm mt-1" style="color:#3a3833;">Bachelor of Software Engineering (Honours) — CGPA 3.2266</p>
+      <p class="text-sm" style="color:#3a3833;">Diploma in Computer Science — CGPA 3.3958</p>
+      <p class="text-xs mt-1" style="color:#787670;">Jul 2020 – Aug 2024</p>
+    </div>
+  </div>
+
+  <!-- Let's Connect -->
   <div class="rounded-[28px] border border-[#ece9e0] bg-white p-8 shadow-[0_4px_20px_rgba(36,35,31,0.04)] space-y-4">
     <h2 class="text-2xl font-medium" style="color:#24231f;">Let's Connect</h2>
     <p class="leading-8" style="color:#3a3833;">
@@ -24,6 +136,7 @@ title: "About"
     <div class="mt-6 flex gap-3 flex-wrap">
       <a href="mailto:looyeanter02@gmail.com" class="rounded-2xl bg-[#39c5bb] hover:bg-[#2ba8a0] px-6 py-2 text-sm font-medium text-white transition-all duration-150">Email Me</a>
       <a href="https://github.com/Yean1277" target="_blank" rel="noopener noreferrer" class="rounded-2xl border border-[#ece9e0] bg-white hover:border-[#39c5bb]/40 px-6 py-2 text-sm font-medium transition-all duration-150" style="color:#3a3833;">GitHub</a>
+      <a href="https://www.linkedin.com/in/loo-yean-ter-60a823222/" target="_blank" rel="noopener noreferrer" class="rounded-2xl border border-[#ece9e0] bg-white hover:border-[#39c5bb]/40 px-6 py-2 text-sm font-medium transition-all duration-150" style="color:#3a3833;">LinkedIn</a>
     </div>
   </div>
 </section>
