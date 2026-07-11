@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../utils/url';
+
 interface Props {
   posts: any[];
 }
@@ -11,15 +13,15 @@ const displayPosts = posts.length > 0
   ? posts.slice(0, 4).map((p, i) => ({
       title:   p.data.title,
       excerpt: p.data.description ?? p.data.excerpt ?? '',
-      href:    `/posts/${p.slug}`,
+      href:    withBase(`/posts/${p.slug}`),
       date:    p.data.date ? new Date(p.data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : '',
       idx: i,
     }))
   : [
-      { title: 'Yean Ter Portfolio',       excerpt: 'A personal portfolio built with Astro, Tailwind, and a lot of attention to detail.',     href: '/projects', date: 'Mar 2026', idx: 0 },
-      { title: 'Anime Collection Viewer',  excerpt: 'Personal anime tracker with a flip-card grid and seasonal stats.',                        href: '/anime',    date: 'Apr 2026', idx: 1 },
-      { title: 'Floating Music Player',    excerpt: 'Viewport-anchored music island with spinning vinyl and a playlist drawer.',               href: '/projects', date: 'May 2026', idx: 2 },
-      { title: 'Cinematic Hero System',    excerpt: 'Full-bleed wallpaper slideshow with auto-fade and overlay navigation.',                   href: '/projects', date: 'May 2026', idx: 3 },
+      { title: 'Yean Ter Portfolio',       excerpt: 'A personal portfolio built with Astro, Tailwind, and a lot of attention to detail.',     href: withBase('/projects'), date: 'Mar 2026', idx: 0 },
+      { title: 'Anime Collection Viewer',  excerpt: 'Personal anime tracker with a flip-card grid and seasonal stats.',                        href: withBase('/anime'),    date: 'Apr 2026', idx: 1 },
+      { title: 'Floating Music Player',    excerpt: 'Viewport-anchored music island with spinning vinyl and a playlist drawer.',               href: withBase('/projects'), date: 'May 2026', idx: 2 },
+      { title: 'Cinematic Hero System',    excerpt: 'Full-bleed wallpaper slideshow with auto-fade and overlay navigation.',                   href: withBase('/projects'), date: 'May 2026', idx: 3 },
     ];
 ---
 
@@ -34,7 +36,7 @@ const displayPosts = posts.length > 0
       <span class="text-[9px] text-[#39c5bb] font-semibold tracking-[0.2em] uppercase">Projects</span>
     </div>
     <a
-      href="/projects"
+      href={withBase('/projects')}
       class="text-[11px] font-medium text-[#787670] hover:text-[#39c5bb] transition-colors flex items-center gap-1"
     >
       View all

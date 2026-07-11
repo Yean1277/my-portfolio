@@ -3,11 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Navigation from '../components/Navigation.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { getCollection } from 'astro:content';
+import { withBase } from '../utils/url';
 
 const pageData = await getCollection('pageData');
 const aboutPage = pageData.find(p => p.slug === 'about');
 
-if (!aboutPage) return Astro.redirect('/');
+if (!aboutPage) return Astro.redirect(withBase('/'));
 const { Content } = await aboutPage.render();
 ---
 <BaseLayout title="About | Personal Workspace">

@@ -20,6 +20,7 @@ import BaseLayout      from '../layouts/BaseLayout.astro';
 import Navigation      from '../components/Navigation.astro';
 import SiteFooter      from '../components/SiteFooter.astro';
 import MusicPlayer     from '../components/MusicPlayer.astro';
+import { withBase }    from '../utils/url';
 
 // ── The one real project ─────────────────────────────────────────────────────
 // Edit these strings — they're the only thing that needs to be true.
@@ -27,8 +28,8 @@ const featured = {
   title:       'Yean Ter Portfolio',
   oneLiner:    'A personal portfolio built with Astro, Tailwind, and a healthy obsession with detail.',
   description: 'The site you\'re reading right now. Built from scratch as both a portfolio and a sandbox — every component (the floating music player, the cinematic hero, the per-category card system) was a chance to learn something new about Astro islands, design tokens, or motion.',
-  liveHref:    'https://your-portfolio.example',
-  repoHref:    'https://github.com/yourname/portfolio',
+  liveHref:    'https://yean1277.github.io/my-portfolio/',
+  repoHref:    'https://github.com/Yean1277/my-portfolio',
   meta: [
     { label: 'Started',    value: 'Mar 2026' },
     { label: 'Components', value: '9' },
@@ -54,7 +55,7 @@ const writeups = [
   {
     title:    'Building a Music Player in Astro',
     excerpt:  'No framework JS — just Astro islands and a spinning vinyl record made from plain SVG.',
-    href:     '/posts/music-player-astro',
+    href:     withBase('/posts/music-player-astro'),
     date:     'Apr 17, 2026',
     category: 'Dev',
     tags:     ['Astro', 'Audio'],
@@ -62,7 +63,7 @@ const writeups = [
   {
     title:    'Designing Card-Based UI Systems',
     excerpt:  'Per-category color tokens, hover micro-interactions, and the geometry of a 78px code square.',
-    href:     '/posts/card-based-ui-systems',
+    href:     withBase('/posts/card-based-ui-systems'),
     date:     'Apr 24, 2026',
     category: 'Design',
     tags:     ['UI', 'Astro'],
@@ -70,7 +71,7 @@ const writeups = [
   {
     title:    'Three.js Particle Systems on a Budget',
     excerpt:  '60fps star-field effects without a beefy GPU — instanced mesh and frustum culling.',
-    href:     '/posts/threejs-particle-budget',
+    href:     withBase('/posts/threejs-particle-budget'),
     date:     'Apr  3, 2026',
     category: 'Dev',
     tags:     ['Three.js', 'WebGL'],
@@ -78,7 +79,7 @@ const writeups = [
   {
     title:    'Why I Switched from Next.js to Astro',
     excerpt:  'Hydration budget, island architecture, and the joy of zero JS by default.',
-    href:     '/posts/nextjs-to-astro',
+    href:     withBase('/posts/nextjs-to-astro'),
     date:     'Mar 20, 2026',
     category: 'Dev',
     tags:     ['Astro', 'Next.js'],
@@ -285,7 +286,7 @@ const roadmap = {
         </div>
         <div class="flex-1 h-px bg-[#ece9e0]"></div>
         <a
-          href="/posts"
+          href={withBase('/posts')}
           class="text-[11px] font-medium hover:text-[#39c5bb] transition-colors flex items-center gap-1 shrink-0"
           style="color:#787670;"
         >
@@ -423,7 +424,7 @@ const roadmap = {
           I'm open to interesting projects, feedback on the build, or recommendations for what to read next.
         </p>
         <a
-          href="/about"
+          href={withBase('/about')}
           class="inline-flex items-center gap-2 bg-[#39c5bb] hover:bg-[#2ba8a0] text-white font-bold text-[13px] px-7 py-3 rounded-full shadow-[0_4px_24px_rgba(57,197,187,0.25)] hover:shadow-[0_6px_28px_rgba(57,197,187,0.4)] hover:-translate-y-0.5 transition-all duration-150 ease-site"
         >
           Get in touch

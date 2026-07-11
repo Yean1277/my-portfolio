@@ -34,3 +34,9 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# astro build output
+/dist
+
+# astro generated types
+.astro/

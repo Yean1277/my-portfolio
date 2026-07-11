@@ -8,11 +8,16 @@ interface Props {
 
 const { postCount, totalWords, tagCount, daysOnline } = Astro.props;
 
+// totalWords is a raw word count; abbreviate once it passes 1k
+const wordsLabel = totalWords >= 1000
+  ? `${(totalWords / 1000).toFixed(1).replace(/\.0$/, '')}k`
+  : totalWords;
+
 const stats = [
-  { value: postCount  || '—',                    label: 'Posts'       },
-  { value: totalWords ? `${totalWords}k` : '—', label: 'Words'       },
-  { value: tagCount   || '—',                    label: 'Tags'        },
-  { value: daysOnline || '—',                    label: 'Days Online' },
+  { value: postCount  || '—', label: 'Posts'       },
+  { value: wordsLabel || '—', label: 'Words'       },
+  { value: tagCount   || '—', label: 'Tags'        },
+  { value: daysOnline || '—', label: 'Days Online' },
 ];
 ---
 

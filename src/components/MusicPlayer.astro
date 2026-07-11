@@ -16,10 +16,11 @@
  */
 
 import { playlist } from '../data/playlist';
+import { withBase } from '../utils/url';
 
 const first = playlist[0];
 const serialized = JSON.stringify(
-  playlist.map(t => ({ ...t, src: `/music/${t.file}` }))
+  playlist.map(t => ({ ...t, src: withBase(`/music/${t.file}`) }))
 );
 ---
 
@@ -431,15 +432,20 @@ const serialized = JSON.stringify(
     }>;
 
     // ── Reveal on scroll past hero ─────────────────────────────────────
+    // Once music is playing (or the pill is open) the player stays visible
+    // even if the user scrolls back up — hiding an active player is jarring.
+    const audioEngine = document.getElementById('audioEngine') as HTMLAudioElement | null;
     const REVEAL_AT = 200; // px scrolled
     const updateVisible = () => {
-      root.classList.toggle('visible', window.scrollY > REVEAL_AT);
+      const engaged =
+        (audioEngine && !audioEngine.paused) || root.classList.contains('expanded');
+      root.classList.toggle('visible', window.scrollY > REVEAL_AT || !!engaged);
     };
     updateVisible();
     window.addEventListener('scroll', updateVisible, { passive: true });
 
-    if (tracks.length > 0) {
-      const audio        = document.getElementById('audioEngine') as HTMLAudioElement;
+    if (tracks.length > 0 && audioEngine) {
+      const audio        = audioEngine;
       const discToggle   = document.getElementById('fp-disc-toggle')!;
       const discIcon     = document.getElementById('fp-disc-icon')!;
       const pillDisc     = document.getElementById('fp-pill-disc')!;
@@ -506,6 +512,7 @@ const serialized = JSON.stringify(
         playIcon.innerHTML = isPlaying ? PAUSE_PATH : PLAY_PATH;
         discIcon.innerHTML = isPlaying ? PAUSE_PATH : PLAY_PATH;
         syncPlaylistUI();
+        updateVisible();
       }
       audio.addEventListener('play',  () => setPlayingVisuals(true));
       audio.addEventListener('pause', () => setPlayingVisuals(false));
@@ -537,6 +544,7 @@ const serialized = JSON.stringify(
         root.classList.add('expanded');
         if (audio.src === '') goTo(0, true);
         scheduleAutoCollapse();
+        updateVisible();
       });
 
       // Vinyl inside the pill: toggle play/pause
@@ -559,6 +567,7 @@ const serialized = JSON.stringify(
         root.classList.remove('expanded');
         root.classList.remove('playlist-open');
         listBtn.classList.remove('active');
+        updateVisible();
       });
 
       // Click outside the player closes the playlist drawer

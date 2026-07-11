@@ -1,12 +1,18 @@
 ---
+import { withBase } from '../utils/url';
+
 const { pathname } = Astro.url;
+const homeHref = withBase('/');
 
 const links = [
-  { href: '/',         label: 'Home' },
-  { href: '/projects', label: 'Projects' },
-  { href: '/anime',    label: 'Anime' },
-  { href: '/about',    label: 'About' },
+  { href: homeHref,              label: 'Home' },
+  { href: withBase('/projects'), label: 'Projects' },
+  { href: withBase('/anime'),    label: 'Anime' },
+  { href: withBase('/about'),    label: 'About' },
 ];
+
+const isLinkActive = (href: string) =>
+  href === homeHref ? pathname === homeHref : pathname.startsWith(href);
 
 /**
  * heroOverlay — pass true from pages that have a full-viewport hero image.
@@ -47,14 +53,14 @@ const { heroOverlay = false } = Astro.props;
   <nav class="relative max-w-[1100px] mx-auto flex justify-between items-center px-6 h-16">
 
     <!-- ── LOGO ── -->
-    <a href="/" class="nav-logo text-[22px] font-black tracking-tight shrink-0">
+    <a href={homeHref} class="nav-logo text-[22px] font-black tracking-tight shrink-0">
       PORTFOLIO
     </a>
 
     <!-- ── DESKTOP LINKS ── -->
     <div id="nav-links" class="hidden md:flex items-center gap-1 relative">
       {links.map(({ href, label }) => {
-        const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+        const isActive = isLinkActive(href);
         return (
           <div class="flex flex-col items-center">
             <a
@@ -90,7 +96,7 @@ const { heroOverlay = false } = Astro.props;
 
       <!-- Contact CTA -->
       <a
-        href="/about"
+        href={withBase('/about')}
         class="hidden md:inline-flex items-center bg-[#F5B3C8] text-[#24231f] px-5 py-2 rounded-full text-[13px] font-medium hover:scale-105 hover:bg-[#E0899F] hover:text-white hover:shadow-[0_4px_20px_rgba(245,179,200,0.5)] transition-all duration-200"
       >
         Contact
@@ -101,6 +107,7 @@ const { heroOverlay = false } = Astro.props;
         id="menu-toggle"
         aria-label="Toggle menu"
         aria-expanded="false"
+        aria-controls="mobile-menu"
         class="md:hidden flex flex-col justify-center items-center w-9 h-9 rounded-full bg-[#f7f6f2]/80 hover:bg-[#ece9e0]/80 transition-colors gap-[5px] shrink-0"
       >
         <span class="hamburger-line block w-4 h-[1.5px] bg-[#3a3833] rounded-full transition-all duration-300"></span>
@@ -117,7 +124,7 @@ const { heroOverlay = false } = Astro.props;
   >
     <div class="bg-white/95 backdrop-blur-md border-t border-[#ece9e0] px-6 py-4 space-y-1">
       {links.map(({ href, label }, i) => {
-        const isActive = href === '/' ? pathname === '/' : pathname.startsWith(href);
+        const isActive = isLinkActive(href);
         return (
           <a
             href={href}
@@ -142,7 +149,7 @@ const { heroOverlay = false } = Astro.props;
       <!-- Mobile contact -->
       <div class="pt-3 pb-1">
         <a
-          href="/about"
+          href={withBase('/about')}
           style="--i:4"
           class="mobile-link flex items-center justify-center w-full bg-[#F5B3C8] text-[#24231f] py-3 rounded-2xl text-[14px] font-medium hover:bg-[#E0899F] hover:text-white hover:shadow-[0_4px_20px_rgba(245,179,200,0.5)] transition-all duration-200"
         >

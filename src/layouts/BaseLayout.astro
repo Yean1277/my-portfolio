@@ -1,10 +1,15 @@
 ---
 import '../styles/globals.css';
+import { withBase } from '../utils/url';
 
 interface Props {
   title?: string;
+  description?: string;
 }
-const { title = "Portfolio // Fidelity System" } = Astro.props;
+const {
+  title = "Portfolio // Fidelity System",
+  description = "Open source projects, portfolio & creative notes with the Fidelity design system.",
+} = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="en" class="h-full">
@@ -12,7 +17,14 @@ const { title = "Portfolio // Fidelity System" } = Astro.props;
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
-  <meta name="description" content="Open source projects, portfolio & creative notes with the Fidelity design system." />
+  <meta name="description" content={description} />
+  <meta name="theme-color" content="#f7f6f2" />
+  <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
+
+  <!-- Social sharing -->
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:type" content="website" />
 
   <!-- Design System Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

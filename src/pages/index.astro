@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { withBase } from '../utils/url';
 
 import BaseLayout      from '../layouts/BaseLayout.astro';
 import Navigation      from '../components/Navigation.astro';
@@ -16,12 +17,17 @@ const allPosts = await getCollection('posts').catch(() => []);
 const launchDate = new Date('2024-01-01');
 const daysOnline = Math.floor((Date.now() - launchDate.getTime()) / 86_400_000);
 
+// Aggregate stats from post frontmatter
+const totalWords = allPosts.reduce((sum, p) => sum + (p.data.wordCount ?? 0), 0);
+const tagCount   = new Set(allPosts.flatMap(p => p.data.tags ?? [])).size;
+
 // ── Hero wallpaper slideshow ─────────────────────────────────────────────────
+// Add more entries here once the files exist in public/images/wallpapers/
 const heroWallpapers = [
-  { src: '/images/wallpapers/hatsune-miku-lantern-flower-moewalls-com.mp4', alt: 'Wallpaper 1' },
-  { src: '/images/wallpapers/wallpaper-2.jpg', alt: 'Wallpaper 2' },
-  { src: '/images/wallpapers/wallpaper-3.jpg', alt: 'Wallpaper 3' },
-  { src: '/images/wallpapers/wallpaper-4.jpg', alt: 'Wallpaper 4' },
+  {
+    src: withBase('/images/wallpapers/hatsune-miku-lantern-flower-moewalls-com.mp4'),
+    alt: 'Hatsune Miku among lanterns and flowers',
+  },
 ];
 ---
 
@@ -34,8 +40,8 @@ const heroWallpapers = [
     greeting="👋 Hey, welcome to my little corner of the web"
     wallpapers={heroWallpapers}
     liveLabel="LIVE"
-    primaryCta={{ label: 'Browse Work', href: '/projects' }}
-    secondaryCta={{ label: 'Anime', href: '/anime'}}
+    primaryCta={{ label: 'Browse Work', href: withBase('/projects') }}
+    secondaryCta={{ label: 'Anime', href: withBase('/anime') }}
   >
     <Navigation slot="nav" heroOverlay={true} />
   </HeroSection>
@@ -58,8 +64,8 @@ const heroWallpapers = [
   <!-- 3 ── SITE STATS ──────────────────────────────────────────────────── -->
   <SiteStats
     postCount={allPosts.length}
-    totalWords={0}
-    tagCount={0}
+    totalWords={totalWords}
+    tagCount={tagCount}
     daysOnline={daysOnline}
   />
 

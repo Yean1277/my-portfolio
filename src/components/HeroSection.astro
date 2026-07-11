@@ -15,6 +15,8 @@
  *   secondaryCta— { label, href, badge } for the second button (default "Anime Labs" w/ "New" badge)
  */
 
+import { withBase } from '../utils/url';
+
 interface WallpaperItem {
   src: string;
   alt?: string;
@@ -44,8 +46,8 @@ const {
   wallpaper = 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80',
   wallpapers,
   liveLabel = 'LIVE',
-  primaryCta   = { label: 'Browse Work', href: '/projects' },
-  secondaryCta = { label: 'Anime Labs',  href: '/anime', badge: 'New' },
+  primaryCta   = { label: 'Browse Work', href: withBase('/projects') },
+  secondaryCta = { label: 'Anime Labs',  href: withBase('/anime'), badge: 'New' },
 } = Astro.props;
 
 // If wallpapers array provided, use it; else wrap single wallpaper
@@ -164,7 +166,7 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
   <slot name="ticker" />
 
   <!-- ── BOTTOM-CENTER SLIDE NAV (prev / dots / next) ─────────────── -->
-  {slides.length > 0 && (
+  {slides.length > 1 && (
     <div
       id="hero-dots"
       class="absolute z-20 flex items-center gap-2 left-1/2 -translate-x-1/2 px-3 py-2 rounded-full bg-[#24231f]/45 backdrop-blur-md border border-white/10"
@@ -271,7 +273,8 @@ const isVideo = (src: string) => /\.(mp4|webm|ogg)(\?.*)?$/i.test(src);
   nextBtn?.addEventListener('click', () => goTo(current + 1));
 
   // Auto-advance on first visit only
-  if (total > 1 && !sessionStorage.getItem('hero-visited')) {
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (total > 1 && !reducedMotion && !sessionStorage.getItem('hero-visited')) {
     sessionStorage.setItem('hero-visited', '1');
     setInterval(() => goTo(current + 1), 6000);
   }
