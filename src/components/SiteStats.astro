@@ -8,11 +8,15 @@ interface Props {
 
 const { postCount, totalWords, tagCount, daysOnline } = Astro.props;
 
+// Compact word count: 1_240 → "1.2k", 950 → "950"
+const formatWords = (n: number) =>
+  n >= 1000 ? `${(n / 1000).toFixed(1).replace(/\.0$/, '')}k` : `${n}`;
+
 const stats = [
-  { value: postCount  || '—',                    label: 'Posts'       },
-  { value: totalWords ? `${totalWords}k` : '—', label: 'Words'       },
-  { value: tagCount   || '—',                    label: 'Tags'        },
-  { value: daysOnline || '—',                    label: 'Days Online' },
+  { value: postCount  || '—',                       label: 'Posts'       },
+  { value: totalWords ? formatWords(totalWords) : '—', label: 'Words'    },
+  { value: tagCount   || '—',                       label: 'Tags'        },
+  { value: daysOnline || '—',                       label: 'Days Online' },
 ];
 ---
 
