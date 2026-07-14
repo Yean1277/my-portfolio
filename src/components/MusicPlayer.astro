@@ -5,7 +5,7 @@
  * Pinned to the bottom-left corner of the viewport. Persistent across scroll.
  *
  * Three states:
- *  • collapsed  → just a 56px circular vinyl disc (default)
+ *  • collapsed  → a 56px vinyl disc with a music-note center label (default)
  *  • expanded   → horizontal pill with vinyl + title + prev/play/next + list + close
  *  • playlist   → drawer slides up from above the expanded pill
  *
@@ -13,6 +13,10 @@
  *  • Hidden on initial paint; fades in once the user scrolls past the hero CTAs.
  *  • Click the vinyl when collapsed → expands. Click ✕ → collapses.
  *  • Auto-collapses after 8s of no interaction when paused.
+ *
+ * Motion: all easing uses the site's `ease-site` curve. The disc conveys
+ * playback with a rotating sheen + pulse ring; a music note marks the hub.
+ * Respects `prefers-reduced-motion`.
  */
 
 import { playlist } from '../data/playlist';
@@ -21,107 +25,184 @@ const first = playlist[0];
 const serialized = JSON.stringify(
   playlist.map(t => ({ ...t, src: `/music/${t.file}` }))
 );
+
+// Standard music-note glyph — the player's "proper" icon.
+const NOTE_PATH = 'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z';
 ---
 
 <style>
+  #floating-player { --ease: cubic-bezier(0.22, 1, 0.36, 1); }
+
   /* ── Container reveal ─────────────────────────────────────────────── */
   #floating-player {
-    transform: translateY(20px);
+    transform: translateY(16px) scale(0.96);
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+    transition: transform 0.5s var(--ease), opacity 0.4s ease;
   }
   #floating-player.visible {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
     opacity: 1;
     pointer-events: auto;
   }
 
-  /* ── Disc base styles ─────────────────────────────────────────────── */
+  /* ── Disc base (vinyl) ────────────────────────────────────────────── */
   .fp-disc {
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #24231f 0%, #3a3833 100%);
-    border: 3px solid rgba(57, 197, 187, 0.25);
+    background:
+      repeating-radial-gradient(circle at 50% 50%,
+        rgba(0, 0, 0, 0.35) 0 1px,
+        rgba(255, 255, 255, 0.02) 1px 2px,
+        transparent 2px 4px),
+      radial-gradient(circle at 50% 36%, #45433d 0%, #2b2a25 52%, #17160f 100%);
+    border: 3px solid rgba(57, 197, 187, 0.28);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 8px 28px rgba(36, 35, 31, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4);
-    transition: box-shadow 0.3s ease, border-color 0.2s ease, transform 0.2s ease;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(36, 35, 31, 0.2), 0 0 0 0 rgba(57, 197, 187, 0.4);
+    transition: box-shadow 0.3s ease, border-color 0.25s var(--ease), transform 0.25s var(--ease);
     position: relative;
+    -webkit-tap-highlight-color: transparent;
   }
   .fp-disc:hover {
-    border-color: rgba(57, 197, 187, 0.6);
-    transform: scale(1.05);
+    border-color: rgba(57, 197, 187, 0.7);
+    transform: scale(1.06);
   }
-  .fp-disc-core {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: #39c5bb;
-    box-shadow: 0 0 12px rgba(57, 197, 187, 0.8);
-  }
+  .fp-disc:active { transform: scale(0.97); }
 
-  /* Hover overlay: show play/pause icon */
-  .fp-disc-hover {
+  /* Rotating sheen — the visible "spin" cue (concentric grooves can't show it) */
+  .fp-disc::before {
+    content: '';
     position: absolute;
     inset: 0;
     border-radius: 50%;
-    background: rgba(36, 35, 31, 0.6);
+    background: conic-gradient(
+      from 0deg,
+      transparent 0 262deg,
+      rgba(255, 255, 255, 0.03) 300deg,
+      rgba(255, 255, 255, 0.16) 336deg,
+      rgba(255, 255, 255, 0.03) 350deg,
+      transparent 360deg
+    );
+    animation: fpSpin 4s linear infinite;
+    animation-play-state: paused;
+    pointer-events: none;
+  }
+  .fp-disc.playing::before { animation-play-state: running; }
+  @keyframes fpSpin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+  }
+
+  /* Center hub / label carrying the music note */
+  .fp-disc-hub {
+    position: relative;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 38%, #34322d 0%, #1c1b18 100%);
+    border: 1px solid rgba(57, 197, 187, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 3px rgba(23, 22, 15, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.06);
+  }
+  .fp-disc-hub svg {
+    width: 12px;
+    height: 12px;
+    color: #39c5bb;
+    filter: drop-shadow(0 0 4px rgba(57, 197, 187, 0.55));
+  }
+
+  /* Center dot (used by the pill vinyl + empty state) */
+  .fp-disc-core {
+    position: relative;
+    z-index: 1;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #39c5bb;
+    box-shadow: 0 0 12px rgba(57, 197, 187, 0.8), 0 0 0 3px rgba(23, 22, 15, 0.55);
+  }
+
+  /* Hover overlay: reveal play/pause icon */
+  .fp-disc-hover {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: 50%;
+    background: rgba(23, 22, 15, 0.62);
     backdrop-filter: blur(2px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: #fff;
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transform: scale(1.08);
+    transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
   }
-  .fp-disc:hover .fp-disc-hover { opacity: 1; }
+  .fp-disc:hover .fp-disc-hover,
+  .fp-disc:focus-visible .fp-disc-hover { opacity: 1; transform: scale(1); }
 
-  /* Pulsing ring when playing */
+  /* Pulsing ring while playing */
   .fp-disc.playing {
-    animation: fpPulse 2s ease-in-out infinite;
+    animation: fpPulse 2.4s ease-in-out infinite;
   }
   @keyframes fpPulse {
-    0%, 100% { box-shadow: 0 8px 28px rgba(36, 35, 31, 0.18), 0 0 0 0 rgba(57, 197, 187, 0.4); }
-    50%      { box-shadow: 0 8px 28px rgba(36, 35, 31, 0.18), 0 0 0 8px rgba(57, 197, 187, 0); }
+    0%, 100% { box-shadow: 0 8px 28px rgba(36, 35, 31, 0.2), 0 0 0 0 rgba(57, 197, 187, 0.45); }
+    50%      { box-shadow: 0 8px 28px rgba(36, 35, 31, 0.2), 0 0 0 9px rgba(57, 197, 187, 0); }
   }
 
-  /* Vinyl spin */
-  .fp-vinyl-spin {
-    animation: fpSpin 4s linear infinite;
-    animation-play-state: paused;
+  /* ── Standalone (collapsed) disc morph ────────────────────────────── */
+  .fp-disc-standalone {
+    transition: opacity 0.22s ease, transform 0.32s var(--ease), border-color 0.25s var(--ease);
   }
-  .fp-disc.playing .fp-vinyl-spin {
-    animation-play-state: running;
-  }
-  @keyframes fpSpin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+  #floating-player.expanded .fp-disc-standalone {
+    opacity: 0;
+    transform: scale(0.55) rotate(-25deg);
+    pointer-events: none;
   }
 
   /* ── Expanded pill ────────────────────────────────────────────────── */
   .fp-pill {
-    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
     align-items: center;
     gap: 12px;
     background: #fff;
     border: 1px solid #ece9e0;
     border-radius: 999px;
     padding: 8px 12px 8px 8px;
-    box-shadow: 0 12px 36px rgba(36, 35, 31, 0.14);
+    box-shadow: 0 14px 40px rgba(36, 35, 31, 0.16);
     min-width: 320px;
     max-width: calc(100vw - 48px);
     font-family: 'Inter', sans-serif;
-    position: relative;
+    transform-origin: bottom left;
+    opacity: 0;
+    transform: scale(0.86) translateY(6px);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      opacity 0.28s var(--ease),
+      transform 0.4s var(--ease),
+      visibility 0.4s;
   }
-  #floating-player.expanded .fp-pill { display: flex; }
-  #floating-player.expanded .fp-disc-standalone { display: none; }
+  #floating-player.expanded .fp-pill {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    visibility: visible;
+    pointer-events: auto;
+  }
 
-  .fp-pill .fp-disc { width: 44px; height: 44px; border-width: 2px; }
-  .fp-pill .fp-disc-core { width: 10px; height: 10px; }
+  .fp-pill .fp-disc { width: 44px; height: 44px; border-width: 2px; flex-shrink: 0; }
+  .fp-pill .fp-disc-core { width: 9px; height: 9px; }
 
   .fp-info {
     flex: 1;
@@ -129,13 +210,27 @@ const serialized = JSON.stringify(
     overflow: hidden;
   }
   .fp-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     font-size: 8px;
     font-weight: 900;
     color: #39c5bb;
     text-transform: uppercase;
     letter-spacing: 0.2em;
-    margin-bottom: 1px;
+    margin-bottom: 2px;
   }
+  .fp-label::before {
+    content: '';
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #39c5bb;
+    box-shadow: 0 0 6px rgba(57, 197, 187, 0.9);
+    animation: fpBlink 1.6s ease-in-out infinite;
+  }
+  @keyframes fpBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
   .fp-title {
     font-size: 12px;
     font-weight: 700;
@@ -143,7 +238,7 @@ const serialized = JSON.stringify(
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.2;
+    line-height: 1.25;
   }
   .fp-artist {
     font-size: 10px;
@@ -151,7 +246,7 @@ const serialized = JSON.stringify(
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.2;
+    line-height: 1.25;
   }
 
   .fp-controls {
@@ -171,9 +266,11 @@ const serialized = JSON.stringify(
     background: transparent;
     border: none;
     cursor: pointer;
-    transition: all 0.15s ease;
+    transition: color 0.15s ease, background 0.15s ease, transform 0.18s var(--ease);
+    -webkit-tap-highlight-color: transparent;
   }
-  .fp-ctrl:hover { color: #39c5bb; background: rgba(57, 197, 187, 0.08); }
+  .fp-ctrl:hover { color: #39c5bb; background: rgba(57, 197, 187, 0.08); transform: scale(1.1); }
+  .fp-ctrl:active { transform: scale(0.9); }
 
   .fp-ctrl.fp-play {
     width: 36px;
@@ -181,8 +278,10 @@ const serialized = JSON.stringify(
     color: #fff;
     background: #39c5bb;
     margin: 0 2px;
+    box-shadow: 0 4px 12px rgba(57, 197, 187, 0.35);
   }
-  .fp-ctrl.fp-play:hover { background: #2ba8a0; }
+  .fp-ctrl.fp-play:hover { background: #2ba8a0; transform: scale(1.08); }
+  .fp-ctrl.fp-play svg { transition: transform 0.2s var(--ease); }
 
   .fp-ctrl.fp-close {
     color: #a8a69f;
@@ -202,13 +301,13 @@ const serialized = JSON.stringify(
     background: #fff;
     border: 1px solid #ece9e0;
     border-radius: 18px;
-    box-shadow: 0 12px 36px rgba(36, 35, 31, 0.14);
+    box-shadow: 0 14px 40px rgba(36, 35, 31, 0.16);
     padding: 12px;
     transform-origin: bottom left;
-    transform: scale(0.95) translateY(8px);
+    transform: scale(0.92) translateY(10px);
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.28s var(--ease), opacity 0.22s ease;
     max-height: 280px;
     display: flex;
     flex-direction: column;
@@ -263,10 +362,11 @@ const serialized = JSON.stringify(
     background: transparent;
     text-align: left;
     width: 100%;
-    transition: background 0.15s;
+    transition: background 0.15s ease, transform 0.15s cubic-bezier(0.22,1,0.36,1);
     font-family: 'Inter', sans-serif;
   }
   :global(.fp-track:hover) { background: rgba(57, 197, 187, 0.07); }
+  :global(.fp-track:active) { transform: scale(0.99); }
   :global(.fp-track.active) { background: rgba(57, 197, 187, 0.12); }
 
   :global(.fp-track-num) {
@@ -295,13 +395,14 @@ const serialized = JSON.stringify(
     width: 2px;
     border-radius: 1px;
     background: #39c5bb;
-    animation: fpEq 0.8s ease-in-out infinite alternate;
+    transform-origin: bottom;
+    animation: fpEq 0.9s ease-in-out infinite alternate;
   }
   :global(.fp-eq-bar:nth-child(1)) { height: 5px; animation-delay: 0s; }
-  :global(.fp-eq-bar:nth-child(2)) { height: 9px; animation-delay: 0.15s; }
-  :global(.fp-eq-bar:nth-child(3)) { height: 6px; animation-delay: 0.3s; }
+  :global(.fp-eq-bar:nth-child(2)) { height: 10px; animation-delay: 0.2s; }
+  :global(.fp-eq-bar:nth-child(3)) { height: 6px; animation-delay: 0.4s; }
   @keyframes fpEq {
-    from { transform: scaleY(0.4); }
+    from { transform: scaleY(0.35); }
     to   { transform: scaleY(1.2); }
   }
 
@@ -340,6 +441,20 @@ const serialized = JSON.stringify(
     .fp-pill { min-width: 0; width: calc(100vw - 32px); }
     .fp-drawer { width: calc(100vw - 32px); }
   }
+
+  /* ── Reduced motion ───────────────────────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    .fp-disc::before,
+    .fp-disc.playing,
+    .fp-label::before,
+    :global(.fp-eq-bar) { animation: none !important; }
+    #floating-player,
+    .fp-pill,
+    .fp-drawer,
+    .fp-disc,
+    .fp-disc-standalone,
+    .fp-ctrl { transition-duration: 0.01ms !important; }
+  }
 </style>
 
 <!-- Hidden audio engine -->
@@ -355,7 +470,9 @@ const serialized = JSON.stringify(
   {playlist.length === 0 ? (
     <!-- Empty state: a static dim disc that does nothing -->
     <div class="fp-disc fp-disc-standalone" title="No tracks loaded" aria-label="Music player (empty)">
-      <span class="fp-disc-core" style="background:#a8a69f;box-shadow:none;"></span>
+      <span class="fp-disc-hub" style="border-color:rgba(168,166,159,0.35);">
+        <svg viewBox="0 0 24 24" fill="currentColor" style="color:#a8a69f;filter:none;"><path d={NOTE_PATH}/></svg>
+      </span>
     </div>
   ) : (
     <>
@@ -363,11 +480,13 @@ const serialized = JSON.stringify(
       <button
         id="fp-disc-toggle"
         type="button"
-        class="fp-disc fp-disc-standalone fp-vinyl-spin"
+        class="fp-disc fp-disc-standalone"
         aria-label="Open music player"
         title={first?.title ?? 'Open music player'}
       >
-        <span class="fp-disc-core"></span>
+        <span class="fp-disc-hub" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d={NOTE_PATH}/></svg>
+        </span>
         <span class="fp-disc-hover" aria-hidden="true">
           <svg id="fp-disc-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
             <path d="M8 5v14l11-7z"/>
@@ -378,7 +497,7 @@ const serialized = JSON.stringify(
       <!-- ── EXPANDED: horizontal pill ──────────────────────────────── -->
       <div class="fp-pill" role="region" aria-label="Now playing controls">
         <!-- Vinyl -->
-        <div class="fp-disc fp-vinyl-spin" id="fp-pill-disc" title="Toggle play/pause">
+        <div class="fp-disc" id="fp-pill-disc" title="Toggle play/pause">
           <span class="fp-disc-core"></span>
         </div>
 
