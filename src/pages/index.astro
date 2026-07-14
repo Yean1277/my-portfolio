@@ -17,8 +17,8 @@ const postCount  = allPosts.length;
 const totalWords = allPosts.reduce((sum, p) => sum + (p.data.wordCount ?? 0), 0);
 const tagCount   = new Set(allPosts.flatMap((p) => p.data.tags ?? [])).size;
 
-// Days online — counted from site launch
-const launchDate = new Date('2024-01-01');
+// Days online — counted from site launch (2026-05-04)
+const launchDate = new Date('2026-05-04');
 const daysOnline = Math.floor((Date.now() - launchDate.getTime()) / 86_400_000);
 
 // ── Hero wallpaper slideshow ─────────────────────────────────────────────────
